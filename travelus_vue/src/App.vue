@@ -2,9 +2,9 @@
   <div class="font-bmjua">
     <AppHeader />
     <!-- <UserLogin /> -->
-    <!-- <UserRegist /> -->
+    <UserRegist />
     <!-- <MainPage /> -->
-    <TripShare />
+    <!-- <TripShare /> -->
   </div>
 </template>
 

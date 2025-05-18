@@ -1,6 +1,5 @@
 <template>
   <div class="min-h-screen bg-gray-50 py-10 px-6 max-w-7xl mx-auto font-bmjua">
-    <!-- Header -->
     <div class="flex justify-between items-center mb-6">
       <div>
         <h1 class="text-2xl font-bold">여행 계획 공유 게시판</h1>
@@ -9,7 +8,6 @@
       <button class="btn btn-neutral">내 여행 계획 업로드</button>
     </div>
 
-    <!-- Filter & Search -->
     <div class="flex flex-wrap justify-between items-center mb-6 gap-2">
       <div class="tabs tabs-boxed">
         <a class="tab tab-active">전체</a>
@@ -23,16 +21,12 @@
       </div>
     </div>
 
-    <!-- Grid Cards -->
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
       <div
         v-for="plan in travelPlans"
         :key="plan.id"
         class="card bg-white shadow-sm border rounded-xl overflow-hidden"
       >
-        <figure v-if="plan.image">
-          <img :src="plan.image" alt="" class="w-full h-48 object-cover" />
-        </figure>
         <div class="card-body p-4">
           <div class="badge badge-outline mb-1">{{ plan.region }}</div>
           <h2 class="font-semibold text-lg mb-1">{{ plan.title }}</h2>
@@ -47,14 +41,13 @@
             <span>👤 {{ plan.author }}</span>
             <div class="flex items-center gap-2">
               <span>❤️ {{ plan.likes }}</span>
-              <span> {{ plan.views }}</span>
+              <span>👁️ {{ plan.views }}</span>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- 더 보기 버튼 -->
     <div class="mt-10 flex justify-center">
       <button class="btn">더 보기</button>
     </div>
@@ -67,7 +60,7 @@ const travelPlans = [
     id: 1,
     region: '제주도',
     title: '제주도 4박 5일 힐링 여행',
-    tags: ['힐링', '자연', '맛집'],
+    tags: ['#힐링', '자연', '맛집'],
     author: '여행자123',
     likes: 153,
     views: 24,
