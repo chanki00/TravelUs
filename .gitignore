@@ -1,0 +1,68 @@
+# ===============================
+# BACKEND (Spring Boot / Maven)
+# ===============================
+/target/
+*.log
+*.class
+*.jar
+*.war
+*.zip
+*.tar.gz
+*.iml
+
+# Maven Wrapper
+.mvn/wrapper/maven-wrapper.properties
+!mvnw
+!mvnw.cmd
+!.mvn/wrapper/maven-wrapper.jar
+
+# IDEs (Eclipse / IntelliJ / VSCode)
+.idea/
+*.iws
+*.ipr
+.vscode/
+*.sw?
+*.bak
+
+# STS/Eclipse specific
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings/
+.springBeans
+.sts4-cache
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# JVM crash logs
+hs_err_pid*
+replay_pid*
+
+# ===============================
+# FRONTEND (Vue.js - in travelus_vue/)
+# ===============================
+/travelus_vue/node_modules/
+/travelus_vue/dist/
+/travelus_vue/.env.local
+/travelus_vue/.env.*.local
+/travelus_vue/npm-debug.log
+/travelus_vue/yarn-error.log
+/travelus_vue/.cache/
+
+# Optional: editor-related
+/travelus_vue/.vscode/
+/travelus_vue/.idea/
+
+# ===============================
+# EXPLICITLY INCLUDE (Do NOT ignore)
+# ===============================
+!pom.xml
+!mvnw
+!mvnw.cmd
+!travelus_vue/package.json
+!travelus_vue/package-lock.json
+!travelus_vue/src/
+!travelus_vue/public/

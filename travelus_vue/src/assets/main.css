@@ -1,0 +1,8 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: 'BMJUA';
+  src: url('/travelus_vue/public/fonts/BMJUA_ttf.ttf');
+}
