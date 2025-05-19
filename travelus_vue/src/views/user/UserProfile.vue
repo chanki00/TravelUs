@@ -1,6 +1,5 @@
 <template>
   <div class="min-h-screen bg-gray-50">
-    <navbar />
     
     <div class="container py-12 px-6">
       <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
@@ -439,7 +438,6 @@
 <script setup>
 // 여기에 script 로직이 추가될 예정
 import { ref } from 'vue';
-import Navbar from '@/components/common/Navbar.vue';
 import FooterComponent from '@/components/common/Footer.vue';
 
 const activeTab = ref('profile');

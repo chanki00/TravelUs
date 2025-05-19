@@ -1,6 +1,5 @@
 <template>
   <div class="min-h-screen">
-    <navbar />
 
     <div class="py-8 px-6 max-w-7xl mx-auto">
       <div class="flex flex-col md:flex-row justify-between items-start mb-6">
@@ -41,29 +40,6 @@
 </template>
 
 <script setup>
-// 여기에 script 로직이 추가될 예정
-// import { ref } from 'vue';
-// import { useRoute } from 'vue-router';
-// import Navbar from '@/components/common/Navbar.vue';
-// import TripPlannerMap from '@/components/trip/TripPlannerMap.vue';
-// import TripMembers from '@/components/trip/TripMembers.vue';
-// 
-// const route = useRoute();
-// const isChatVisible = ref(true);
-// const answers = route.params.answers || {};
-// 
-// // Mock data
-// const destination = ...;
-// const duration = ...;
-// const mockMembers = [...];
-// const mockPlaces = {...};
-// const chatMessages = [...];
-// const itinerary = [...];
-// 
-// const newMessage = ref('');
-// const messages = ref(chatMessages);
-// 
-// function handleSendMessage() {...}
 </script>
 
 <style scoped>

@@ -1,19 +1,22 @@
 <template>
 
   <div class="font-bmjua">
-      <router-view />
-    <!-- <AppHeader /> -->
+      <!-- <router-view /> -->
+    <AppHeader />
     <!-- <UserLogin /> -->
     <!-- <UserRegist /> -->
     <!-- <MainPage /> -->
     <!-- <TripShare /> -->
+
+    <RouterView />
   </div>
   <!-- <Index/> -->
 </template>
 
 <script setup>
-// import Index from './components/views/index.vue'
-// import AppHeader from './components/fragments/AppHeader.vue'
+import {RouterView} from "vue-router"
+import AppHeader from './components/fragments/AppHeader.vue'
+
 // import UserLogin from './components/user/UserLogin.vue'
 // import UserRegist from './components/user/UserRegist.vue'
 // import MainPage from './components/MainPage.vue'

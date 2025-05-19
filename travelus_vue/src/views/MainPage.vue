@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-screen">
-    <Navbar />
+    <!-- <Navbar /> -->
     <Hero />
     <PopularTrips />
     <!-- <Footer /> -->
@@ -13,7 +13,6 @@
 </template>
 
 <script setup>
-import Navbar from '@/components/common/Navbar.vue';
 import Hero from '@/components/common/Hero.vue';
 import PopularTrips from '@/components/common/PopularTrips.vue';
 // import Footer from '@/components/common/Footers.vue';

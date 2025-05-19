@@ -1,6 +1,5 @@
 <template>
   <div class="min-h-screen flex flex-col">
-    <Navbar />
     
     <div class="flex-1 flex items-center justify-center py-12 px-6">
       <div class="w-full max-w-md">

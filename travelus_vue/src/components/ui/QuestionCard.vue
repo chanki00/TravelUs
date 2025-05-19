@@ -31,18 +31,7 @@
 </template>
 
 <script setup>
-// 여기에 script 로직이 추가될 예정
-// import { ref } from 'vue';
-// const props = defineProps({
-//   question: String,
-//   options: Array,
-//   onSelect: Function,
-//   allowMultiple: Boolean
-// });
-// const selectedOptions = ref([]);
-// 
-// function handleSelectOption(optionId) {...}
-// function handleSubmit() {...}
+
 </script>
 
 <style scoped>

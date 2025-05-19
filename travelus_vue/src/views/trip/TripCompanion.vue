@@ -1,7 +1,6 @@
 
 <template>
   <div class="min-h-screen bg-gray-50">
-    <Navbar />
     
     <div class="container py-12 px-6">
       <h1 class="text-3xl font-bold mb-2">동행 찾기</h1>
@@ -169,94 +168,5 @@
 </template>
 
 <script setup>
-// 여기에 script 로직이 추가될 예정
-// import { ref, reactive, computed, onMounted, watch } from 'vue';
-// import { useCompanionStore } from '@/stores/companion';
-// import Navbar from '@/components/common/Navbar.vue';
-// import Footer from '@/components/common/Footer.vue';
-// import CompanionCard from '@/components/companion/CompanionCard.vue';
-// 
-// const companionStore = useCompanionStore();
-// 
-// // 필터 옵션
-// const travelThemes = [
-//   '맛집 탐방', '자연/힐링', '문화/역사', '쇼핑', '액티비티'
-// ];
-// 
-// const ageGroups = [
-//   '20대', '30대', '40대', '50대 이상'
-// ];
-// 
-// // 상태 관리
-// const companions = ref([]);
-// const isLoading = ref(false);
-// const currentPage = ref(1);
-// const totalPages = ref(1);
-// const itemsPerPage = 9;
-// const sortBy = ref('recent');
-// 
-// const filters = reactive({
-//   destination: '',
-//   startDate: '',
-//   themes: [],
-//   ageGroups: []
-// });
-// 
-// // 필터 적용
-// async function applyFilters() {
-//   currentPage.value = 1;
-//   await fetchCompanions();
-// }
-// 
-// // 정렬 변경 감지
-// watch(sortBy, async () => {
-//   await fetchCompanions();
-// });
-// 
-// // 동행 목록 가져오기
-// async function fetchCompanions() {
-//   isLoading.value = true;
-//   
-//   try {
-//     const result = await companionStore.fetchCompanions({
-//       ...filters,
-//       sort: sortBy.value,
-//       page: currentPage.value,
-//       limit: itemsPerPage
-//     });
-//     
-//     companions.value = result;
-//     
-//     // 실제 구현에서는 API에서 총 페이지 수를 받아와야 함
-//     totalPages.value = Math.ceil(companions.value.length / itemsPerPage);
-//   } catch (error) {
-//     console.error('동행 목록 가져오기 실패:', error);
-//   } finally {
-//     isLoading.value = false;
-//   }
-// }
-// 
-// // 페이지네이션 함수
-// function goToPage(page) {
-//   currentPage.value = page;
-//   fetchCompanions();
-// }
-// 
-// function nextPage() {
-//   if (currentPage.value &lt; totalPages.value) {
-//     currentPage.value++;
-//     fetchCompanions();
-//   }
-// }
-// 
-// function prevPage() {
-//   if (currentPage.value > 1) {
-//     currentPage.value--;
-//     fetchCompanions();
-//   }
-// }
-// 
-// onMounted(async () => {
-//   await fetchCompanions();
-// });
+
 </script>

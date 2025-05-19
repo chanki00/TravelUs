@@ -1,6 +1,5 @@
 <template>
   <div class="min-h-screen bg-gradient-to-b from-blue-50 to-white">
-    <navbar />
 
     <div class="py-12 px-6 max-w-4xl mx-auto">
       <h1 class="text-3xl font-bold text-center mb-2">AI 여행 플래너</h1>
@@ -43,20 +42,7 @@
 
 <script setup>
 // 여기에 script 로직이 추가될 예정
-import { ref, computed } from 'vue';
-import { useRouter } from 'vue-router';
-import Navbar from '@/components/common/Navbar.vue';
-import QuestionCard from '@/components/ui/QuestionCard.vue';
 
-const router = useRouter();
-const currentQuestion = ref(0);
-const answers = ref({});
-
-const questions = []; // 질문 데이터
-
-const currentQuestionData = computed(() => questions[currentQuestion.value]);
-
-function handleSelectAnswer(questionId, selectedOptions) {}
 </script>
 
 <style scoped>

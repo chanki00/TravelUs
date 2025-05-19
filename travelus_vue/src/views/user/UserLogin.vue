@@ -1,6 +1,5 @@
 <template>
   <div class="min-h-screen flex flex-col">
-    <navbar />
     
     <div class="flex-1 flex items-center justify-center py-12 px-6">
       <div class="w-full max-w-md">
@@ -108,30 +107,7 @@
 </template>
 
 <script setup>
-// 여기에 script 로직이 추가될 예정
-// import { ref } from 'vue';
-// import { useRouter } from 'vue-router';
-// import Navbar from '@/components/common/Navbar.vue';
-// import FooterComponent from '@/components/common/Footer.vue';
-// 
-// const router = useRouter();
-// const email = ref('');
-// const password = ref('');
-// const rememberMe = ref(false);
-// const isLoading = ref(false);
-// 
-// async function handleLogin() {
-//   try {
-//     isLoading.value = true;
-//     // 로그인 로직 구현
-//     // await authStore.login(email.value, password.value, rememberMe.value);
-//     // router.push('/');
-//   } catch (error) {
-//     console.error('로그인 실패:', error);
-//   } finally {
-//     isLoading.value = false;
-//   }
-// }
+
 </script>
 
 <style scoped>
