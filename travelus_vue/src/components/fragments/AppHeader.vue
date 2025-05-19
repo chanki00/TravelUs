@@ -10,7 +10,7 @@
       <nav class="hidden md:flex gap-4">
         <RouterLink to="/plan" class="text-m hover:underline">여행 플래너</RouterLink>
         <RouterLink to="/recruit" class="text-m hover:underline">여행 인원 모집</RouterLink>
-        <RouterLink to="/match" class="text-m hover:underline">동행자 찾기</RouterLink>
+        <RouterLink to="/companion" class="text-m hover:underline">동행자 찾기</RouterLink>
         <RouterLink to="/share" class="text-m hover:underline">여행 공유 게시판</RouterLink>
 
       </nav>

@@ -8,6 +8,7 @@ import TripHumanPlan from '@/views/trip/TripHumanPlan.vue'
 import TripRecruit from '@/views/trip/TripRecruit.vue'
 import TripCompanion from '@/views/trip/TripCompanion.vue'
 import TripShare from '@/views/trip/TripShare.vue'
+import AdminDashboard from '@/views/admin/AdminDashboard.vue'
 
 
 const router = createRouter({
@@ -58,6 +59,11 @@ const router = createRouter({
       name: "share",
       component: TripShare
     },
+    {
+      path: "/admin",
+      name: "admin",
+      component: AdminDashboard
+    }
  
   ],
 })
