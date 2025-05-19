@@ -9,7 +9,6 @@ import TripRecruit from '@/views/trip/TripRecruit.vue'
 import TripCompanion from '@/views/trip/TripCompanion.vue'
 import TripShare from '@/views/trip/TripShare.vue'
 import TripPlanSelect from '@/views/trip/TripPlanSelect.vue'
-import TripPlan from '@/views/trip/TripPlan.vue'
 
 
 const router = createRouter({
@@ -64,11 +63,6 @@ const router = createRouter({
       path: "/share",
       name: "share",
       component: TripShare
-    },
-    {
-      path: "/planresult",
-      name: "planresult",
-      component: TripPlan
     },
  
   ],
