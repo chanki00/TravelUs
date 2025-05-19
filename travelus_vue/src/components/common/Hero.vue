@@ -10,7 +10,7 @@
     </p>
 
     <div class="flex gap-4 flex-col sm:flex-row mb-12">
-      <router-link to="/ai-planner">
+      <router-link to="/aiplan">
         <button class="btn-primary">
           AI 여행 시작하기
         </button>

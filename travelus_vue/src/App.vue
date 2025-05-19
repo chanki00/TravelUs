@@ -1,13 +1,12 @@
 <template>
 
   <div class="font-bmjua">
-      <!-- <router-view /> -->
     <AppHeader />
     <!-- <UserLogin /> -->
     <!-- <UserRegist /> -->
     <!-- <MainPage /> -->
     <!-- <TripShare /> -->
-
+    <!-- <TripAiPlan/> -->
     <RouterView />
   </div>
   <!-- <Index/> -->
@@ -16,7 +15,7 @@
 <script setup>
 import {RouterView} from "vue-router"
 import AppHeader from './components/fragments/AppHeader.vue'
-
+// import TripAiPlan from './views/trip/TripAiPlan.vue'
 // import UserLogin from './components/user/UserLogin.vue'
 // import UserRegist from './components/user/UserRegist.vue'
 // import MainPage from './components/MainPage.vue'

@@ -1,26 +1,26 @@
 <template>
-  <div class="w-full max-w-xl mx-auto rounded-lg border bg-card text-card-foreground shadow-sm">
-    <div class="flex flex-col space-y-1.5 p-6">
-      <h3 class="text-xl font-medium text-center">{{ question }}</h3>
-    </div>
-    <div class="p-6 pt-0">
+  <div class="w-full max-w-xl mx-auto bg-white rounded-lg border shadow-sm">
+    <div class="p-6">
+      <h3 class="text-xl font-medium text-center mb-4">{{ question }}</h3>
+      
       <div class="flex flex-wrap gap-3 justify-center mb-6">
         <button
           v-for="option in options"
           :key="option.id"
           :class="[
-            'inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
-            selectedOptions.includes(option.id) 
+            'px-4 py-2 rounded-md transition-colors',
+            isSelected(option.id) 
               ? 'bg-blue-600 text-white' 
-              : 'border border-input bg-background hover:bg-blue-50 hover:text-blue-600'
+              : 'border hover:bg-blue-50 hover:text-blue-600'
           ]"
           @click="handleSelectOption(option.id)"
         >
           {{ option.label }}
         </button>
       </div>
+      
       <button 
-        class="w-full inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2"
+        class="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
         :disabled="selectedOptions.length === 0"
         @click="handleSubmit"
       >
@@ -31,9 +31,52 @@
 </template>
 
 <script setup>
+import { ref } from 'vue'
 
+const props = defineProps({
+  question: {
+    type: String,
+    required: true
+  },
+  options: {
+    type: Array,
+    required: true
+  },
+  allowMultiple: {
+    type: Boolean,
+    default: false
+  }
+})
+
+const emit = defineEmits(['select'])
+
+const selectedOptions = ref([])
+
+const isSelected = (optionId) => {
+  return selectedOptions.value.includes(optionId)
+}
+
+const handleSelectOption = (optionId) => {
+  if (props.allowMultiple) {
+    // Toggle selection for multi-select
+    if (selectedOptions.value.includes(optionId)) {
+      selectedOptions.value = selectedOptions.value.filter(id => id !== optionId)
+    } else {
+      selectedOptions.value.push(optionId)
+    }
+  } else {
+    // Single selection
+    selectedOptions.value = [optionId]
+  }
+}
+
+const handleSubmit = () => {
+  if (selectedOptions.value.length > 0) {
+    emit('select', selectedOptions.value)
+  }
+}
 </script>
 
 <style scoped>
-/* 필요한 스타일 추가 */
+/* 추가 스타일이 필요한 경우 여기에 작성 */
 </style>
