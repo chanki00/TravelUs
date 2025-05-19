@@ -10,6 +10,7 @@ import TripCompanion from '@/views/trip/TripCompanion.vue'
 import TripShare from '@/views/trip/TripShare.vue'
 import TripPlanSelect from '@/views/trip/TripPlanSelect.vue'
 import AdminDashboard from '@/views/admin/AdminDashboard.vue'
+import TripPlan from '@/views/trip/TripPlan.vue'
 
 
 const router = createRouter({
@@ -69,6 +70,11 @@ const router = createRouter({
       path: "/admin",
       name: "admin",
       component: AdminDashboard
+    },
+    {
+      path: "/planresult",
+      name: "planresult",
+      component: TripPlan
     }
   ],
 })
