@@ -23,7 +23,7 @@
 
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
       <div
-        v-for="plan in travelPlans"
+        v-for="plan in tripPlans"
         :key="plan.id"
         class="card bg-white shadow-sm border rounded-xl overflow-hidden"
       >
@@ -55,7 +55,7 @@
 </template>
 
 <script setup>
-const travelPlans = [
+const tripPlans = [
   {
     id: 1,
     region: '제주도',
