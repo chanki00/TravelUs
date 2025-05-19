@@ -2,6 +2,7 @@
 
 # 김찬기 유환태 vue 관통 - Travelus
 
+### [👉🏻코딩 컨벤션 위키](https://lab.DB_PASSWORD_REDACTED.com/rlacksrl00/daejeon_5_13_finalproject_travelus/-/wikis/commit)
 ## 프로젝트 소개
 
 바쁜 현대사회에서 친구들과 여행 일정을 맞추기란 쉽지 않으며, 혼자 여행을 떠나기엔 부담을 느끼는 사람들도 많습니다.
