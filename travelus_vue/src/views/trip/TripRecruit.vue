@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen">
+  <div class="min-h-screen bg-gradient-to-b from-blue-50 to-white">
 
     <div class="py-8 px-6 max-w-7xl mx-auto">
       <h1 class="text-3xl font-bold mb-2">여행 인원 모집</h1>

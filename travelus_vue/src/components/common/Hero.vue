@@ -1,7 +1,7 @@
 <template>
   <div class="hero-gradient py-16 md:py-24 px-6 md:px-12 flex flex-col items-center text-center animate-fade-in">
     <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-      <span class="text-gradient">AI 기반 여행 플래너</span>
+      <span class="text-gradient text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-purple-500 to-violet-600 font-bold ">AI 기반 여행 플래너</span>
       <br />& 동행 매칭 플랫폼
     </h1>
 
@@ -11,12 +11,12 @@
 
     <div class="flex gap-4 flex-col sm:flex-row mb-12">
       <router-link to="/aiplan">
-        <button class="btn-primary">
+        <button class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-xl shadow-md transition duration-300">
           AI 여행 시작하기
         </button>
       </router-link>
       <router-link to="/companion">
-        <button class="btn-secondary">
+        <button class="bg-white hover:bg-gray-100 text-blue-500 font-semibold py-2 px-4 border border-blue-500 rounded-xl shadow-md transition duration-300">
           동행자 찾기
         </button>
       </router-link>

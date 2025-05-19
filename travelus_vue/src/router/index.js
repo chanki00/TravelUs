@@ -11,6 +11,8 @@ import TripShare from '@/views/trip/TripShare.vue'
 import TripPlanSelect from '@/views/trip/TripPlanSelect.vue'
 import AdminDashboard from '@/views/admin/AdminDashboard.vue'
 import TripPlan from '@/views/trip/TripPlan.vue'
+import TripBoard from '@/views/trip/TripBoard.vue'
+import TripDetail from '@/views/trip/TripDetail.vue'
 
 
 const router = createRouter({
@@ -64,7 +66,8 @@ const router = createRouter({
     {
       path: "/share",
       name: "share",
-      component: TripShare
+      // component: TripShare
+      component: TripBoard
     },
     {
       path: "/admin",
@@ -75,7 +78,12 @@ const router = createRouter({
       path: "/planresult",
       name: "planresult",
       component: TripPlan
-    }
+    },
+    {
+    path: '/tripdetail/:id',
+    name: 'TripDetail',
+    component : TripDetail
+  },
   ],
 })
 

@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen">
+  <div class="min-h-screen bg-gradient-to-b from-blue-50 to-white">
     <!-- <Navbar /> -->
     <Hero />
     <PopularTrips />
