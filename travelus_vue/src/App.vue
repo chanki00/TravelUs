@@ -1,19 +1,25 @@
 <template>
+
   <div class="font-bmjua">
-    <AppHeader />
+      <router-view />
+    <!-- <AppHeader /> -->
     <!-- <UserLogin /> -->
-    <UserRegist />
+    <!-- <UserRegist /> -->
     <!-- <MainPage /> -->
     <!-- <TripShare /> -->
   </div>
+  <!-- <Index/> -->
 </template>
 
 <script setup>
-import AppHeader from './components/fragments/AppHeader.vue'
-import UserLogin from './components/user/UserLogin.vue'
-import UserRegist from './components/user/UserRegist.vue'
-import MainPage from './components/MainPage.vue'
-import TripShare from './components/trip/TripShare.vue'
+// import Index from './components/views/index.vue'
+// import AppHeader from './components/fragments/AppHeader.vue'
+// import UserLogin from './components/user/UserLogin.vue'
+// import UserRegist from './components/user/UserRegist.vue'
+// import MainPage from './components/MainPage.vue'
+// import TripShare from './components/trip/TripShare.vue'
 </script>
 
-<style scoped></style>
+<style scoped>
+@import './assets/main.css';
+</style>
