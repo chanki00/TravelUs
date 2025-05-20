@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.DB_PASSWORD_REDACTED.trip.repository.TripRepository">
+
+    <resultMap id="sidoResultMap" type="Sidos">
+        <id property="no" column="no" />
+        <result property="sidoCode" column="sido_code" />
+        <result property="sidoName" column="sido_name" />
+    </resultMap>
+
+    <select id="getAllSidos" resultMap="sidoResultMap">
+        SELECT * FROM sidos
+    </select>
+
+    <select id="getSidoByCode" resultMap="sidoResultMap" parameterType="int">
+        SELECT * FROM sidos WHERE sido_code = #{sidoCode}
+        
+    </select>
+	    <resultMap id="gugunResultMap" type="Guguns">
+        <id property="no" column="no" />
+        <result property="sidoCode" column="sido_code" />
+        <result property="gugunCode" column="gugun_code" />
+        <result property="gugunName" column="gugun_name" />
+    </resultMap>
+
+    <select id="getGugunsBySidoCode" resultMap="gugunResultMap" parameterType="int">
+        SELECT * FROM guguns WHERE sido_code = #{sidoCode}
+    </select>
+	
+	<resultMap id="contentResultMap" type="contentTypes">
+        <result property="id" column="content_type_id" />
+        <result property="name" column="content_type_name" />
+    </resultMap>
+	
+	<select id="getContentTypes" resultMap="contentResultMap">
+		select * FROM contenttypes
+	</select>
+	
+	<resultMap type="contentData" id="contentDataMap">
+		<result property="y" column="latitude" />
+        <result property="x" column="longitude" />
+        <result property="placeName" column="title" />
+	</resultMap>
+	
+	<select id="contentSearch" resultMap="contentDataMap">
+		select latitude, longitude, title from attractions 
+		where content_type_id=#{content} and area_code=#{sido} and si_gun_gu_code=#{gugun};
+	</select>
+</mapper>
