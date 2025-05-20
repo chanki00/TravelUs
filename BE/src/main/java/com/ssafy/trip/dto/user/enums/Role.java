@@ -18,9 +18,4 @@ public enum Role {
 			throw new RuntimeException("해당하는 권한이 없습니다." + value);
 		}
 	}
-
-	@Override
-	public String toString() {
-		return label;
-	}
 }

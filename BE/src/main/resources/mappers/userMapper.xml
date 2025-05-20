@@ -3,6 +3,7 @@
   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.DB_PASSWORD_REDACTED.trip.repository.UserRepository">
+<!-- TODO: db 컬럼명이랑 객체 변수명 매핑하는 map 만들어야 함 -->
 	<insert id="insertUser" parameterType="UserDto" useGeneratedKeys="true" keyProperty="id">
 		INSERT INTO users (user_id, user_pw, user_email, name, age, gender, address) 
 		VALUES (#{userId}, #{userPw}, #{userEmail}, #{name}, #{age}, #{gender}, #{address})
