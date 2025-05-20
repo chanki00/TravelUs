@@ -1,6 +1,5 @@
 <template>
-  <div class="min-h-screen  bg-gradient-to-b from-blue-50 to-white">
-
+  <div class="min-h-screen bg-gradient-to-b from-blue-50 to-white">
     <div class="py-8 px-6 max-w-7xl mx-auto">
       <h1 class="text-3xl font-bold mb-2">여행 플래너</h1>
       <p class="text-gray-600 mb-8">나만의 맞춤형 여행 계획을 직접 만들어보세요</p>
@@ -12,13 +11,19 @@
 
             <div class="space-y-4">
               <div>
-                <label for="destination" class="block text-sm font-medium text-gray-700 mb-1">여행지</label>
-                <input 
-                  id="destination" 
+                <label for="destination" class="block text-sm font-medium text-gray-700 mb-1"
+                  >여행지</label
+                >
+                <select
+                  id="destination"
                   v-model="destination"
-                  placeholder="여행지를 입력하세요" 
                   class="w-full px-3 py-2 border rounded-md"
-                />
+                >
+                  <option disabled value="">시/도를 선택하세요</option>
+                  <option v-for="sido in sidos" :key="sido.sidoCode" :value="sido.sidoCode">
+                    {{ sido.sidoName }}
+                  </option>
+                </select>
               </div>
 
               <!-- <div>
@@ -32,9 +37,11 @@
               </div> -->
 
               <div>
-                <label for="duration" class="block text-sm font-medium text-gray-700 mb-1">여행 일수</label>
-                <select 
-                  id="duration" 
+                <label for="duration" class="block text-sm font-medium text-gray-700 mb-1"
+                  >여행 일수</label
+                >
+                <select
+                  id="duration"
                   v-model="selectedDays"
                   class="w-full px-3 py-2 border rounded-md"
                 >
@@ -43,21 +50,25 @@
               </div>
 
               <div>
-                <label for="travelers" class="block text-sm font-medium text-gray-700 mb-1">여행 인원</label>
-                <input 
-                  id="travelers" 
-                  type="number" 
-                  min="1" 
+                <label for="travelers" class="block text-sm font-medium text-gray-700 mb-1"
+                  >여행 인원</label
+                >
+                <input
+                  id="travelers"
+                  type="number"
+                  min="1"
                   v-model="travelers"
-                  placeholder="인원수를 입력하세요" 
+                  placeholder="인원수를 입력하세요"
                   class="w-full px-3 py-2 border rounded-md"
                 />
               </div>
 
               <div>
-                <label for="transportation" class="block text-sm font-medium text-gray-700 mb-1">주요 이동 수단</label>
-                <select 
-                  id="transportation" 
+                <label for="transportation" class="block text-sm font-medium text-gray-700 mb-1"
+                  >주요 이동 수단</label
+                >
+                <select
+                  id="transportation"
                   v-model="transportation"
                   class="w-full px-3 py-2 border rounded-md"
                 >
@@ -68,14 +79,13 @@
                 </select>
               </div>
               <RouterLink to="/planresult">
-                 <button 
-                class="w-full mt-4 py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-md flex items-center justify-center"
-                @click="createPlan"
-              >
-                여행 계획 생성 <arrow-right-icon class="ml-2 h-4 w-4" />
-              </button>
+                <button
+                  class="w-full mt-4 py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-md flex items-center justify-center"
+                  @click="createPlan"
+                >
+                  여행 계획 생성 <arrow-right-icon class="ml-2 h-4 w-4" />
+                </button>
               </RouterLink>
-             
             </div>
           </div>
         </div>
@@ -85,10 +95,10 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { RouterLink, useRouter} from "vue-router"
+import { ref, onMounted } from 'vue'
+import { RouterLink, useRouter } from 'vue-router'
 
-import api from '@/api'; 
+import api from '@/api'
 
 const router = useRouter()
 const destination = ref('')
@@ -98,16 +108,27 @@ const travelers = ref(1)
 const transportation = ref('car')
 const days = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
+const sidos = ref([])
+
+onMounted(async () => {
+  try {
+    const response = await api.get('/api/v1/sidos')
+    sidos.value = response.data
+  } catch (error) {
+    console.error('시도 목록 조회 실패:', error)
+  }
+})
+
 const createPlan = async () => {
   try {
     const response = await api.post('/api/v1/plan', {
       destination: destination.value,
       duration: selectedDays.value,
       members: travelers.value,
-      transport: transportation.value
+      transport: transportation.value,
     })
-    router.push('/planresult') // 회원가입 성공 후 로그인 페이지로 이동
-
+    const planId = response.data
+    router.push(`/planresult/${planId}`)
   } catch (error) {
     console.error(error)
   }

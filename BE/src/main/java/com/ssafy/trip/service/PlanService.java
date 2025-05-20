@@ -5,6 +5,7 @@ import java.util.Iterator;
 import org.springframework.stereotype.Service;
 
 import com.DB_PASSWORD_REDACTED.trip.dto.BasicPlanDTO;
+import com.DB_PASSWORD_REDACTED.trip.dto.Tripplan;
 import com.DB_PASSWORD_REDACTED.trip.repository.PlanRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -30,5 +31,9 @@ public class PlanService {
 			repo.insertDay(dto.getId(), day);
 		}
 	}
+
+	public Tripplan getTripplanById(int planId) {
+        return repo.selectTripplanById(planId);
+    }
 
 }

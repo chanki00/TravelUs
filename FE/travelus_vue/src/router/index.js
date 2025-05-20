@@ -14,76 +14,75 @@ import TripPlan from '@/views/trip/TripPlan.vue'
 import TripBoard from '@/views/trip/TripBoard.vue'
 import TripDetail from '@/views/trip/TripDetail.vue'
 
-
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-  {
-    path: '/login',
-    name: 'login',
-    component: UserLogin
-  },
-  {
-    path: '/regist',
-    name: 'regist',
-    component: UserRegist
-  },
-  {
-    path: '/profile',
-    name: 'profile',
-    component: UserProfile
-  },
+    {
+      path: '/login',
+      name: 'login',
+      component: UserLogin,
+    },
+    {
+      path: '/regist',
+      name: 'regist',
+      component: UserRegist,
+    },
+    {
+      path: '/profile',
+      name: 'profile',
+      component: UserProfile,
+    },
     {
       path: '/',
       name: 'main',
-      component: MainPage
+      component: MainPage,
     },
     {
-        path: "/plan",
-        name: "planSelect",
-        component: TripPlanSelect
+      path: '/plan',
+      name: 'planSelect',
+      component: TripPlanSelect,
     },
     {
-        path: "/aiplan",
-        name: "aiplan",
-        component: TripAiPlan
+      path: '/aiplan',
+      name: 'aiplan',
+      component: TripAiPlan,
     },
     {
-        path: "/humanplan",
-        name: "humanplan",
-        component: TripHumanPlan
+      path: '/humanplan',
+      name: 'humanplan',
+      component: TripHumanPlan,
     },
     {
-        path: "/recruit",
-        name: "recruit",
-        component: TripRecruit
+      path: '/recruit',
+      name: 'recruit',
+      component: TripRecruit,
     },
     {
-        path: "/companion",
-        name: "companion",
-        component: TripCompanion
+      path: '/companion',
+      name: 'companion',
+      component: TripCompanion,
     },
     {
-      path: "/share",
-      name: "share",
+      path: '/share',
+      name: 'share',
       // component: TripShare
-      component: TripBoard
+      component: TripBoard,
     },
     {
-      path: "/admin",
-      name: "admin",
-      component: AdminDashboard
+      path: '/admin',
+      name: 'admin',
+      component: AdminDashboard,
     },
     {
-      path: "/planresult",
-      name: "planresult",
-      component: TripPlan
+      path: '/planresult/:planId',
+      name: 'PlanResult',
+      component: TripPlan,
     },
     {
-    path: '/tripdetail/:id',
-    name: 'TripDetail',
-    component : TripDetail
-  },
+      path: '/tripdetail/:id',
+      name: 'TripDetail',
+      component: TripDetail,
+    },
   ],
 })
 

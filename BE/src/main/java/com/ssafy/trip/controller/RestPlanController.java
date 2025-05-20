@@ -2,12 +2,15 @@ package com.DB_PASSWORD_REDACTED.trip.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.DB_PASSWORD_REDACTED.trip.dto.BasicPlanDTO;
+import com.DB_PASSWORD_REDACTED.trip.dto.Tripplan;
 import com.DB_PASSWORD_REDACTED.trip.service.PlanService;
 
 import lombok.RequiredArgsConstructor;
@@ -23,10 +26,19 @@ public class RestPlanController {
 	public ResponseEntity<?> createPlan(@RequestBody BasicPlanDTO dto){
 		  try {
 		        int res = service.insert(dto);
-		        return ResponseEntity.ok("Insert successful");
+		        return ResponseEntity.ok(dto.getId());
 		    } catch (Exception e) {
 		        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Insert failed: " + e.getMessage());
 		    }
 	}
+	
+	@GetMapping("/{planId}")
+	 public ResponseEntity<Tripplan> getTripplan(@PathVariable int planId) {
+        Tripplan tripplan = service.getTripplanById(planId);
+        if (tripplan == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(tripplan);
+    }
 	
 }

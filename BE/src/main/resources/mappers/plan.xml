@@ -13,4 +13,27 @@
     INSERT INTO TripPlanDays (plan_id, day_number)
     VALUES (#{plan_id}, #{day_number})
 	</insert>
+	
+	<select id="selectTripplanById" parameterType="int" resultMap="TripplanResultMap">
+  SELECT * FROM TripPlans WHERE id = #{planId}
+</select>
+	
+	<resultMap id="TripplanResultMap" type="com.DB_PASSWORD_REDACTED.trip.dto.Tripplan">
+	  <result property="userId" column="user_id"/>
+	  <result property="title" column="title"/>
+	  <result property="description" column="description"/>
+	  <result property="likes" column="likes"/>
+	  <result property="shares" column="shares"/>
+	  <result property="createdAt" column="created_at"/>
+	  <result property="updatedAt" column="updated_at"/>
+	  <association property="basicplan" javaType="com.DB_PASSWORD_REDACTED.trip.dto.BasicPlanDTO">
+	    <id property="id" column="id" />
+	    <result property="destination" column="destination"/>
+	    <result property="duration" column="duration"/>
+	    <result property="members" column="members"/>
+	    <result property="transport" column="transport"/>
+	  </association>
+</resultMap>
+
+
 </mapper>

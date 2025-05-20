@@ -6,42 +6,46 @@
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center">
           <div class="flex-1">
             <div class="flex items-center gap-2 mb-2">
-              <input 
-                v-if="isEditingTitle" 
-                v-model="editedTitle" 
+              <input
+                v-if="isEditingTitle"
+                v-model="editedTitle"
                 @blur="saveTitle"
                 @keyup.enter="saveTitle"
                 class="text-3xl font-bold w-full border-b border-blue-500 focus:outline-none bg-blue-50 px-2 py-1 rounded"
                 ref="titleInput"
                 placeholder="여행 제목을 입력하세요"
               />
-              <h1 
-                v-else 
-                class="text-3xl font-bold cursor-pointer group flex items-center" 
+              <h1
+                v-else
+                class="text-3xl font-bold cursor-pointer group flex items-center"
                 @click="startEditingTitle"
               >
                 {{ title }}
-                <pencil-icon class="h-5 w-5 ml-2 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <pencil-icon
+                  class="h-5 w-5 ml-2 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity"
+                />
               </h1>
             </div>
-            
+
             <div class="flex items-start gap-2">
-              <textarea 
-                v-if="isEditingDescription" 
-                v-model="editedDescription" 
+              <textarea
+                v-if="isEditingDescription"
+                v-model="editedDescription"
                 @blur="saveDescription"
                 class="text-gray-500 w-full border border-blue-500 focus:outline-none bg-blue-50 px-2 py-1 rounded resize-none"
                 rows="2"
                 ref="descriptionTextarea"
                 placeholder="여행 계획에 대한 설명을 입력하세요"
               ></textarea>
-              <p 
-                v-else 
-                class="text-gray-500 cursor-pointer group flex items-start" 
+              <p
+                v-else
+                class="text-gray-500 cursor-pointer group flex items-start"
                 @click="startEditingDescription"
               >
                 {{ description }}
-                <pencil-icon class="h-4 w-4 ml-1 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity mt-0.5" />
+                <pencil-icon
+                  class="h-4 w-4 ml-1 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity mt-0.5"
+                />
               </p>
             </div>
           </div>
@@ -50,7 +54,9 @@
             <TripMembers :members="mockMembers" />
             <button class="px-4 py-2 border rounded-md hover:bg-gray-50">일정 저장</button>
             <button class="px-4 py-2 border rounded-md hover:bg-gray-50">공유하기</button>
-            <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">일정 수정</button>
+            <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+              일정 수정
+            </button>
           </div>
         </div>
       </div>
@@ -60,16 +66,13 @@
     <main class="flex-1 overflow-hidden">
       <div class="h-full flex">
         <!-- 장소 검색 패널 -->
-        <div class="w-1/5 p-4 border-r h-full overflow-hidden">
-          <TripSearch @add-to-itinerary="addToItinerary" />
+        <div class="w-1/5 p-4 border-r h-full overflow-hidden flex flex-col">
+          <TripSearch :destination="destination" @add-to-itinerary="addToItinerary" />
         </div>
 
         <!-- 일정 목록 -->
         <div class="w-1/5 p-4 border-r h-full overflow-hidden">
-          <TripItinerary 
-            :itinerary="itinerary" 
-            @remove-item="removeFromItinerary"
-          />
+          <TripItinerary :itinerary="itinerary" @remove-item="removeFromItinerary" />
         </div>
 
         <!-- 지도 -->
@@ -87,20 +90,23 @@
 </template>
 
 <script setup>
-import { ref, nextTick } from 'vue'
+import { ref, nextTick, onMounted } from 'vue'
 import TripPlannerMap from '@/components/trip/TripPlannerMap.vue'
 import TripMembers from '@/components/trip/TripMembers.vue'
 import TripSearch from '@/components/trip/TripSearch.vue'
 import TripItinerary from '@/components/trip/TripItinerary.vue'
 import TripChat from '@/components/trip/TripChat.vue'
 import { Pencil as PencilIcon } from 'lucide-vue-next'
+import { useRoute } from 'vue-router'
+import api from '@/api'
 
-// 목업 데이터
-const destination = '제주도'
+const route = useRoute()
+const planId = route.params.planId
+const destination = ref(null)
 const duration = '3박 4일'
 
 // 제목 및 설명 편집 관련 상태
-const title = ref(`${destination} ${duration} 여행 계획`)
+const title = ref(` ${duration} 여행 계획`)
 const description = ref('여행 계획을 확인하고 참여자들과 의견을 나눠보세요')
 const isEditingTitle = ref(false)
 const isEditingDescription = ref(false)
@@ -108,6 +114,15 @@ const editedTitle = ref('')
 const editedDescription = ref('')
 const titleInput = ref(null)
 const descriptionTextarea = ref(null)
+
+onMounted(async () => {
+  try {
+    const response = await api.get(`/api/v1/plan/${planId}`)
+    destination.value = response.data.basicplan.destination
+  } catch (error) {
+    console.error('Error fetching plan:', error)
+  }
+})
 
 // 제목 편집 시작
 const startEditingTitle = () => {
@@ -145,25 +160,25 @@ const saveDescription = () => {
 
 const mockMembers = [
   {
-    id: "1",
-    name: "여행좋아",
-    role: "호스트",
-    status: "online",
-    image: "https://i.pravatar.cc/150?img=1",
+    id: '1',
+    name: '여행좋아',
+    role: '호스트',
+    status: 'online',
+    image: 'https://i.pravatar.cc/150?img=1',
   },
   {
-    id: "2",
-    name: "산타클로스",
-    role: "참여자",
-    status: "online",
-    image: "https://i.pravatar.cc/150?img=2",
+    id: '2',
+    name: '산타클로스',
+    role: '참여자',
+    status: 'online',
+    image: 'https://i.pravatar.cc/150?img=2',
   },
   {
-    id: "3",
-    name: "맛집탐방러",
-    role: "참여자",
-    status: "offline",
-    image: "https://i.pravatar.cc/150?img=3",
+    id: '3',
+    name: '맛집탐방러',
+    role: '참여자',
+    status: 'offline',
+    image: 'https://i.pravatar.cc/150?img=3',
   },
 ]
 
@@ -171,15 +186,15 @@ const mockMembers = [
 const itinerary = ref([
   {
     day: 1,
-    items: []
+    items: [],
   },
   {
     day: 2,
-    items: []
+    items: [],
   },
   {
     day: 3,
-    items: []
+    items: [],
   },
 ])
 

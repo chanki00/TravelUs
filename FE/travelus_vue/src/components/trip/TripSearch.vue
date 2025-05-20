@@ -1,13 +1,13 @@
 <template>
   <div class="h-full flex flex-col">
-    <!-- Tab navigation -->
+    <!-- Tab navigation - 고정 영역 -->
     <div class="flex border-b">
-      <button 
-        v-for="(label, tab) in tabLabels" 
+      <button
+        v-for="(label, tab) in tabLabels"
         :key="tab"
         :class="[
           'flex-1 py-2 px-4 text-center',
-          activeTab === tab ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-500'
+          activeTab === tab ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-500',
         ]"
         @click="activeTab = tab"
       >
@@ -15,39 +15,61 @@
       </button>
     </div>
 
-    <!-- Search area -->
-    <div class="mt-4 flex-1 flex flex-col">
+    <!-- Search input - 고정 영역 -->
+    <div class="mt-4">
       <div class="flex items-center gap-2 mb-4">
         <div class="flex-1 relative">
-          <input 
-            type="text" 
-            placeholder="장소 검색하기" 
+          <input
+            type="text"
+            placeholder="장소 검색하기"
             class="w-full px-3 py-2 pl-10 border rounded-md"
           />
           <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="lucide lucide-search"
+            >
               <circle cx="11" cy="11" r="8"></circle>
               <path d="m21 21-4.3-4.3"></path>
             </svg>
           </span>
         </div>
-        <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
+        <button
+          class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+        >
           검색
         </button>
       </div>
+    </div>
 
-      <!-- Results area - scrollable -->
-      <div class="flex-1 overflow-y-auto pr-2 custom-scrollbar space-y-3">
-        <div 
-          v-if="activeTab === 'attractions'"
-          v-for="place in mockPlaces.attractions" 
-          :key="place.id"
+    <!-- Loading indicator for initial load -->
+    <div v-if="isLoading" class="flex justify-center items-center py-8">
+      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+    </div>
+
+    <!-- Results area - 스크롤 영역 -->
+    <div ref="scrollContainer" class="mt-2 flex-1 overflow-auto custom-scrollbar">
+      <div v-if="!isLoading && visiblePlaces.length === 0" class="text-center py-8 text-gray-500">
+        검색 결과가 없습니다.
+      </div>
+      <div v-else-if="!isLoading" class="space-y-3 pr-2">
+        <div
+          v-for="place in visiblePlaces"
+          :key="place.contentId"
           class="border rounded-md p-3 flex items-center gap-3 cursor-pointer hover:border-blue-200 transition-colors"
         >
           <div class="flex-1 flex items-center gap-3" @click="showPlaceDetail(place)">
             <img :src="place.image" :alt="place.name" class="w-16 h-16 object-cover rounded-md" />
             <div>
-              <h4 class="font-medium">{{ place.name }}</h4>
+              <h4 class="font-medium">{{ place.title }}</h4>
               <div class="flex items-center gap-1 text-sm text-gray-500">
                 <span>{{ place.category }}</span>
                 <span>•</span>
@@ -55,8 +77,8 @@
               </div>
             </div>
           </div>
-          <button 
-            @click="addToItinerary(place)" 
+          <button
+            @click="addToItinerary(place)"
             class="p-2 text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
             title="일정에 추가"
           >
@@ -64,63 +86,24 @@
           </button>
         </div>
 
-        <div 
-          v-if="activeTab === 'restaurants'"
-          v-for="place in mockPlaces.restaurants" 
-          :key="place.id"
-          class="border rounded-md p-3 flex items-center gap-3 cursor-pointer hover:border-blue-200 transition-colors"
-        >
-          <div class="flex-1 flex items-center gap-3" @click="showPlaceDetail(place)">
-            <img :src="place.image" :alt="place.name" class="w-16 h-16 object-cover rounded-md" />
-            <div>
-              <h4 class="font-medium">{{ place.name }}</h4>
-              <div class="flex items-center gap-1 text-sm text-gray-500">
-                <span>{{ place.category }}</span>
-                <span>•</span>
-                <span>★ {{ place.rating }}</span>
-              </div>
-            </div>
+        <!-- 스크롤 감지를 위한 요소 -->
+        <div ref="loadMoreTrigger" class="h-20 flex justify-center items-center my-2">
+          <div
+            v-if="isLoadingMore"
+            class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"
+          ></div>
+          <div v-else-if="visibleCount < getTotalCount" class="text-sm text-gray-400">
+            스크롤하여 더 보기
           </div>
-          <button 
-            @click="addToItinerary(place)" 
-            class="p-2 text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
-            title="일정에 추가"
-          >
-            <plus-icon class="h-5 w-5" />
-          </button>
-        </div>
-        <div 
-          v-if="activeTab === 'accommodations'"
-          v-for="place in mockPlaces.accommodations" 
-          :key="place.id"
-          class="border rounded-md p-3 flex items-center gap-3 cursor-pointer hover:border-blue-200 transition-colors"
-        >
-          <div class="flex-1 flex items-center gap-3" @click="showPlaceDetail(place)">
-            <img :src="place.image" :alt="place.name" class="w-16 h-16 object-cover rounded-md" />
-            <div>
-              <h4 class="font-medium">{{ place.name }}</h4>
-              <div class="flex items-center gap-1 text-sm text-gray-500">
-                <span>{{ place.category }}</span>
-                <span>•</span>
-                <span>★ {{ place.rating }}</span>
-              </div>
-            </div>
-          </div>
-          <button 
-            @click="addToItinerary(place)" 
-            class="p-2 text-blue-600 hover:bg-blue-50 rounded-full transition-colors"
-            title="일정에 추가"
-          >
-            <plus-icon class="h-5 w-5" />
-          </button>
+          <div v-else class="text-sm text-gray-400">모든 항목을 불러왔습니다</div>
         </div>
       </div>
     </div>
 
     <!-- Place Detail Modal -->
-    <PlaceDetailModal 
-      v-if="selectedPlace" 
-      :place="selectedPlace" 
+    <PlaceDetailModal
+      v-if="selectedPlace"
+      :place="selectedPlace"
       @close="selectedPlace = null"
       @add-to-itinerary="addToItinerary(selectedPlace)"
     />
@@ -128,174 +111,222 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, watch, computed, onBeforeUnmount, nextTick } from 'vue'
+import api from '@/api'
 import { Plus as PlusIcon } from 'lucide-vue-next'
 import PlaceDetailModal from './PlaceDetailModal.vue'
+import { defineProps, defineEmits } from 'vue'
+
+const props = defineProps({
+  destination: {
+    type: Number,
+  },
+})
 
 const activeTab = ref('attractions')
+const isLoading = ref(false)
+const isLoadingMore = ref(false)
 const selectedPlace = ref(null)
-
 const emit = defineEmits(['add-to-itinerary'])
+const scrollContainer = ref(null)
+const loadMoreTrigger = ref(null)
 
-// 탭 레이블
 const tabLabels = {
   attractions: '명소',
   restaurants: '식당',
-  accommodations: '숙소'
+  accommodations: '숙소',
 }
 
-const mockPlaces = {
-  attractions: [
-    {
-      id: "attr1",
-      name: "유명한 명소",
-      category: "관광지",
-      rating: 4.8,
-      image: "https://images.unsplash.com/photo-1533929736458-ca588d08c8be?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80",
-      description: "이 유명한 명소는 많은 관광객들이 찾는 곳으로, 아름다운 경치와 역사적인 가치를 지니고 있습니다.",
-      address: "제주특별자치도 제주시 첨단로 242",
-      hours: "09:00 - 18:00 (매일)",
-      phone: "064-123-4567",
-      website: "https://example.com",
-    },
-    {
-      id: "attr2",
-      name: "역사적인 장소",
-      category: "역사",
-      rating: 4.6,
-      image: "https://images.unsplash.com/photo-1526815456940-2c11653292a2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80",
-      description: "오랜 역사를 간직한 이 장소는 문화재로 지정되어 있으며, 한국의 전통 건축양식을 볼 수 있습니다.",
-      address: "제주특별자치도 서귀포시 중문관광로 224",
-      hours: "09:00 - 17:00 (월요일 휴무)",
-      phone: "064-234-5678",
-      website: "https://example.com",
-    },
-    {
-      id: "attr3",
-      name: "아름다운 공원",
-      category: "자연",
-      rating: 4.5,
-      image: "https://images.unsplash.com/photo-1519331379826-f10be5486c6f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80",
-      description: "울창한 숲과 다양한 식물들이 있는 이 공원은 휴식과 산책을 즐기기에 완벽한 장소입니다.",
-      address: "제주특별자치도 제주시 노형동 2565",
-      hours: "항상 개방",
-      phone: "064-345-6789",
-      website: "https://example.com",
-    },
-  ],
-  restaurants: [
-    {
-      id: "rest1",
-      name: "맛있는 식당 1",
-      category: "한식",
-      rating: 4.5,
-      image: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80",
-      description: "제주도의 신선한 해산물을 사용한 전통 한식을 맛볼 수 있는 곳입니다.",
-      address: "제주특별자치도 제주시 연동 312-1",
-      hours: "11:00 - 22:00 (매일)",
-      phone: "064-456-7890",
-      website: "https://example.com",
-      menu: ["해물탕 - 45,000원", "고등어구이 - 18,000원", "전복죽 - 15,000원"]
-    },
-    {
-      id: "rest2",
-      name: "좋은 레스토랑",
-      category: "양식",
-      rating: 4.2,
-      image: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80",
-      description: "제주도에서 맛볼 수 있는 최고의 양식 레스토랑으로, 현지 식재료를 활용한 창의적인 요리를 선보입니다.",
-      address: "제주특별자치도 서귀포시 색달동 2812-4",
-      hours: "17:00 - 23:00 (월요일 휴무)",
-      phone: "064-567-8901",
-      website: "https://example.com",
-      menu: ["스테이크 - 38,000원", "파스타 - 22,000원", "샐러드 - 15,000원"]
-    },
-    {
-      id: "rest3",
-      name: "로컬 맛집",
-      category: "분식",
-      rating: 4.7,
-      image: "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80",
-      description: "현지인들이 자주 찾는 분식점으로, 푸짐한 양과 합리적인 가격이 특징입니다.",
-      address: "제주특별자치도 제주시 일도2동 991-21",
-      hours: "10:00 - 20:00 (일요일 휴무)",
-      phone: "064-678-9012",
-      website: "https://example.com",
-      menu: ["떡볶이 - 5,000원", "김밥 - 3,500원", "라면 - 4,000원"]
-    },
-  ],
- 
-  accommodations: [
-    {
-      id: "acc1",
-      name: "좋은 호텔",
-      category: "호텔",
-      rating: 4.3,
-      image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80",
-      description: "제주도의 아름다운 해변 근처에 위치한 고급 호텔입니다. 수영장과 스파 시설을 갖추고 있습니다.",
-      address: "제주특별자치도 서귀포시 중문관광로 332-2",
-      checkIn: "15:00",
-      checkOut: "11:00",
-      phone: "064-901-2345",
-      website: "https://example.com",
-      amenities: ["수영장", "스파", "레스토랑", "무료 와이파이", "주차장"]
-    },
-    {
-      id: "acc2",
-      name: "아늑한 펜션",
-      category: "펜션",
-      rating: 4.5,
-      image: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=200&q=80",
-      description: "자연 속에 위치한 아늑한 펜션으로, 바베큐 시설과 정원이 있습니다.",
-      address: "제주특별자치도 제주시 애월읍 애월해안로 940",
-      checkIn: "14:00",
-      checkOut: "12:00",
-      phone: "064-012-3456",
-      website: "https://example.com",
-      amenities: ["바베큐 시설", "정원", "무료 와이파이", "주방", "주차장"]
-    },
-  ],
-}
+const rawPlaces = ref([])
+const filteredPlaces = ref({
+  attractions: [],
+  restaurants: [],
+  accommodations: [],
+})
 
-// 장소 상세 정보 표시
+// 무한 스크롤 관련
+const visibleCount = ref(10)
+const pageSize = 10
+
+const visiblePlaces = computed(() => {
+  const list = filteredPlaces.value[activeTab.value] || []
+  return list.slice(0, visibleCount.value)
+})
+
+// 탭 바뀔 때마다 보여줄 개수 초기화
+watch(activeTab, () => {
+  visibleCount.value = 10
+  // 탭 변경 시 스크롤 맨 위로
+  if (scrollContainer.value) {
+    scrollContainer.value.scrollTop = 0
+  }
+  // 탭 변경 후 스크롤 감지 재설정
+  nextTick(() => {
+    setupScrollDetection()
+  })
+})
+
+// 데이터 로딩
+const fetchAttractions = async () => {
+  try {
+    isLoading.value = true
+    const res = await api.get(`/api/v1/attractions/${props.destination}`)
+    rawPlaces.value = res.data
+    console.log(props.destination)
+    filteredPlaces.value.attractions = rawPlaces.value.filter((p) => p.contentTypeId === 12)
+    filteredPlaces.value.restaurants = rawPlaces.value.filter((p) => p.contentTypeId === 39)
+    filteredPlaces.value.accommodations = rawPlaces.value.filter((p) => p.contentTypeId === 32)
+  } catch (err) {
+    console.error('명소 데이터를 불러오는 데 실패했습니다:', err)
+  } finally {
+    isLoading.value = false
+    // 데이터 로딩 후 스크롤 감지 설정
+    nextTick(() => {
+      setupScrollDetection()
+    })
+  }
+}
+// destination 변경 시 재요청
+// watch(() => props.destination, fetchAttractions, { immediate: true })
+
+// 장소 상세
 const showPlaceDetail = (place) => {
   selectedPlace.value = place
 }
 
-// 일정에 장소 추가
+// 일정 추가
 const addToItinerary = (place) => {
   emit('add-to-itinerary', {
-    id: place.id,
-    title: place.name,
-    type: place.category,
+    id: place.id ?? place.contentId,
+    title: place.name ?? place.title,
+    type: place.category ?? '',
     time: new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' }),
-    image: place.image,
-    placeData: place
+    image: place.image ?? '',
+    placeData: place,
   })
 }
+
+// 스크롤 이벤트 리스너
+const handleScroll = () => {
+  if (!scrollContainer.value || !loadMoreTrigger.value || isLoadingMore.value) return
+
+  const containerRect = scrollContainer.value.getBoundingClientRect()
+  const triggerRect = loadMoreTrigger.value.getBoundingClientRect()
+
+  // 트리거 요소가 컨테이너 내에 보이는지 확인
+  if (triggerRect.top <= containerRect.bottom + 100) {
+    loadMore()
+  }
+}
+
+// IntersectionObserver 설정
+let observer = null
+
+const setupScrollDetection = () => {
+  // 기존 observer 제거
+  if (observer) {
+    observer.disconnect()
+  }
+
+  // 스크롤 이벤트 리스너 설정
+  if (scrollContainer.value) {
+    scrollContainer.value.addEventListener('scroll', handleScroll)
+  }
+
+  // IntersectionObserver 설정
+  observer = new IntersectionObserver(
+    (entries) => {
+      if (entries[0].isIntersecting && !isLoadingMore.value) {
+        console.log('스크롤 끝 감지: 추가 데이터 로드 시작')
+        loadMore()
+      }
+    },
+    {
+      root: scrollContainer.value,
+      threshold: 0.1,
+      rootMargin: '100px',
+    },
+  )
+
+  // 로드 트리거 요소 관찰 시작
+  if (loadMoreTrigger.value) {
+    observer.observe(loadMoreTrigger.value)
+    console.log('스크롤 감지 설정 완료')
+  }
+}
+
+onMounted(() => {
+  // 컴포넌트 마운트 후 스크롤 감지 설정
+  fetchAttractions()
+
+  nextTick(() => {
+    setupScrollDetection()
+  })
+})
+
+onBeforeUnmount(() => {
+  // 컴포넌트 언마운트 시 정리
+  if (observer) {
+    observer.disconnect()
+  }
+
+  if (scrollContainer.value) {
+    scrollContainer.value.removeEventListener('scroll', handleScroll)
+  }
+})
+
+const loadMore = async () => {
+  const total = filteredPlaces.value[activeTab.value]?.length || 0
+  console.log(`현재 표시 항목: ${visibleCount.value}/${total}`)
+
+  if (visibleCount.value < total && !isLoadingMore.value) {
+    console.log('추가 항목 로딩 시작')
+    isLoadingMore.value = true
+
+    try {
+      // 실제 API 호출이 있다면 여기서 처리
+      // 시뮬레이션을 위한 짧은 지연
+      await new Promise((resolve) => setTimeout(resolve, 500))
+
+      // 항목 추가
+      visibleCount.value += pageSize
+      console.log(`항목 추가 완료: ${visibleCount.value}/${total}`)
+    } catch (error) {
+      console.error('추가 항목 로딩 실패:', error)
+    } finally {
+      isLoadingMore.value = false
+    }
+  } else {
+    console.log('더 이상 로드할 항목이 없거나 이미 로딩 중입니다')
+  }
+}
+
+const getTotalCount = computed(() => {
+  return filteredPlaces.value[activeTab.value]?.length || 0
+})
 </script>
 
 <style scoped>
-/* Custom scrollbar styling */
+.custom-scrollbar {
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch; /* iOS 스크롤 개선 */
+}
 .custom-scrollbar::-webkit-scrollbar {
   width: 6px;
 }
-
 .custom-scrollbar::-webkit-scrollbar-track {
   background: #f1f1f1;
   border-radius: 10px;
 }
-
 .custom-scrollbar::-webkit-scrollbar-thumb {
   background: #c5c5c5;
   border-radius: 10px;
 }
-
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: #a8a8a8;
 }
-
-/* Transition effects */
 .transition-colors {
   transition: all 0.2s ease;
 }
