@@ -75,7 +75,7 @@
 
 <script setup>
 import { ref } from 'vue'
-// import { Users as UsersIcon } from 'lucide-vue-next'
+import { Users as UsersIcon } from 'lucide-vue-next'
 
 const props = defineProps({
   members: {

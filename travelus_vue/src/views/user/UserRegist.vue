@@ -11,6 +11,17 @@
         <div class="bg-white rounded-xl shadow-sm border p-6">
           <form @submit.prevent="handleRegister">
             <div class="mb-4">
+              <label for="id" class="block text-sm font-medium mb-2">아이디</label>
+              <input 
+                id="id"
+                v-model="id"
+                type="text" 
+                class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                placeholder="아이디를 입력하세요"
+                required
+              />
+            </div>
+            <div class="mb-4">
               <label for="name" class="block text-sm font-medium mb-2">이름</label>
               <input 
                 id="name"
@@ -134,98 +145,47 @@
 </template>
 
 <script setup>
-// 여기에 script 로직이 추가될 예정
-// import { ref, computed, watch } from 'vue';
-// import { useRouter } from 'vue-router';
-// import { useAuthStore } from '@/stores/auth';
-// import Navbar from '@/components/common/Navbar.vue';
-// import Footer from '@/components/common/Footer.vue';
-// 
-// const router = useRouter();
-// const authStore = useAuthStore();
-// 
-// const name = ref('');
-// const email = ref('');
-// const password = ref('');
-// const passwordConfirm = ref('');
-// const agreeTerms = ref(false);
-// const isLoading = ref(false);
-// const passwordError = ref('');
-// 
-// // 비밀번호 유효성 검사
-// watch(password, () => {
-//   validatePassword();
-// });
-// 
-// watch(passwordConfirm, () => {
-//   validatePasswordMatch();
-// });
-// 
-// function validatePassword() {
-//   if (password.value.length &lt; 8) {
-//     passwordError.value = '비밀번호는 8자 이상이어야 합니다.';
-//     return false;
-//   }
-//   
-//   if (!/[A-Z]/.test(password.value) || !/[a-z]/.test(password.value) || !/[0-9]/.test(password.value)) {
-//     passwordError.value = '비밀번호는 대문자, 소문자, 숫자를 포함해야 합니다.';
-//     return false;
-//   }
-//   
-//   passwordError.value = '';
-//   return true;
-// }
-// 
-// function validatePasswordMatch() {
-//   if (password.value !== passwordConfirm.value) {
-//     passwordError.value = '비밀번호가 일치하지 않습니다.';
-//     return false;
-//   }
-//   
-//   if (passwordConfirm.value && !validatePassword()) {
-//     return false;
-//   }
-//   
-//   passwordError.value = '';
-//   return true;
-// }
-// 
-// const isFormValid = computed(() => {
-//   return (
-//     name.value.trim() !== '' &&
-//     email.value.trim() !== '' &&
-//     password.value.trim() !== '' &&
-//     passwordConfirm.value.trim() !== '' &&
-//     password.value === passwordConfirm.value &&
-//     agreeTerms.value &&
-//     !passwordError.value
-//   );
-// });
-// 
-// async function handleRegister() {
-//   if (!isFormValid.value) return;
-//   
-//   try {
-//     isLoading.value = true;
-//     const success = await authStore.register(name.value, email.value, password.value);
-//     
-//     if (success) {
-//       router.push('/login');
-//     } else {
-//       // 회원가입 실패 처리
-//       alert('회원가입에 실패했습니다. 다시 시도해주세요.');
-//     }
-//   } catch (error) {
-//     console.error('회원가입 실패:', error);
-//     alert('회원가입 중 오류가 발생했습니다. 다시 시도해주세요.');
-//   } finally {
-//     isLoading.value = false;
-//   }
-// }
-// 
-// function handleSocialRegister(provider) {
-//   // 소셜 회원가입 처리
-//   console.log(`${provider} 회원가입 시도`);
-//   // 실제 구현에서는 각 소셜 로그인 API 연동 필요
-// }
+import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
+import api from '@/api';
+
+const router = useRouter()
+
+const id = ref('')
+const name = ref('')
+const email = ref('')
+const password = ref('')
+const passwordConfirm = ref('')
+const agreeTerms = ref(false)
+const isLoading = ref(false)
+
+const isFormValid = computed(() => {
+  return name.value && email.value && password.value && passwordConfirm.value &&
+         password.value === passwordConfirm.value && agreeTerms.value
+})
+
+const handleRegister = async () => {
+  if (!isFormValid.value) return
+
+  isLoading.value = true
+
+  try {
+    const response = await api.post('/api/v1/member', {
+      id: id.value,
+      pw: password.value,
+      name: name.value,
+      email: email.value,
+      role : 'USER'
+    })
+
+    alert(response.data.message)
+    router.push('/login') // 회원가입 성공 후 로그인 페이지로 이동
+
+  } catch (error) {
+    console.error(error)
+    alert(error.response?.data?.message || '회원가입에 실패했습니다.')
+  } finally {
+    isLoading.value = false
+  }
+}
 </script>

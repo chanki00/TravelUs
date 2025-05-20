@@ -11,6 +11,17 @@
         <div class="bg-white rounded-xl shadow-sm border p-6">
           <form @submit.prevent="handleLogin">
             <div class="mb-4">
+              <label for="id" class="block text-sm font-medium mb-2">아이디</label>
+              <input 
+                id="id"
+                v-model="id"
+                type="id" 
+                class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                placeholder="아이디를 입력하세요"
+                required
+              />
+            </div>
+            <!-- <div class="mb-4">
               <label for="email" class="block text-sm font-medium mb-2">이메일</label>
               <input 
                 id="email"
@@ -20,7 +31,7 @@
                 placeholder="이메일 주소를 입력하세요"
                 required
               />
-            </div>
+            </div> -->
             
             <div class="mb-6">
               <div class="flex items-center justify-between mb-2">
@@ -102,11 +113,46 @@
       </div>
     </div>
     
-    <footer-component />
   </div>
 </template>
 
 <script setup>
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import api from '@/api'; // ← 위에서 만든 axios 인스턴스
+
+const router = useRouter();
+const id = ref('');
+const password = ref('');
+const rememberMe = ref(false);
+const isLoading = ref(false);
+const errorMessage = ref('');
+
+const handleLogin = async () => {
+  isLoading.value = true;
+  errorMessage.value = '';
+
+  try {
+    const form = new URLSearchParams();
+    form.append('id', id.value);
+    form.append('pw', password.value);
+
+    await api.post('/member/login', form, {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+    }, {
+  withCredentials: true
+});
+
+    // 로그인 성공 시 이동
+    router.push('/'); // 원하는 경로로 이동
+  } catch (e) {
+    errorMessage.value = '아이디 또는 비밀번호가 올바르지 않습니다.';
+  } finally {
+    isLoading.value = false;
+  }
+};
 
 </script>
 
