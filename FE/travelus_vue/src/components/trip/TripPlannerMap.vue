@@ -1,8 +1,7 @@
 <template>
   <div 
     ref="mapContainer" 
-    class="bg-gray-100 rounded-lg overflow-hidden relative" 
-    :style="{ height }"
+    class="bg-gray-100 rounded-lg overflow-hidden relative h-full" 
   >
     <div class="absolute inset-0 flex items-center justify-center">
       <div class="text-center">
@@ -20,10 +19,6 @@ const props = defineProps({
   locations: {
     type: Array,
     default: () => []
-  },
-  height: {
-    type: String,
-    default: '500px'
   }
 })
 
@@ -39,7 +34,3 @@ watch(() => props.locations, (newLocations) => {
   console.log("Map would be updated with locations:", newLocations)
 }, { deep: true })
 </script>
-
-<style scoped>
-/* 추가 스타일이 필요한 경우 여기에 작성 */
-</style>

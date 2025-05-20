@@ -86,17 +86,31 @@
 
 <script setup>
 import { ref } from 'vue'
-  import { RouterLink} from "vue-router"
+import { RouterLink, useRouter} from "vue-router"
 
+import api from '@/api'; 
+
+const router = useRouter()
 const destination = ref('')
-const startDate = ref('')
+// const startDate = ref('')
 const selectedDays = ref(3)
 const travelers = ref(1)
 const transportation = ref('car')
 const days = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
-const createPlan = () => {
-  // 여행 계획 생성 로직 추가
+const createPlan = async () => {
+  try {
+    const response = await api.post('/api/v1/plan', {
+      destination: destination.value,
+      duration: selectedDays.value,
+      members: travelers.value,
+      transport: transportation.value
+    })
+    router.push('/planresult') // 회원가입 성공 후 로그인 페이지로 이동
+
+  } catch (error) {
+    console.error(error)
+  }
 }
 </script>
 
