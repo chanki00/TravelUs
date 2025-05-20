@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.DB_PASSWORD_REDACTED.trip.repository.PlanRepository">
+	<insert id="insert" parameterType="BasicPlanDTO" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO tripplans (destination, duration, members, transport)
+		VALUES (#{destination}, #{duration}, #{members}, #{transport})
+	</insert>
+	
+	<insert id="insertDay">
+    INSERT INTO TripPlanDays (plan_id, day_number)
+    VALUES (#{plan_id}, #{day_number})
+	</insert>
+</mapper>

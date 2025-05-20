@@ -5,6 +5,7 @@
 <configuration>
 	<typeAliases>
 		<typeAlias type="com.DB_PASSWORD_REDACTED.trip.dto.UserDto" alias="user" />
+		<typeAlias type="com.DB_PASSWORD_REDACTED.trip.dto.BasicPlanDTO" alias="BasicPlanDTO" />
 	</typeAliases>
 
 </configuration>
