@@ -4,7 +4,7 @@
   "https://mybatis.org/dtd/mybatis-3-config.dtd">
 <configuration>
 	<typeAliases>
-		<typeAlias type="com.DB_PASSWORD_REDACTED.trip.dto.MemberDto" alias="member" />
+		<typeAlias type="com.DB_PASSWORD_REDACTED.trip.dto.UserDto" alias="user" />
 	</typeAliases>
 
 </configuration>
