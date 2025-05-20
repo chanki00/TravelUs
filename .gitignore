@@ -6,7 +6,6 @@
 *.class
 *.jar
 *.war
-*.zip
 *.tar.gz
 *.iml
 
