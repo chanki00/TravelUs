@@ -24,4 +24,5 @@ public class Tripplan {
 	private int shares;
 	private LocalDateTime createdAt;
 	private LocalDateTime updatedAt;
+	private boolean isShared;
 }

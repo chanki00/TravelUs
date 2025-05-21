@@ -1,5 +1,7 @@
 package com.DB_PASSWORD_REDACTED.trip.controller;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,6 +44,15 @@ public class RestPlanController {
         return ResponseEntity.ok(tripplan);
     }
 	
+	@GetMapping("/user/{userId}")
+	 public ResponseEntity<List<Tripplan>> getTripplanByUserId(@PathVariable int userId) {
+       List<Tripplan> tripplan = service.getTripplanByUserId(userId);
+       if (tripplan == null) {
+           return ResponseEntity.notFound().build();
+       }
+       return ResponseEntity.ok(tripplan);
+   }
+	
 	
 	@GetMapping("/tripplandays/{planId}/{dayNumber}")
 	public ResponseEntity<?> getPlanDaysID(@PathVariable int planId, @PathVariable int dayNumber){
@@ -56,5 +67,16 @@ public class RestPlanController {
 		return ResponseEntity.ok(service.insertItinerary(dayId, attractionId,order));
 	}
 	
+	@GetMapping("/share")
+	public ResponseEntity<?> getAllSharePlan(){
+		List<Tripplan> res = service.getAllSharePlan();
+		return ResponseEntity.ok(res);
+	}
+	
+	@PatchMapping("/updateShare/{planId}")
+	public ResponseEntity<?> updateShare(@PathVariable int planId){
+		int res = service.updateShare(planId);
+		return ResponseEntity.ok(res);
+	}
 	
 }

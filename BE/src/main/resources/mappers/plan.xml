@@ -23,12 +23,27 @@
 	  SELECT * FROM TripPlans WHERE id = #{planId}
 	</select>
 	
+	<select id="getTripplanByUserId" parameterType="int" resultMap="TripplanResultMap">
+	  SELECT * FROM TripPlans WHERE user_id = #{userId} and is_shared = false
+	</select>
+	
 	<select id="getPlanDaysId" parameterType="int">
 		select id from tripplandays
 		where plan_id = #{planId} and day_number = #{dayNumber};
 	</select>
 	
+	<select id="getAllSharePlan" resultMap="TripplanResultMap">
+	  SELECT * FROM TripPlans WHERE is_shared = true
+	</select>
+	
+	<update id="updateShare" parameterType="int">
+		UPDATE TripPlans
+		SET is_shared = TRUE
+		where id = #{planId};
+	</update>
+	
 	<resultMap id="TripplanResultMap" type="com.DB_PASSWORD_REDACTED.trip.dto.Tripplan">
+		<id property="id" column="id" />
 	  <result property="userId" column="user_id"/>
 	  <result property="title" column="title"/>
 	  <result property="description" column="description"/>
@@ -36,14 +51,12 @@
 	  <result property="shares" column="shares"/>
 	  <result property="createdAt" column="created_at"/>
 	  <result property="updatedAt" column="updated_at"/>
-	  <association property="basicplan" javaType="com.DB_PASSWORD_REDACTED.trip.dto.BasicPlanDTO">
-	    <id property="id" column="id" />
+	  <result property="isShared" column="is_shared"/>
 	    <result property="destination" column="destination"/>
 	    <result property="duration" column="duration"/>
 	    <result property="members" column="members"/>
 	    <result property="transport" column="transport"/>
-	  </association>
-</resultMap>
+	  </resultMap>
 
 
 </mapper>

@@ -1,5 +1,7 @@
 package com.DB_PASSWORD_REDACTED.trip.repository;
 
+import java.util.List;
+
 import org.apache.ibatis.annotations.Mapper;
 
 import com.DB_PASSWORD_REDACTED.trip.dto.BasicPlanDTO;
@@ -17,4 +19,10 @@ public interface PlanRepository {
 	int getPlanDaysId(int planId, int dayNumber);
 
 	int insertItinerary(int dayId, int attractionId, int order);
+
+	List<Tripplan> getTripplanByUserId(int userId);
+
+	int updateShare(int planId);
+
+	List<Tripplan> getAllSharePlan();
 }

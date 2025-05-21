@@ -1,6 +1,7 @@
 package com.DB_PASSWORD_REDACTED.trip.service;
 
 import java.util.Iterator;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 
@@ -42,6 +43,18 @@ public class PlanService {
 
 	public int insertItinerary(int dayId, int attractionId, int order) {
 		return repo.insertItinerary(dayId, attractionId, order);
+	}
+
+	public List<Tripplan> getTripplanByUserId(int userId) {
+		return repo.getTripplanByUserId(userId);
+	}
+
+	public int updateShare(int planId) {
+		return repo.updateShare(planId);
+	}
+
+	public List<Tripplan> getAllSharePlan() {
+		return repo.getAllSharePlan();
 	}
 
 }
