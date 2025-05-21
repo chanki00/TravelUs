@@ -1,5 +1,6 @@
 package com.DB_PASSWORD_REDACTED.trip.controller;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +33,7 @@ public class UserController {
 	
 	@GetMapping("/{id}")
 	@Operation(summary = "id 검색 사용자 조회")
-	public ResponseEntity<UserDto> selectUser(@PathVariable Long id) {
+	public ResponseEntity<UserDto> selectUser(@PathVariable Long id) throws SQLException {
 		UserDto user = uService.selectUser(id);
 		
 //		Map<String, Object> map = new HashMap<>();
@@ -45,7 +46,7 @@ public class UserController {
 	
 	@GetMapping("")
 	@Operation(summary = "모든 사용자 정보 조회")
-	public ResponseEntity<List<UserDto>> selectAllUser() {
+	public ResponseEntity<List<UserDto>> selectAllUser() throws SQLException {
 		
 		List<UserDto> userList = uService.selectAllUser();
 				
@@ -54,7 +55,7 @@ public class UserController {
 	
 	@PostMapping("")
 	@Operation(summary = "멤버 삽입")
-	public ResponseEntity<Map<String, Object>> insertUser(@RequestBody UserDto user) {
+	public ResponseEntity<Map<String, Object>> insertUser(@RequestBody UserDto user) throws SQLException {
 		
 	    int cnt = uService.insertUser(user);
 
@@ -73,7 +74,7 @@ public class UserController {
 	
 	@PatchMapping("/info/{id}")
 	@Operation(summary = "멤버 수정")
-	public ResponseEntity<Map<String, Object>> updateInfo(@PathVariable Long id, @RequestBody UserInfoDto user) {
+	public ResponseEntity<Map<String, Object>> updateInfo(@PathVariable Long id, @RequestBody UserInfoDto user) throws SQLException {
 		user.setId(id);
 		
 		int cnt = uService.updateInfo(user);
@@ -93,7 +94,7 @@ public class UserController {
 	
 	@PatchMapping("/pw/{id}")
 	@Operation(summary = "비밀번호 수정")
-	public ResponseEntity<Map<String, Object>> updatePw(@PathVariable Long id, @RequestBody UserPwDto user) {
+	public ResponseEntity<Map<String, Object>> updatePw(@PathVariable Long id, @RequestBody UserPwDto user) throws SQLException {
 		user.setId(id);
 		
 		int cnt = uService.updatePw(user);
@@ -113,7 +114,7 @@ public class UserController {
 	
 	@DeleteMapping("/{id}")
 	@Operation(summary = "멤버 삭제")
-	public ResponseEntity<Map<String, Object>> deleteUser(@PathVariable Long id) {
+	public ResponseEntity<Map<String, Object>> deleteUser(@PathVariable Long id) throws SQLException {
 		
 		int cnt = uService.deleteUser(id);
 		
