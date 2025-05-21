@@ -119,7 +119,8 @@ import { defineProps, defineEmits } from 'vue'
 
 const props = defineProps({
   destination: {
-    type: Number,
+    type: [Number, String],
+    required: true
   },
 })
 
@@ -169,10 +170,10 @@ watch(activeTab, () => {
 // 데이터 로딩
 const fetchAttractions = async () => {
   try {
+    console.log('Fetching attractions for destination:', props.destination)
     isLoading.value = true
     const res = await api.get(`/api/v1/attractions/${props.destination}`)
     rawPlaces.value = res.data
-    console.log(props.destination)
     filteredPlaces.value.attractions = rawPlaces.value.filter((p) => p.contentTypeId === 12)
     filteredPlaces.value.restaurants = rawPlaces.value.filter((p) => p.contentTypeId === 39)
     filteredPlaces.value.accommodations = rawPlaces.value.filter((p) => p.contentTypeId === 32)
@@ -187,7 +188,12 @@ const fetchAttractions = async () => {
   }
 }
 // destination 변경 시 재요청
-// watch(() => props.destination, fetchAttractions, { immediate: true })
+watch(() => props.destination, (newVal) => {
+  if (newVal) {
+    console.log('Destination changed to:', newVal)
+    fetchAttractions()
+  }
+}, { immediate: true })
 
 // 장소 상세
 const showPlaceDetail = (place) => {
@@ -199,7 +205,7 @@ const addToItinerary = (place) => {
   emit('add-to-itinerary', {
     id: place.id ?? place.contentId,
     title: place.name ?? place.title,
-    type: place.category ?? '',
+    type: place.contentTypeId==12?'명소':(place.contentTypeId==32?'숙소':'식당'),
     time: new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' }),
     image: place.image ?? '',
     placeData: place,
@@ -257,8 +263,7 @@ const setupScrollDetection = () => {
 
 onMounted(() => {
   // 컴포넌트 마운트 후 스크롤 감지 설정
-  fetchAttractions()
-
+  
   nextTick(() => {
     setupScrollDetection()
   })

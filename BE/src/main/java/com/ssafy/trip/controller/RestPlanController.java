@@ -3,6 +3,7 @@ package com.DB_PASSWORD_REDACTED.trip.controller;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,7 +24,7 @@ public class RestPlanController {
 	private final PlanService service;
 	
 	@PostMapping("")
-	public ResponseEntity<?> createPlan(@RequestBody BasicPlanDTO dto){
+	public ResponseEntity<?> createPlan(@RequestBody Tripplan dto){
 		  try {
 		        int res = service.insert(dto);
 		        return ResponseEntity.ok(dto.getId());
@@ -40,5 +41,20 @@ public class RestPlanController {
         }
         return ResponseEntity.ok(tripplan);
     }
+	
+	
+	@GetMapping("/tripplandays/{planId}/{dayNumber}")
+	public ResponseEntity<?> getPlanDaysID(@PathVariable int planId, @PathVariable int dayNumber){
+		return ResponseEntity.ok(service.getPlanDaysId(planId, dayNumber));
+	}
+	
+	@PostMapping("/itinerary/{dayId}/{attractionId}/{order}")
+	public ResponseEntity<?> createItinerary(
+			@PathVariable int dayId
+			, @PathVariable int attractionId
+			, @PathVariable int order){
+		return ResponseEntity.ok(service.insertItinerary(dayId, attractionId,order));
+	}
+	
 	
 }

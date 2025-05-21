@@ -4,9 +4,9 @@
   "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.DB_PASSWORD_REDACTED.trip.repository.PlanRepository">
-	<insert id="insert" parameterType="BasicPlanDTO" useGeneratedKeys="true" keyProperty="id">
-		INSERT INTO tripplans (destination, duration, members, transport)
-		VALUES (#{destination}, #{duration}, #{members}, #{transport})
+	<insert id="insert" parameterType="Tripplan" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO tripplans (destination, duration, members, transport, user_id, title, description )
+		VALUES (#{destination}, #{duration}, #{members}, #{transport}, #{userId}, #{title}, #{description})
 	</insert>
 	
 	<insert id="insertDay">
@@ -14,9 +14,19 @@
     VALUES (#{plan_id}, #{day_number})
 	</insert>
 	
+	<insert id="insertItinerary">
+    INSERT INTO tripplanplaces (day_id, attraction_id, place_order)
+    VALUES (#{dayId}, #{attractionId}, #{order})
+	</insert>
+	
 	<select id="selectTripplanById" parameterType="int" resultMap="TripplanResultMap">
-  SELECT * FROM TripPlans WHERE id = #{planId}
-</select>
+	  SELECT * FROM TripPlans WHERE id = #{planId}
+	</select>
+	
+	<select id="getPlanDaysId" parameterType="int">
+		select id from tripplandays
+		where plan_id = #{planId} and day_number = #{dayNumber};
+	</select>
 	
 	<resultMap id="TripplanResultMap" type="com.DB_PASSWORD_REDACTED.trip.dto.Tripplan">
 	  <result property="userId" column="user_id"/>

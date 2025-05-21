@@ -16,7 +16,7 @@ public class PlanService {
 	
 	private final PlanRepository repo;
 	
-	public int insert(BasicPlanDTO dto) {
+	public int insert(Tripplan dto) {
 		 try {
 			 	int res = repo.insert(dto); 
 			 	makeDaysPlan(dto);
@@ -26,7 +26,7 @@ public class PlanService {
 		    }
 	}
 
-	public void makeDaysPlan(BasicPlanDTO dto) {
+	public void makeDaysPlan(Tripplan dto) {
 		for (int day = 1; day <= dto.getDuration() ; day++) {
 			repo.insertDay(dto.getId(), day);
 		}
@@ -35,5 +35,13 @@ public class PlanService {
 	public Tripplan getTripplanById(int planId) {
         return repo.selectTripplanById(planId);
     }
+
+	public int getPlanDaysId(int planId, int dayNumber) {
+		return repo.getPlanDaysId(planId, dayNumber);
+	}
+
+	public int insertItinerary(int dayId, int attractionId, int order) {
+		return repo.insertItinerary(dayId, attractionId, order);
+	}
 
 }

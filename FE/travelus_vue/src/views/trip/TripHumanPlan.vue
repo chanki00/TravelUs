@@ -26,16 +26,6 @@
                 </select>
               </div>
 
-              <!-- <div>
-                <label for="startDate" class="block text-sm font-medium text-gray-700 mb-1">출발일</label>
-                <input 
-                  id="startDate" 
-                  type="date" 
-                  v-model="startDate"
-                  class="w-full px-3 py-2 border rounded-md"
-                />
-              </div> -->
-
               <div>
                 <label for="duration" class="block text-sm font-medium text-gray-700 mb-1"
                   >여행 일수</label
@@ -78,14 +68,14 @@
                   <option value="tour">투어버스</option>
                 </select>
               </div>
-              <RouterLink to="/planresult">
-                <button
-                  class="w-full mt-4 py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-md flex items-center justify-center"
-                  @click="createPlan"
-                >
-                  여행 계획 생성 <arrow-right-icon class="ml-2 h-4 w-4" />
-                </button>
-              </RouterLink>
+              
+              <!-- Changed to navigate to TripPlan with query parameters -->
+              <button
+                class="w-full mt-4 py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-md flex items-center justify-center"
+                @click="navigateToTripPlan"
+              >
+                다음 단계로 <arrow-right-icon class="ml-2 h-4 w-4" />
+              </button>
             </div>
           </div>
         </div>
@@ -96,13 +86,11 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { RouterLink, useRouter } from 'vue-router'
-
+import { useRouter } from 'vue-router'
 import api from '@/api'
 
 const router = useRouter()
 const destination = ref('')
-// const startDate = ref('')
 const selectedDays = ref(3)
 const travelers = ref(1)
 const transportation = ref('car')
@@ -119,19 +107,24 @@ onMounted(async () => {
   }
 })
 
-const createPlan = async () => {
-  try {
-    const response = await api.post('/api/v1/plan', {
+// New function to navigate to TripPlan with query parameters
+const navigateToTripPlan = () => {
+  // Validate inputs if needed
+  if (!destination.value) {
+    alert('여행지를 선택해주세요')
+    return
+  }
+  
+  // Navigate to TripPlan with query parameters
+  router.push({
+    path: '/tripplan',
+    query: {
       destination: destination.value,
       duration: selectedDays.value,
       members: travelers.value,
-      transport: transportation.value,
-    })
-    const planId = response.data
-    router.push(`/planresult/${planId}`)
-  } catch (error) {
-    console.error(error)
-  }
+      transport: transportation.value
+    }
+  })
 }
 </script>
 

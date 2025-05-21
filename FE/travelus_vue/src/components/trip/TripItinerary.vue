@@ -41,6 +41,7 @@
                     {{ item.type }}
                   </div>
                 </div>
+                <img :src="item.image" :alt="item.name" class="w-16 h-16 object-cover rounded-md" />
                 <button 
                   @click="removeItem(dayIndex, itemIndex)" 
                   class="p-1.5 text-gray-400 group-hover:text-red-500 transition-colors rounded-full hover:bg-gray-100"
@@ -58,7 +59,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, defineEmits , computed} from 'vue'
 import { 
   Trash as TrashIcon,
   Calendar as CalendarIcon
@@ -68,13 +69,16 @@ const props = defineProps({
   itinerary: {
     type: Array,
     required: true
-  }
+  },
+  modelValue: Number
 })
 
-const emit = defineEmits(['remove-item'])
+const emit = defineEmits(['update:modelValue','remove-item'])
 
-const activeDay = ref(0)
-
+const activeDay = computed({
+  get: () => props.modelValue,
+  set: (val) => emit('update:modelValue', val),
+})
 // 일정 항목 제거
 const removeItem = (dayIndex, itemIndex) => {
   emit('remove-item', { dayIndex, itemIndex })

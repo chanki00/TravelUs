@@ -8,7 +8,7 @@
 *.war
 *.tar.gz
 *.iml
-
+**/.env
 # Maven Wrapper
 .mvn/wrapper/maven-wrapper.properties
 !mvnw

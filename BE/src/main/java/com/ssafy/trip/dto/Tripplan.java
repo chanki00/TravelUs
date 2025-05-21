@@ -12,7 +12,11 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString
 public class Tripplan {
-	private BasicPlanDTO basicplan;
+	private int id; 
+	private String destination;
+	private int duration;
+	private int members;
+	private String transport;
 	private int userId;
 	private String title;
 	private String description;
