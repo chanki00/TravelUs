@@ -31,6 +31,8 @@ public class CustomUserDetailsService implements UserDetailsService {
 		try {
 			user = repo.selectUserByUserid(username);
 			
+			System.out.println("로그인 유저: " + user);
+			
 			if (user == null) {
 				throw new UsernameNotFoundException(username);
 			}

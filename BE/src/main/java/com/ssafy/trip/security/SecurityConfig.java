@@ -1,71 +1,98 @@
 package com.DB_PASSWORD_REDACTED.trip.security;
 
+import java.util.Arrays;
+
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
-import lombok.RequiredArgsConstructor;
+import com.DB_PASSWORD_REDACTED.trip.repository.RefreshRepository;
+import com.DB_PASSWORD_REDACTED.trip.security.jwt.JWTAuthenticationFilter;
+import com.DB_PASSWORD_REDACTED.trip.security.jwt.JWTUtil;
+import com.DB_PASSWORD_REDACTED.trip.security.jwt.JWTVerificationFilter;
 
 @Configuration
 public class SecurityConfig {
 
 	@Bean
-	public RoleHierarchy roleHierarchy() {
+	RoleHierarchy roleHierarchy() {
 		return RoleHierarchyImpl.withDefaultRolePrefix().role("ADMIN").implies("USER").build();
 	}
 
 	@Bean
-	public PasswordEncoder passwordEncoder() {
-		return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+	PasswordEncoder passwordEncoder() {
+		return PasswordEncoderFactories.createDelegatingPasswordEncoder(); 
 	}
 
+    @Bean
+    AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
+        return authConfig.getAuthenticationManager();
+    }
+    
+    @Bean
+    JWTAuthenticationFilter jwtAuthenticationFilter(
+            AuthenticationManager authenticationManager,
+            JWTUtil jwtUtil,
+            RefreshRepository refreshRepository) {
+
+        JWTAuthenticationFilter filter = new JWTAuthenticationFilter(authenticationManager, jwtUtil, refreshRepository);
+        filter.setAuthenticationManager(authenticationManager);
+        filter.setFilterProcessesUrl("/api/auth/login"); // 로그인 URL
+        return filter;
+    }
+    
+	
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(Arrays.asList("*"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+        configuration.setAllowedHeaders(Arrays.asList("*"));
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/api/**", configuration);
+        source.registerCorsConfiguration("/member/checkEmail", configuration);
+
+        return source;
+    }
+
 	@Bean
-	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-		// cors 설정
-		http.cors(cors -> cors.configurationSource(new CorsConfigurationSource() {
+    SecurityFilterChain apiSecurityFilterChain(
+            HttpSecurity http,
+            @Qualifier("corsConfigurationSource") CorsConfigurationSource corsConfig,
+            CustomUserDetailsService userDetailsService,
+            JWTAuthenticationFilter authFilter,
+            JWTVerificationFilter jwtVerifyFilter)
+            throws Exception {
+		
+    	http.securityMatcher("/api/**")
+    	.cors(t -> t.configurationSource(corsConfig))
+    	.userDetailsService(userDetailsService)
+    	.csrf(csrf -> csrf.disable())
+    	.sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-			@Override
-			public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
-				CorsConfiguration config = new CorsConfiguration();
-				config.addAllowedOriginPattern("*"); // 모든 도메인 허용 (개발용)
-				config.addAllowedHeader("*");
-				config.addAllowedMethod("*");
-				config.setAllowCredentials(true); // 자격 증명 포함 허용
-				config.addExposedHeader("Authorization");
+    	http.authorizeHttpRequests(auth -> auth
+    		    .requestMatchers("/api/v1/user", "/api/v1/user/**").permitAll()  // 회원가입 등 허용
+    		    .requestMatchers("/api/auth/**").permitAll()                     // 로그인/재발급 허용
+    		    .anyRequest().authenticated()                                    // 나머지는 인증 필요
+    		);
 
-				return config;
-			}
-		}));
-
-		http.csrf(auth -> auth.disable());
-
-		http.formLogin(member -> member.loginPage("/member/loginform").loginProcessingUrl("/member/login")
-				.usernameParameter("id").passwordParameter("pw").failureUrl("/member/loginform?")
-				.successHandler((request, response, authentication) -> {
-					String remember = request.getParameter("remember");
-					Cookie cookie = new Cookie("idsave", authentication.getName());
-					cookie.setPath("/");
-					if (remember != null) {
-						cookie.setMaxAge(60 * 60 * 10);
-					} else {
-						cookie.setMaxAge(0);
-					}
-
-					response.addCookie(cookie);
-					response.sendRedirect(request.getContextPath() + "/");
-				}).permitAll());
-
-		http.logout(member -> member.logoutUrl("/member/logout").invalidateHttpSession(true).logoutSuccessUrl("/"));
+    	
+    	http.addFilterBefore(jwtVerifyFilter, UsernamePasswordAuthenticationFilter.class)
+    	.addFilterAt(authFilter, UsernamePasswordAuthenticationFilter.class);
 
 		return http.build();
 
