@@ -4,21 +4,22 @@ import lombok.Getter;
 
 @Getter
 public enum Gender {
-	M("남성"), F("여성");
-	
+	M("남성"),
+	F("여성"),
+	O("기타"); // 기타 추가
+
 	private final String label;
-	
+
 	Gender(String label) {
 		this.label = label;
 	}
-	
+
 	public static Gender fromString(String value) {
 		if (value == null) return null;
 		try {
 			return Gender.valueOf(value.toUpperCase());
-		}
-		catch (IllegalArgumentException e) {
-			throw new RuntimeException("해당하는 성별이 없습니다." + value);
+		} catch (IllegalArgumentException e) {
+			throw new RuntimeException("해당하는 성별이 없습니다: " + value);
 		}
 	}
 }

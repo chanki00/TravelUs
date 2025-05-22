@@ -133,6 +133,7 @@
                   <option value="30s">30대</option>
                   <option value="40s">40대</option>
                   <option value="50s">50대 이상</option>
+                  <option value="other">기타</option>
                 </select>
               </div>
 
@@ -143,17 +144,17 @@
                   v-model="user.gender" 
                   class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-gray-700"
                 >
-                  <option value="male">남성</option>
-                  <option value="female">여성</option>
-                  <option value="other">기타</option>
+                  <option value="M">남성</option>
+                  <option value="F">여성</option>
+                  <option value="O">기타</option>
                 </select>
               </div>
             </div>
 
             <div class="space-y-2">
-              <label for="bio" class="block text-sm font-medium text-gray-700">자기소개</label>
+              <label for="intro" class="block text-sm font-medium text-gray-700">자기소개</label>
               <textarea 
-                id="bio" 
+                id="intro" 
                 v-model="user.intro" 
                 rows="4" 
                 class="resize-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-gray-700"
