@@ -53,7 +53,7 @@
           <div class="flex gap-3 mt-4 md:mt-0">
             <TripMembers :members="mockMembers" />
             <button class="px-4 py-2 border rounded-md hover:bg-gray-50">공유하기</button>
-            <button @click="openTagModal()" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+            <button @click="openImageModal()" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
               일정 저장
             </button>
           </div>
@@ -85,6 +85,13 @@
         </div>
       </div>
     </main>
+    
+     <TripimageModal 
+      :is-open="isImageModalOpen" 
+      @close="closeImageModal" 
+      @save="onImageSelected" 
+    />
+
     <TripTagModal 
       :is-open="isTagModalOpen" 
       :initial-tags="tags"
@@ -106,6 +113,7 @@ import { Pencil as PencilIcon } from 'lucide-vue-next'
 import { useRoute, useRouter } from 'vue-router'
 import api from '@/api'
 import { defineProps, defineEmits } from 'vue'
+import TripimageModal from '@/components/trip/TripimageModal.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -136,10 +144,13 @@ const activeDay = ref(0)
 const itinerary = ref([])
 
 const isTagModalOpen = ref(false)
+const isImageModalOpen = ref(false)
+const image = ref({
+
+})
+
 const tags = ref({
-  style: [],
-  theme: [],
-  season: []
+  id : []
 })
 onMounted(() => {
   // Initialize itinerary based on duration
@@ -208,6 +219,23 @@ const saveDescription = () => {
   isEditingDescription.value = false
 }
 
+// Open image modal
+const openImageModal = () => {
+  isImageModalOpen.value = true
+}
+
+// Close image modal
+const closeImageModal = () => {
+  isImageModalOpen.value = false
+}
+
+const onImageSelected = (selectedImage) => {
+  // 이미지 선택 후 image modal 닫고 tag modal 열기 
+  image.value = selectedImage
+  isImageModalOpen.value = false
+  isTagModalOpen.value = true
+}
+
 // Open tag modal
 const openTagModal = () => {
   isTagModalOpen.value = true
@@ -221,9 +249,7 @@ const closeTagModal = () => {
 const saveWithTags = (selectedTags) => {
   tags.value = selectedTags
   isTagModalOpen.value = false
-  
-
-  createPlan()
+  createPlan() 
 }
 
 const mockMembers = [
@@ -254,7 +280,7 @@ const mockMembers = [
 const addToItinerary = (item) => {
   // 현재 활성화된 일차에 항목 추가
   itinerary.value[activeDay.value].items.push(item)
-  console.log(itinerary.value)
+  
 }
 
 // 일정에서 장소 제거
@@ -276,6 +302,7 @@ const createPlan = async () => {
       description: description.value,
       likes : 0,
       shares : 0,
+      image : image.value.img
     })
     
     planId.value = response.data
@@ -286,8 +313,10 @@ const createPlan = async () => {
           const response = await api.post(`/api/v1/plan/itinerary/${dayId_resp.data}/${itinerary.value[i].items[j].placeData.no}/${j+1}`);
       }
     }
-
-    
+    tags.value.id.forEach(async (tagId) => {
+      await api.post(`/api/v1/tag/tripplan/${planId.value}/${tagId}`)
+    });
+   
 
     router.push("/")
   } catch (error) {

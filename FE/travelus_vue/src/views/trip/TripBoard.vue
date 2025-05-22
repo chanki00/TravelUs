@@ -133,8 +133,20 @@ const trips = ref([])
 
 onMounted(async () => {
     const response = await api.get(`/api/v1/plan/share`)
-    console.log(response.data)
-    trips.value = response.data
+     const trip = response.data
+
+  // 각 여행 계획에 태그를 병렬로 가져와서 추가
+  const enrichedTrips = await Promise.all(
+    trip.map(async (tripPlan) => {
+      const tagRes = await api.get(`/api/v1/tag/plan/${tripPlan.id}`)
+      return {
+        ...tripPlan,     // 기존 tripPlan의 모든 속성 유지
+        tags: tagRes.data // 새로 추가된 tags 필드
+      }
+    })
+  )
+
+  trips.value = enrichedTrips
 })
 
 // 모달 열기

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.DB_PASSWORD_REDACTED.trip.repository.TagRepository">
+
+	<select id="getTripTags" resultType="com.DB_PASSWORD_REDACTED.trip.dto.TagDTO">
+	  SELECT * FROM tags WHERE type = '여행'
+	</select>
+	
+	<insert id="insertplanTag">
+		insert into tripplantags (plan_id, tag_id)
+		values (#{planId}, #{tagId})
+	</insert>
+	
+	<select id="getTripplanTagsName">
+	  SELECT t.name
+		FROM TripPlanTags tpt
+		JOIN Tags t ON tpt.tag_id = t.id
+		WHERE tpt.plan_id = #{planId};
+	</select>
+	
+</mapper>

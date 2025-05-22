@@ -25,4 +25,5 @@ public class Tripplan {
 	private LocalDateTime createdAt;
 	private LocalDateTime updatedAt;
 	private boolean isShared;
+	private String image;
 }

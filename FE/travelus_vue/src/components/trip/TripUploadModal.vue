@@ -122,7 +122,7 @@ const selectTrip = (trip) => {
 }
 
 // 선택한 여행 계획 적용
-const applySelectedTrip = () => {
+const applySelectedTrip = () => { 
   if (selectedTrip.value) {
     emit('apply', selectedTrip.value)
     closeModal()
@@ -146,10 +146,23 @@ onMounted(async () => {
     getPlans()
 })
 
-const getPlans = async () => {
+const getPlans = async () => {  
  // const response = await api.get(`/api/v1/plan/user/${userId}`)
     const response = await api.get(`/api/v1/plan/user/1`)
-    myTrips.value = response.data
+     const trips = response.data
+
+  // 각 여행 계획에 태그를 병렬로 가져와서 추가
+  const enrichedTrips = await Promise.all(
+    trips.map(async (tripPlan) => {
+      const tagRes = await api.get(`/api/v1/tag/plan/${tripPlan.id}`)
+      return {
+        ...tripPlan,     // 기존 tripPlan의 모든 속성 유지
+        tags: tagRes.data // 새로 추가된 tags 필드
+      }
+    })
+  )
+
+  myTrips.value = enrichedTrips
 }
 
 </script>

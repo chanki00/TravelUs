@@ -210,6 +210,7 @@ const addToItinerary = (place) => {
     image: place.image ?? '',
     placeData: place,
   })
+  
 }
 
 // 스크롤 이벤트 리스너
