@@ -161,40 +161,72 @@
               ></textarea>
             </div>
 
-            <div class="space-y-2">
-              <label class="block text-sm font-medium text-gray-700">성격 태그</label>
-              <div class="flex flex-wrap gap-2 mb-2">
-                <span 
-                  v-for="(tag, index) in personalityTags" 
-                  :key="index" 
-                  class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-50 text-purple-800"
-                >
-                  {{ tag }}
-                  <button 
-                    @click="removeTag('personality', tag)" 
-                    class="ml-1 h-4 w-4 rounded-full inline-flex items-center justify-center hover:bg-red-100"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
-                      <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
-                    </svg>
-                  </button>
-                </span>
-              </div>
-              <div class="flex gap-2">
-                <input 
-                  v-model="newTag" 
-                  @keydown.enter.prevent="addTag('personality')" 
-                  placeholder="새 태그 추가" 
-                  class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-gray-700"
-                />
-                <button 
-                  @click="addTag('personality')" 
-                  class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-                >
-                  추가
-                </button>
-              </div>
-            </div>
+            <!-- 성격 태그 리스트 -->
+    <div class="space-y-2">
+      <label class="block text-sm font-medium text-gray-700">성격 태그</label>
+      <div class="flex flex-wrap gap-2 mb-2">
+        <span
+          v-for="(tag, index) in selectedTags"
+          :key="index"
+          class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-50 text-purple-800"
+        >
+          {{ tag.name }}
+          <button
+            @click="removeTag(tag)"
+            class="ml-1 h-4 w-4 rounded-full inline-flex items-center justify-center hover:bg-red-100"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+            </svg>
+          </button>
+        </span>
+      </div>
+      <button @click="showModal = true" class="px-3 py-1 bg-gray-200 text-sm rounded hover:bg-gray-300">
+        성격 태그 수정하기
+      </button>
+    </div>
+
+    <!-- 모달 -->
+    <div v-if="showModal" class="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
+      <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
+        <h3 class="text-lg font-semibold mb-4">성격 태그 선택</h3>
+
+        <!-- 선택된 태그들 -->
+        <div class="mb-4">
+          <h4 class="text-sm font-medium mb-2">선택한 태그</h4>
+          <div class="flex flex-wrap gap-2">
+            <span
+              v-for="tag in allTags.filter(t => selectedTagIds.includes(t.id))"
+              :key="tag.id"
+              class="px-2 py-1 rounded-full bg-blue-100 text-blue-800 text-xs cursor-pointer"
+              @click="toggleTag(tag.id)"
+            >
+              {{ tag.name }}
+            </span>
+          </div>
+        </div>
+
+        <!-- 선택 안 된 태그들 -->
+        <div class="mb-4">
+          <h4 class="text-sm font-medium mb-2">선택 안 한 태그</h4>
+          <div class="flex flex-wrap gap-2">
+            <span
+              v-for="tag in allTags.filter(t => !selectedTagIds.includes(t.id))"
+              :key="tag.id"
+              class="px-2 py-1 rounded-full bg-gray-100 text-gray-800 text-xs cursor-pointer hover:bg-gray-200"
+              @click="toggleTag(tag.id)"
+            >
+              {{ tag.name }}
+            </span>
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-2 mt-4">
+          <button @click="showModal = false" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">취소</button>
+          <button @click="saveTags" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">저장</button>
+        </div>
+      </div>
+    </div>
 
             <div class="space-y-2">
               <label class="block text-sm font-medium text-gray-700">선호 여행 태그</label>

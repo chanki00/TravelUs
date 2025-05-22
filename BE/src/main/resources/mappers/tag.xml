@@ -21,4 +21,20 @@
 		WHERE tpt.plan_id = #{planId};
 	</select>
 	
+	<select id="getUserTags" resultType="com.DB_PASSWORD_REDACTED.trip.dto.TagDTO">
+		SELECT * FROM tags WHERE type = '성격'
+	</select>
+	
+	<insert id="insertUserTag">
+		INSERT INTO usertags (user_id, tag_id)
+		VALUES (#{planId}, #{tagId})
+	</insert>
+	
+	<select id="getUserTagsName">
+		SELECT u.name
+		FROM usertags u
+		JOIN tags t ON u.tag_id = t.id
+		WHERE u.user_id = #{userId};
+	</select>
+	
 </mapper>
