@@ -62,7 +62,7 @@
               />
               <div class="absolute top-3 left-3">
                 <span class="px-2 py-1 bg-white/70 backdrop-blur-sm text-gray-800 text-xs rounded-full">
-                  {{ trip.location }}
+                  {{ trip.destination }}
                 </span>
               </div>
             </div>
@@ -82,9 +82,9 @@
               <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2">
                   <div class="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center">
-                    <span class="text-xs">{{ trip.user }}</span>
+                    <span class="text-xs">{{ user.image }}</span>
                   </div>
-                  <span class="text-xs text-gray-600">{{ trip.author }}</span>
+                  <span class="text-xs text-gray-600">{{ user.name }}</span>
                 </div>
 
                 <div class="flex items-center gap-3 text-xs text-gray-500">
@@ -114,15 +114,18 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
+import { useUserStore } from '@/store/user'
 import TripUploadModal from '@/components/trip/TripUploadModal.vue'
 import api from '@/api'
 
+const userStore = useUserStore()
+const user = computed(() => userStore.loginUser)
 
 const activeFilter = ref('all')
 const searchTerm = ref('')
 const isUploadModalOpen = ref(false)
-
+console.log(user)
 const tabs = [
   { value: 'all', label: '전체' },
   { value: 'popular', label: '인기순' },

@@ -29,7 +29,7 @@ const props = defineProps({
     default: 0
   }
 })
-
+console.log('map itinerary', props.itinerary)
 const mapContainer = ref(null)
 const mapLoaded = ref(false)
 let map = null
@@ -186,6 +186,7 @@ onMounted(() => {
 
 // itinerary 또는 activeDay가 변경될 때 마커와 경로 업데이트
 watch([() => props.itinerary, () => props.activeDay], () => {
+  console.log(props.itinerary)
   if (map) {
     updateMapMarkers()
   }
