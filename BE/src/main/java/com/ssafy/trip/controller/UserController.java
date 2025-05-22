@@ -79,6 +79,8 @@ public class UserController {
 		
 		int cnt = uService.updateInfo(user);
 		
+		System.out.println(user);
+		
 		Map<String, Object> map = new HashMap<>();
 		
 		if (cnt == 0) {

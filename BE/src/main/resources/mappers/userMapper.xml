@@ -35,7 +35,7 @@
 
   <update id="updateInfo" parameterType="UserInfoDto">
     UPDATE users 
-    SET name = #{name}, user_email = #{userEmail}, address = #{address}, age = #{age}
+    SET name = #{name}, user_email = #{userEmail}, address = #{address}, age = #{age}, gender=#{gender}, intro=#{intro}
     WHERE id = #{id}
   </update>
 
