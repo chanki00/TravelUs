@@ -11,19 +11,19 @@
         <div class="max-w-7xl mx-auto">
           <div class="flex items-center gap-2 mb-2">
             <span class="px-2 py-1 bg-white/20 backdrop-blur-sm rounded-full text-sm">{{ tripDetails.location }}</span>
-            <span class="px-2 py-1 bg-white/20 backdrop-blur-sm rounded-full text-sm">{{ tripDetails.period }}</span>
+            <span class="px-2 py-1 bg-white/20 backdrop-blur-sm rounded-full text-sm">{{ tripDetails.duration -1}}박 {{ tripDetails.duration }}일</span>
           </div>
           <h1 class="text-3xl md:text-4xl font-bold mb-2">{{ tripDetails.title }}</h1>
           <div class="flex items-center gap-3">
             <div class="flex items-center gap-2">
               <div class="w-8 h-8 rounded-full bg-white/30 backdrop-blur-sm flex items-center justify-center">
-                <span>{{ tripDetails.author.charAt(0) }}</span>
+                <span>{{ tripDetails.userId.charAt(0) }}</span>
               </div>
-              <span>{{ tripDetails.author }}</span>
+              <span>{{ tripDetails.userId }}</span>
             </div>
             <div class="flex items-center gap-3">
               <span>♥ {{ tripDetails.likes }}</span>
-              <span>💬 {{ tripDetails.comments }}</span>
+              <span>💬 {{ tripDetails.shares }}</span>
             </div>
           </div>
         </div>
@@ -110,7 +110,7 @@
             </div>
             <div class="p-4 space-y-4">
               <div>
-                <h4 class="text-sm text-gray-500 mb-1">작성자 성격</h4>
+                <h4 class="text-sm text-gray-500 mb-1">작성자 성격(미구현)</h4>
                 <div class="flex flex-wrap gap-2">
                   <span 
                     v-for="(tag, index) in tripDetails.personalityTags" 
@@ -147,17 +147,17 @@
                 <ul class="space-y-3">
                   <li>
                     <a href="#" class="text-sm text-blue-600 hover:underline">
-                      강릉 2박 3일 여름 여행
+                      미구현 상태
                     </a>
                   </li>
                   <li>
                     <a href="#" class="text-sm text-blue-600 hover:underline">
-                      부산 맛집 투어 주말 여행
+                      미구현 상태
                     </a>
                   </li>
                   <li>
                     <a href="#" class="text-sm text-blue-600 hover:underline">
-                      서울 근교 당일치기 코스
+                      미구현 상태
                     </a>
                   </li>
                 </ul>
@@ -168,17 +168,17 @@
                 <ul class="space-y-3">
                   <li>
                     <a href="#" class="text-sm text-blue-600 hover:underline">
-                      제주 서부권 3박 4일 가족 여행
+                      미구현 상태
                     </a>
                   </li>
                   <li>
                     <a href="#" class="text-sm text-blue-600 hover:underline">
-                      제주도 신혼여행 코스 5박 6일
+                      미구현 상태
                     </a>
                   </li>
                   <li>
                     <a href="#" class="text-sm text-blue-600 hover:underline">
-                      제주 맛집만 모은 먹방 여행
+                      미구현 상태 
                     </a>
                   </li>
                 </ul>
@@ -192,89 +192,75 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { ArrowRight as ArrowRightIcon } from 'lucide-vue-next'
 import TripPlannerMap from '@/components/trip/TripPlannerMap.vue'
+import api from '@/api'
+
 
 const route = useRoute()
 const activeDay = ref(0)
-
 // 실제 구현에서는 ID를 기반으로 데이터를 가져오는 로직 추가
-const tripDetails = {
-  id: route.params.id || "1",
-  title: "제주도 4박 5일 힐링 여행",
-  location: "제주도",
-  period: "4박 5일",
-  author: "여행자123",
+const tripDetails = ref({
+  id: route.params.id || "id",
+  title: "제목",
+  location: "지역",
+  duration: 0,
+  userId: "유저ID",
   image:
     "https://images.unsplash.com/photo-1601621915196-2ad9b06857b3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80",
-  personalityTags: ["친절함", "차분함", "계획적"],
-  travelTags: ["힐링", "자연", "맛집"],
-  likes: 153,
-  comments: 24,
-  description: "제주도의 아름다운 자연을 즐기면서 힐링하는 여행. 유명 관광지부터 숨은 맛집까지 모두 담았습니다.",
+  personalityTags: [],
+  travelTags: [],
+  likes: 0,
+  shares: 0,
+  description: "여행 계획 설명",
   itinerary: [
-    {
-      day: 1,
-      title: "제주 도착 및 동부 탐험",
-      items: [
-        { time: "09:00", title: "제주공항 도착", description: "렌터카 수령", type: "이동" },
-        { time: "11:00", title: "성산일출봉", description: "유네스코 세계자연유산", type: "관광" },
-        { time: "13:00", title: "섭지코지", description: "드라마 촬영지로 유명한 해안가", type: "관광" },
-        { time: "15:00", title: "우도 탐방", description: "페리로 이동하여 우도 탐방", type: "관광" },
-        { time: "18:00", title: "흑돼지 맛집", description: "제주 흑돼지 전문점", type: "식사" },
-        { time: "20:00", title: "호텔 체크인", description: "서귀포 호텔", type: "숙박" },
-      ],
-    },
-    {
-      day: 2,
-      title: "서부 자연 체험",
-      items: [
-        { time: "09:00", title: "아침 식사", description: "호텔 조식", type: "식사" },
-        { time: "10:30", title: "올레길 걷기", description: "7코스 서귀포 올레길", type: "액티비티" },
-        { time: "13:00", title: "점심 식사", description: "해산물 요리", type: "식사" },
-        { time: "15:00", title: "한라산 둘레길", description: "쉬운 코스로 산책", type: "액티비티" },
-        { time: "18:00", title: "흑돼지 BBQ", description: "로컬 맛집", type: "식사" },
-      ],
-    },
-    {
-      day: 3,
-      title: "중문 관광단지",
-      items: [
-        { time: "09:00", title: "아침 식사", description: "호텔 조식", type: "식사" },
-        { time: "10:30", title: "주상절리", description: "천연기념물 해안 절벽", type: "관광" },
-        { time: "12:30", title: "점심 식사", description: "전복죽", type: "식사" },
-        { time: "14:00", title: "카페 투어", description: "뷰 좋은 카페 방문", type: "휴식" },
-        { time: "16:00", title: "테디베어 박물관", description: "중문관광단지 내 위치", type: "관광" },
-        { time: "18:30", title: "저녁 식사", description: "해물 뚝배기", type: "식사" },
-      ],
-    },
-    {
-      day: 4,
-      title: "북부 탐험",
-      items: [
-        { time: "08:30", title: "아침 식사", description: "호텔 조식", type: "식사" },
-        { time: "10:00", title: "만장굴", description: "세계자연유산 용암동굴", type: "관광" },
-        { time: "12:30", title: "점심 식사", description: "고등어회", type: "식사" },
-        { time: "14:00", title: "에코랜드", description: "기차 테마파크", type: "관광" },
-        { time: "16:30", title: "제주민속촌", description: "전통 제주 마을 체험", type: "관광" },
-        { time: "19:00", title: "저녁 식사", description: "제주 흑돼지", type: "식사" },
-      ],
-    },
-    {
-      day: 5,
-      title: "마무리 및 귀가",
-      items: [
-        { time: "09:00", title: "아침 식사", description: "호텔 조식 후 체크아웃", type: "식사" },
-        { time: "10:30", title: "이호테우 해변", description: "하얀 등대가 있는 해변", type: "관광" },
-        { time: "12:00", title: "제주공항 근처 점심", description: "해물탕", type: "식사" },
-        { time: "14:00", title: "제주공항 도착", description: "렌터카 반납", type: "이동" },
-        { time: "16:00", title: "제주공항 출발", description: "귀가", type: "이동" },
-      ],
-    },
   ],
-}
+})
+
+onMounted(async () => {
+    const response = await api.get(`/api/v1/plan/${route.params.id}`);
+    tripDetails.value.title = response.data.title;
+    tripDetails.value.duration = response.data.duration;
+    tripDetails.value.userId = response.data.userId + '님';
+    tripDetails.value.description = response.data.description
+    tripDetails.value.likes = response.data.likes
+    tripDetails.value.shares = response.data.shares
+    tripDetails.value.location = response.data.destination
+    tripDetails.value.image = response.data.image
+    const tagRes = await api.get(`/api/v1/tag/plan/${route.params.id}`)
+    tripDetails.value.travelTags = tagRes.data
+    const itineraryRes = await api.get(`/api/v1/plan/itinerary/${route.params.id}`)
+    const typeMap = {
+      12: "관광",
+      39: "식당",
+      32: "숙박",
+      // 필요한 다른 매핑 추가
+    };
+
+    // 날짜별로 그룹핑
+    const grouped = itineraryRes.data.reduce((acc, cur) => {
+      const { dayNumber } = cur;
+      if (!acc[dayNumber]) acc[dayNumber] = [];
+
+      acc[dayNumber].push({
+        time: "", // 현재 시간 정보가 없으므로 빈 문자열
+        title: cur.title,
+        description: cur.memo || "",
+        type: typeMap[cur.contentTypeId] || "기타", // fallback
+      });
+
+      return acc;
+    }, {});
+
+    // tripDetails.itinerary 구성
+    tripDetails.value.itinerary = Object.entries(grouped).map(([day, items]) => ({
+      day: Number(day),
+      title: "", // 서버에서 안 준다면 비워둡니다 (또는 직접 작성)
+      items,
+    }));
+    })
 </script>
 
 <style scoped>

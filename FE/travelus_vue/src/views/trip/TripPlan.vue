@@ -71,7 +71,12 @@
 
         <!-- 일정 목록 -->
         <div class="w-1/5 p-4 border-r h-full overflow-hidden">
-          <TripItinerary v-model="activeDay" :itinerary="itinerary" @remove-item="removeFromItinerary" />
+          <TripItinerary 
+            v-model="activeDay" 
+            :itinerary="itinerary" 
+            @remove-item="removeFromItinerary" 
+            @update-memo="updateItineraryMemo" 
+          />
         </div>
 
         <!-- 지도 -->
@@ -288,6 +293,12 @@ const removeFromItinerary = ({ dayIndex, itemIndex }) => {
   itinerary.value[dayIndex].items.splice(itemIndex, 1)
 }
 
+// 일정 메모 업데이트
+const updateItineraryMemo = ({ dayIndex, itemIndex, memo }) => {
+  console.log('메모 업데이트:', dayIndex, itemIndex, memo)
+  itinerary.value[dayIndex].items[itemIndex].memo = memo
+}
+
 // 일정 생성 (이전에 updatePlan이었던 함수를 createPlan으로 변경)
 const createPlan = async () => {
   try {
@@ -310,7 +321,12 @@ const createPlan = async () => {
     for (let i = 0; i < tripData.value.duration; i++) {
       const dayId_resp = await api.get(`/api/v1/plan/tripplandays/${planId.value}/${i + 1}`);
       for (let j = 0; j < itinerary.value[i].items.length; j++){
-          const response = await api.post(`/api/v1/plan/itinerary/${dayId_resp.data}/${itinerary.value[i].items[j].placeData.no}/${j+1}`);
+          const response = await api.post(`/api/v1/plan/itinerary`,{
+            dayId : dayId_resp.data,
+            attractionId : itinerary.value[i].items[j].placeData.no,
+            placeOrder : j + 1,
+            memo : itinerary.value[i].items[j].memo
+          });
       }
     }
     tags.value.id.forEach(async (tagId) => {

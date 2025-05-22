@@ -15,8 +15,8 @@
 	</insert>
 	
 	<insert id="insertItinerary">
-    INSERT INTO tripplanplaces (day_id, attraction_id, place_order)
-    VALUES (#{dayId}, #{attractionId}, #{order})
+    INSERT INTO tripplanplaces (day_id, attraction_id, place_order, memo)
+    VALUES (#{dayId}, #{attractionId}, #{placeOrder}, #{memo})
 	</insert>
 	
 	<select id="selectTripplanById" parameterType="int" resultMap="TripplanResultMap">
@@ -58,6 +58,61 @@
 	    <result property="members" column="members"/>
 	    <result property="transport" column="transport"/>
 	  </resultMap>
+
+
+<resultMap id="ItineraryPlaceDtoMap" type="com.DB_PASSWORD_REDACTED.trip.dto.ItineraryPlaceResponseDto">
+  <!-- Itinerary -->
+  <result property="dayId" column="day_id"/>
+  <result property="dayNumber" column="day_number"/>
+  <result property="attractionId" column="attraction_id"/>
+  <result property="placeOrder" column="place_order"/>
+  <result property="memo" column="memo"/>
+  
+  <!-- Attraction -->
+  <result property="no" column="no"/>
+  <result property="contentId" column="content_id"/>
+  <result property="title" column="title"/>
+  <result property="contentTypeId" column="content_type_id"/>
+  <result property="areaCode" column="area_code"/>
+  <result property="sigunguCode" column="si_gun_gu_code"/>
+  <result property="image" column="first_image1"/>
+  <result property="mapLevel" column="map_level"/>
+  <result property="latitude" column="latitude"/>
+  <result property="longitude" column="longitude"/>
+  <result property="tel" column="tel"/>
+  <result property="addr" column="addr1"/>
+  <result property="homepage" column="homepage"/>
+  <result property="overview" column="overview"/>
+</resultMap>
+
+<select id="getItineraryByPlanId" resultMap="ItineraryPlaceDtoMap" parameterType="int">
+  SELECT
+    d.id AS day_id,
+    d.day_number AS day_number,
+    p.attraction_id AS attraction_id,
+    p.place_order AS place_order,
+    p.memo AS memo,
+    
+    a.no,
+    a.content_id,
+    a.title,
+    a.content_type_id,
+    a.area_code,
+    a.si_gun_gu_code,
+    a.first_image1 AS first_image1,
+    a.map_level,
+    a.latitude,
+    a.longitude,
+    a.tel,
+    a.addr1,
+    a.homepage,
+    a.overview
+  FROM TripPlanDays d
+  JOIN TripPlanPlaces p ON d.id = p.day_id
+  JOIN attractions a ON p.attraction_id = a.no
+  WHERE d.plan_id = #{planId}
+  ORDER BY d.day_number, p.place_order
+</select>
 
 
 </mapper>

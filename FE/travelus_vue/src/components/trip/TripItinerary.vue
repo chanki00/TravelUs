@@ -40,8 +40,51 @@
                   <div class="text-xs text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full inline-block mt-1">
                     {{ item.type }}
                   </div>
+                  
+                  <!-- 메모 영역 - 수정 시 레이아웃이 깨지지 않도록 별도 영역으로 분리 -->
+                  <div class="mt-2">
+                    <div v-if="editingItemId === `${dayIndex}-${itemIndex}`" class="relative">
+                      <textarea
+                        v-model="editedDescription"
+                        @blur="saveDescription(dayIndex, itemIndex)"
+                        @keydown.enter="saveDescription(dayIndex, itemIndex)"
+                        class="w-full border border-blue-200 focus:border-blue-500 focus:outline-none bg-blue-50 px-2 py-1 rounded text-sm resize-none"
+                        rows="2"
+                        ref="descriptionTextarea"
+                        placeholder="여행 계획에 대한 설명을 입력하세요"
+                      ></textarea>
+                      <div class="absolute right-2 bottom-2 flex gap-1">
+                        <button 
+                          @click="saveDescription(dayIndex, itemIndex)" 
+                          class="text-xs bg-blue-500 text-white px-2 py-0.5 rounded hover:bg-blue-600"
+                        >
+                          저장
+                        </button>
+                        <button 
+                          @click="cancelEditing()" 
+                          class="text-xs bg-gray-200 text-gray-700 px-2 py-0.5 rounded hover:bg-gray-300"
+                        >
+                          취소
+                        </button>
+                      </div>
+                    </div>
+                    <div v-else class="flex items-center">
+                      <p class="text-sm text-gray-600" v-if="item.memo">
+                        {{ item.memo }}
+                      </p>
+                      <p class="text-sm text-gray-400 italic" v-else>
+                        메모 추가하기
+                      </p>
+                      <button 
+                        @click="startEditingDescription(dayIndex, itemIndex, item.memo || '')" 
+                        class="ml-1 p-1 text-gray-400 hover:text-blue-500 transition-colors rounded-full hover:bg-gray-100"
+                      >
+                        <pencil-icon class="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  </div>
                 </div>
-                <img :src="item.image" :alt="item.name" class="w-16 h-16 object-cover rounded-md" />
+                <img :src="item.image" :alt="item.title" class="w-16 h-16 object-cover rounded-md" />
                 <button 
                   @click="removeItem(dayIndex, itemIndex)" 
                   class="p-1.5 text-gray-400 group-hover:text-red-500 transition-colors rounded-full hover:bg-gray-100"
@@ -59,10 +102,11 @@
 </template>
 
 <script setup>
-import { ref, defineEmits , computed} from 'vue'
+import { ref, nextTick, defineEmits, computed } from 'vue'
 import { 
   Trash as TrashIcon,
-  Calendar as CalendarIcon
+  Calendar as CalendarIcon,
+  Pencil as PencilIcon
 } from 'lucide-vue-next'
 
 const props = defineProps({
@@ -73,14 +117,61 @@ const props = defineProps({
   modelValue: Number
 })
 
-const emit = defineEmits(['update:modelValue','remove-item'])
+const emit = defineEmits(['update:modelValue', 'remove-item', 'update-memo'])
 
 const activeDay = computed({
   get: () => props.modelValue,
   set: (val) => emit('update:modelValue', val),
 })
+
+// 메모 편집 관련 상태
+const editingItemId = ref(null)
+const editedDescription = ref('')
+const descriptionTextarea = ref(null)
+
+// 메모 편집 시작
+const startEditingDescription = (dayIndex, itemIndex, currentDescription) => {
+  editingItemId.value = `${dayIndex}-${itemIndex}`
+  editedDescription.value = currentDescription
+  
+}
+
+// 메모 저장
+const saveDescription = (dayIndex, itemIndex) => {
+  if (editedDescription.value.trim() !== '') {
+    // 부모 컴포넌트에 업데이트 이벤트 발생 - memo 필드로 변경
+    emit('update-memo', { 
+      dayIndex, 
+      itemIndex, 
+      memo: editedDescription.value.trim() 
+    })
+    
+    // 로컬 데이터 업데이트 (props는 직접 수정하지 않음)
+    if (props.itinerary[dayIndex] && props.itinerary[dayIndex].items[itemIndex]) {
+      // 이 부분은 실제로 props를 직접 수정하지 않고, 부모 컴포넌트에서 처리하도록 함
+    }
+  }
+  editingItemId.value = null
+}
+
+// 메모 편집 취소
+const cancelEditing = () => {
+  editingItemId.value = null
+}
+
 // 일정 항목 제거
 const removeItem = (dayIndex, itemIndex) => {
   emit('remove-item', { dayIndex, itemIndex })
+}
+
+// 아이템의 메모 가져오기 - memo 필드로 변경
+const getItemDescription = (dayIndex, itemIndex) => {
+  if (props.itinerary && 
+      props.itinerary[dayIndex] && 
+      props.itinerary[dayIndex].items && 
+      props.itinerary[dayIndex].items[itemIndex]) {
+    return props.itinerary[dayIndex].items[itemIndex].memo || ''
+  }
+  return ''
 }
 </script>

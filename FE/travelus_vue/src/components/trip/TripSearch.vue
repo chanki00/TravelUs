@@ -209,6 +209,7 @@ const addToItinerary = (place) => {
     time: new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' }),
     image: place.image ?? '',
     placeData: place,
+    memo: ''
   })
   
 }

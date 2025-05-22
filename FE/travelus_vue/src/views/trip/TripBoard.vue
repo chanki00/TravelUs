@@ -118,6 +118,7 @@ import { ref, onMounted } from 'vue'
 import TripUploadModal from '@/components/trip/TripUploadModal.vue'
 import api from '@/api'
 
+
 const activeFilter = ref('all')
 const searchTerm = ref('')
 const isUploadModalOpen = ref(false)
@@ -131,22 +132,27 @@ const tabs = [
 
 const trips = ref([])
 
-onMounted(async () => {
-    const response = await api.get(`/api/v1/plan/share`)
-     const trip = response.data
+const fetchTrips = async () => {
+  const response = await api.get(`/api/v1/plan/share`)
+  const trip = response.data
 
-  // 각 여행 계획에 태그를 병렬로 가져와서 추가
   const enrichedTrips = await Promise.all(
     trip.map(async (tripPlan) => {
       const tagRes = await api.get(`/api/v1/tag/plan/${tripPlan.id}`)
       return {
-        ...tripPlan,     // 기존 tripPlan의 모든 속성 유지
-        tags: tagRes.data // 새로 추가된 tags 필드
+        ...tripPlan,
+        tags: tagRes.data
       }
     })
   )
 
   trips.value = enrichedTrips
+}
+
+
+
+onMounted(async () => {
+    fetchTrips()
 })
 
 // 모달 열기
@@ -167,22 +173,25 @@ const handleApplyTrip = async (selectedTrip) => {
   // 예: API 호출 또는 상태 업데이트
   const response = await api.patch(`/api/v1/plan/updateShare/${selectedTrip.id}`)
   // 예시: 선택한 여행 계획을 게시판 목록에 추가
-  const newTrip = {
-    id: `new-${Date.now()}`,
-    title: selectedTrip.title,
-    location: selectedTrip.location,
-    author: "현재사용자", // 실제로는 로그인한 사용자 정보를 사용
-    image: selectedTrip.image,
-    tags: selectedTrip.tags,
-    likes: 0,
-    comments: 0,
-    created: new Date().toISOString().split('T')[0]
-  }
+  // const newTrip = {
+  //   id: `new-${Date.now()}`,
+  //   title: selectedTrip.title,
+  //   location: selectedTrip.location,
+  //   author: "현재사용자", // 실제로는 로그인한 사용자 정보를 사용
+  //   image: selectedTrip.image,
+  //   tags: selectedTrip.tags,
+  //   likes: 0,
+  //   comments: 0,
+  //   created: new Date().toISOString().split('T')[0]
+  // }
   
-  // 새 여행 계획을 목록 맨 앞에 추가
-  trips.value.unshift(newTrip)
-  
+  // // 새 여행 계획을 목록 맨 앞에 추가
+  // trips.value.unshift(newTrip)
+
+   await fetchTrips()
   // 성공 메시지 표시 (실제 구현에서는 토스트 메시지 등으로 구현)
   alert('여행 계획이 성공적으로 업로드되었습니다!')
+  
+
 }
 </script>

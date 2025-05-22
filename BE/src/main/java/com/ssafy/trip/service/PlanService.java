@@ -6,6 +6,8 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.DB_PASSWORD_REDACTED.trip.dto.BasicPlanDTO;
+import com.DB_PASSWORD_REDACTED.trip.dto.Itinerary;
+import com.DB_PASSWORD_REDACTED.trip.dto.ItineraryPlaceResponseDto;
 import com.DB_PASSWORD_REDACTED.trip.dto.Tripplan;
 import com.DB_PASSWORD_REDACTED.trip.repository.PlanRepository;
 
@@ -41,8 +43,8 @@ public class PlanService {
 		return repo.getPlanDaysId(planId, dayNumber);
 	}
 
-	public int insertItinerary(int dayId, int attractionId, int order) {
-		return repo.insertItinerary(dayId, attractionId, order);
+	public int insertItinerary(Itinerary req) {
+		return repo.insertItinerary(req);
 	}
 
 	public List<Tripplan> getTripplanByUserId(int userId) {
@@ -55,6 +57,10 @@ public class PlanService {
 
 	public List<Tripplan> getAllSharePlan() {
 		return repo.getAllSharePlan();
+	}
+
+	public List<ItineraryPlaceResponseDto> getItineraryByPlanId(int planId) {
+		return repo.getItineraryByPlanId(planId);
 	}
 
 }

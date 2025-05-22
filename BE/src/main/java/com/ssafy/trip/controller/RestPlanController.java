@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.DB_PASSWORD_REDACTED.trip.dto.BasicPlanDTO;
+import com.DB_PASSWORD_REDACTED.trip.dto.Itinerary;
+import com.DB_PASSWORD_REDACTED.trip.dto.ItineraryPlaceResponseDto;
 import com.DB_PASSWORD_REDACTED.trip.dto.Tripplan;
 import com.DB_PASSWORD_REDACTED.trip.service.PlanService;
 
@@ -44,6 +46,13 @@ public class RestPlanController {
         return ResponseEntity.ok(tripplan);
     }
 	
+	@GetMapping("/itinerary/{planId}")
+	 public ResponseEntity<List<ItineraryPlaceResponseDto>> getItineraryByplanId(@PathVariable int planId) {
+		List<ItineraryPlaceResponseDto> list = service.getItineraryByPlanId(planId);
+
+       return ResponseEntity.ok(list);
+   }
+	
 	@GetMapping("/user/{userId}")
 	 public ResponseEntity<List<Tripplan>> getTripplanByUserId(@PathVariable int userId) {
        List<Tripplan> tripplan = service.getTripplanByUserId(userId);
@@ -59,12 +68,9 @@ public class RestPlanController {
 		return ResponseEntity.ok(service.getPlanDaysId(planId, dayNumber));
 	}
 	
-	@PostMapping("/itinerary/{dayId}/{attractionId}/{order}")
-	public ResponseEntity<?> createItinerary(
-			@PathVariable int dayId
-			, @PathVariable int attractionId
-			, @PathVariable int order){
-		return ResponseEntity.ok(service.insertItinerary(dayId, attractionId,order));
+	@PostMapping("/itinerary")
+	public ResponseEntity<?> createItinerary(@RequestBody Itinerary req){
+		return ResponseEntity.ok(service.insertItinerary(req));
 	}
 	
 	@GetMapping("/share")
