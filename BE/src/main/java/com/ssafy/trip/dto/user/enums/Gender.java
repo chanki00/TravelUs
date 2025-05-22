@@ -21,12 +21,4 @@ public enum Gender {
 			throw new RuntimeException("해당하는 성별이 없습니다." + value);
 		}
 	}
-
-	@Override
-	public String toString() {
-		return label;
-	}
-	
-	
-
 }

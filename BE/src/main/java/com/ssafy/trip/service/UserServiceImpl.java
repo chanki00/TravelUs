@@ -1,7 +1,9 @@
 package com.DB_PASSWORD_REDACTED.trip.service;
 
+import java.sql.SQLException;
 import java.util.List;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.DB_PASSWORD_REDACTED.trip.dto.user.UserDto;
@@ -15,9 +17,12 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 	private final UserRepository repo;
+	private final PasswordEncoder pe;
 
 	@Override
-	public int insertUser(UserDto user) {
+	public int insertUser(UserDto user) throws SQLException {
+		
+		user.setUserPw(pe.encode(user.getUserPw()));
 		
 		int cnt = repo.insertUser(user);
 		
@@ -25,17 +30,17 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public UserDto selectUser(Long id) {		
+	public UserDto selectUser(Long id) throws SQLException {		
 		return repo.selectUser(id);
 	}
 
 	@Override
-	public List<UserDto> selectAllUser() {
+	public List<UserDto> selectAllUser() throws SQLException {
 		return repo.selectAllUser();
 	}
 
 	@Override
-	public int updateInfo(UserInfoDto dto) {
+	public int updateInfo(UserInfoDto dto) throws SQLException {
 		
 		int cnt = repo.updateInfo(dto);
 		
@@ -43,24 +48,21 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public int updatePw(UserPwDto dto) {
+	public int updatePw(UserPwDto dto) throws SQLException {
 		
-		int cnt = updatePw(dto);
+		dto.setPw(pe.encode(dto.getPw()));
+		
+		int cnt = repo.updatePw(dto);
 		
 		return cnt;
 	}
 
 	@Override
-	public int deleteUser(Long id) {
+	public int deleteUser(Long id) throws SQLException {
 		
 		int cnt = repo.deleteUser(id);
 		
 		return cnt;
-	}
-
-	@Override
-	public boolean login(Long id, String userId, String userPw) {
-		return false;
 	}
 	
 }
