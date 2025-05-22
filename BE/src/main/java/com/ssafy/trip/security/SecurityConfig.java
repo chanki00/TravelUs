@@ -50,7 +50,7 @@ public class SecurityConfig {
 
         JWTAuthenticationFilter filter = new JWTAuthenticationFilter(authenticationManager, jwtUtil, refreshRepository);
         filter.setAuthenticationManager(authenticationManager);
-        filter.setFilterProcessesUrl("/api/auth/login"); // 로그인 URL
+        filter.setFilterProcessesUrl("/api/v1/user/login"); // 로그인 URL
         return filter;
     }
     
@@ -58,13 +58,13 @@ public class SecurityConfig {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("*"));
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173")); // ★ 프론트 주소로
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
+        configuration.setAllowCredentials(true); // ★ 꼭 추가
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/api/**", configuration);
-        source.registerCorsConfiguration("/member/checkEmail", configuration);
+        source.registerCorsConfiguration("/**", configuration); // ★ 전역 설정
 
         return source;
     }

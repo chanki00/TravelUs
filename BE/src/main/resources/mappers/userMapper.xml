@@ -16,7 +16,7 @@
     <result property="address" column="address"/>
     <result property="intro" column="intro"/>
     <result property="role" column="role"/>
-    <result property="allow_invite" column="allow_invite"/>
+    <result property="allowInvite" column="allow_invite"/>
     <result property="createdAt" column="created_at"/>
   </resultMap>
 

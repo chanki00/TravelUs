@@ -17,6 +17,8 @@ import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.DB_PASSWORD_REDACTED.trip.dto.RefreshToken;
 import com.DB_PASSWORD_REDACTED.trip.dto.user.LoginDto;
+import com.DB_PASSWORD_REDACTED.trip.dto.user.UserDto;
+import com.DB_PASSWORD_REDACTED.trip.dto.user.UserResponseDto;
 import com.DB_PASSWORD_REDACTED.trip.repository.RefreshRepository;
 import com.DB_PASSWORD_REDACTED.trip.security.CustomUserDetails;
 
@@ -34,64 +36,78 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 	private final AuthenticationManager authenticationManager;
 	private final JWTUtil jwtUtil;
 	private final RefreshRepository repo;
-	
+
 	@Override
 	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) {
-		
+
 		UsernamePasswordAuthenticationToken authToken = null;
-		
+
 		ObjectMapper mapper = new ObjectMapper();
 		try {
 			LoginDto login = mapper.readValue(request.getInputStream(), LoginDto.class);
-			
+
 			authToken = new UsernamePasswordAuthenticationToken(login.getUserId(), login.getUserPw());
-			
+
 			return authenticationManager.authenticate(authToken);
-			
-			
+
 		} catch (IOException e) {
 			throw new RuntimeException("로그인 정보 파싱 실패");
 		}
-		
+
 	}
 
 	@Override
 	protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
 			Authentication authentication) throws IOException, ServletException {
-		
+
 		System.out.println("로그인 성공");
-		
+
 		CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
 		String username = customUserDetails.getUsername();
 		Collection<? extends GrantedAuthority> authorities = customUserDetails.getAuthorities();
-		
+
 		String role = new String();
 		for (GrantedAuthority grantedAuthority : authorities) {
 			role = grantedAuthority.getAuthority();
 		}
-		
+
 		// AccessToken, RefreshToken
 		String accessToken = jwtUtil.createAccessToken(Map.of("username", username, "role", role));
 		String refreshToken = jwtUtil.createRefreshToken(Map.of("username", username));
-		
+
 		repo.saveToken(new RefreshToken(username, refreshToken));
-		
+
+		// ------------------------------
+		UserDto user = customUserDetails.getUser();
+		UserResponseDto userResponse = new UserResponseDto(user.getId(), user.getUserId(), user.getUserEmail(),
+				user.getName(), user.getAge(), user.getGender(), user.getAddress(), user.getIntro(), user.getRole(),
+				user.getAllowInvite());
+
+		// 응답 헤더 설정 (선택 사항)
 		response.setHeader("accessToken", accessToken);
-		
+		response.setHeader("refreshToken", refreshToken);
 		response.addCookie(createCookie("refreshToken", refreshToken));
-		response.setHeader("refreshToken", refreshToken);	
-		
-	}
-	
-	private Cookie createCookie(String key, String refreshToken) {
-		Cookie cookie = new Cookie(key, refreshToken);
-	    cookie.setMaxAge(24*60*60);
-	    //cookie.setSecure(true);
-	    //cookie.setPath("/");
-	    cookie.setHttpOnly(true);
-		return cookie;
+
+		// 응답 본문에 JSON으로 토큰 전달
+		response.setContentType("application/json");
+		response.setCharacterEncoding("UTF-8");
+
+		Map<String, Object> responseBody = Map.of("accessToken", accessToken, "refreshToken", refreshToken, "user",
+				userResponse);
+
+		ObjectMapper objectMapper = new ObjectMapper();
+		response.getWriter().write(objectMapper.writeValueAsString(responseBody));
+
 	}
 
+	private Cookie createCookie(String key, String refreshToken) {
+		Cookie cookie = new Cookie(key, refreshToken);
+		cookie.setMaxAge(24 * 60 * 60);
+		// cookie.setSecure(true);
+		// cookie.setPath("/");
+		cookie.setHttpOnly(true);
+		return cookie;
+	}
 
 	@Override
 	protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
@@ -99,7 +115,5 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 		System.out.println("login 실패");
 		response.setStatus(401);
 	}
-	
-	
-	
+
 }

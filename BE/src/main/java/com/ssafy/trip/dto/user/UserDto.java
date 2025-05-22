@@ -21,11 +21,11 @@ public class UserDto {
 	private @NonNull String userPw;
 	private @NonNull String UserEmail;
 	private @NonNull String name;
-	private @NonNull Integer age;
+	private @NonNull String age;
 	private @NonNull Gender gender;
 	private @NonNull String address;
 	private String intro;
 	private Role role;
-	private Boolean allow_invite;
+	private Boolean allowInvite;
 	private LocalDateTime createdAt;
 }

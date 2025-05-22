@@ -20,5 +20,5 @@ public class UserInfoDto {
 	private @NonNull String name;
 	private @NonNull String userEmail;
 	private @NonNull String address;
-	private @NonNull Integer age;
+	private @NonNull String age;
 }

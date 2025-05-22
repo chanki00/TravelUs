@@ -13,6 +13,7 @@ import com.DB_PASSWORD_REDACTED.trip.dto.RefreshToken;
 import com.DB_PASSWORD_REDACTED.trip.repository.RefreshRepository;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -21,34 +22,47 @@ import lombok.RequiredArgsConstructor;
 public class JwtController {
 
     private final JWTUtil jwtUtil;
-    private final RefreshRepository refreshTokenMapper;
+    private final RefreshRepository repo;
 
     /**
      * RefreshToken을 이용하여 새로운 AccessToken 재발급
      */
-    @PostMapping("/reissue")
+    @PostMapping("/refresh")
     public ResponseEntity<?> reissue(@RequestHeader("refreshToken") String refreshToken) {
 
-        // 1. 만료 확인
         if (jwtUtil.isExpired(refreshToken)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("RefreshToken이 만료되었습니다.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("RefreshToken 만료");
         }
 
-        // 2. 토큰 정보에서 username 추출
         Claims claims = jwtUtil.getClaims(refreshToken);
         String username = claims.get("username", String.class);
 
-        // 3. DB의 refresh token과 비교
-        RefreshToken savedToken = refreshTokenMapper.findByUsername(username);
+        RefreshToken savedToken = repo.findByUsername(username);
         if (savedToken == null || !savedToken.getToken().equals(refreshToken)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("RefreshToken이 일치하지 않습니다.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("RefreshToken 불일치");
         }
 
-        // 4. 새 access token 발급
-        String role = claims.get("role", String.class); // 없으면 기본값으로도 가능
+        String role = claims.get("role", String.class);
         String newAccessToken = jwtUtil.createAccessToken(Map.of("username", username, "role", role));
 
-        // 5. 응답
+
         return ResponseEntity.ok(Map.of("accessToken", newAccessToken));
+    }
+    
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@RequestHeader("Refresh-Token") String refreshToken) {
+    	if (refreshToken == null || refreshToken.isEmpty()) {
+    		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "RefreshToken 필요"));
+    	}
+    	
+    	Map<String, Object> claims = jwtUtil.getClaims(refreshToken);
+    	String username = (String) claims.get("username");
+    	if (username == null) {
+    		throw new JwtException("username이 없습니다.");
+    	}
+    	
+    	repo.deleteToken(username);
+    	
+    	return ResponseEntity.ok("로그아웃 완료");
     }
 }
