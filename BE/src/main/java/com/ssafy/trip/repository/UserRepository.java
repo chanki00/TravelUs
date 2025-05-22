@@ -1,5 +1,6 @@
 package com.DB_PASSWORD_REDACTED.trip.repository;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
@@ -10,10 +11,11 @@ import com.DB_PASSWORD_REDACTED.trip.dto.user.UserPwDto;
 
 @Mapper
 public interface UserRepository {
-	public int insertUser(UserDto user);
-	public UserDto selectUser(Long id);
-	public List<UserDto> selectAllUser();
-	public int updateInfo(UserInfoDto dto);
-	public int updatePw(UserPwDto dto);
-	public int deleteUser(Long id);
+	public int insertUser(UserDto user) throws SQLException;
+	public UserDto selectUser(Long id) throws SQLException;
+	public UserDto selectUserByUserid(String userId) throws SQLException;
+	public List<UserDto> selectAllUser() throws SQLException;
+	public int updateInfo(UserInfoDto dto) throws SQLException;
+	public int updatePw(UserPwDto dto) throws SQLException;
+	public int deleteUser(Long id) throws SQLException;
 }
