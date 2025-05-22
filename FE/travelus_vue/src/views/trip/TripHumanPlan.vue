@@ -102,6 +102,7 @@ onMounted(async () => {
   try {
     const response = await api.get('/api/v1/sidos')
     sidos.value = response.data
+    console.log(sidos.value )
   } catch (error) {
     console.error('시도 목록 조회 실패:', error)
   }

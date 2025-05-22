@@ -87,7 +87,9 @@ public class SecurityConfig {
     	http.authorizeHttpRequests(auth -> auth
     		    .requestMatchers("/api/v1/user", "/api/v1/user/**").permitAll()  // 회원가입 등 허용
     		    .requestMatchers("/api/auth/**").permitAll()                     // 로그인/재발급 허용
-    		    .anyRequest().authenticated()                                    // 나머지는 인증 필요
+//    		    .anyRequest().authenticated()                                    // 나머지는 인증 필요
+    		 //  TODO : 테스트용( 제거 해야됨)
+    		    .anyRequest().permitAll() 
     		);
 
     	
