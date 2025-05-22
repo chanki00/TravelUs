@@ -16,4 +16,6 @@ public interface TagRepository {
 	List<TagDTO> getUserTags();
 	int insertUserTag(int userId, int tagId);
 	List<String> getUserTagsName(int userId);
+	
+    int deleteUserTags(int userId);
 }

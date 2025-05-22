@@ -19,7 +19,7 @@ public class UserDto {
 	private Long id;
 	private @NonNull String userId;
 	private @NonNull String userPw;
-	private @NonNull String UserEmail;
+	private @NonNull String userEmail;
 	private @NonNull String name;
 	private @NonNull String age;
 	private @NonNull Gender gender;

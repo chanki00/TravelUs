@@ -6,35 +6,44 @@
 <mapper namespace="com.DB_PASSWORD_REDACTED.trip.repository.TagRepository">
 
 	<select id="getTripTags" resultType="com.DB_PASSWORD_REDACTED.trip.dto.TagDTO">
-	  SELECT * FROM tags WHERE type = '여행'
+		SELECT * FROM tags WHERE type = '여행'
 	</select>
-	
+
 	<insert id="insertplanTag">
 		insert into tripplantags (plan_id, tag_id)
-		values (#{planId}, #{tagId})
+		values
+		(#{planId}, #{tagId})
 	</insert>
-	
+
 	<select id="getTripplanTagsName">
-	  SELECT t.name
+		SELECT t.name
 		FROM TripPlanTags tpt
 		JOIN Tags t ON tpt.tag_id = t.id
-		WHERE tpt.plan_id = #{planId};
+		WHERE
+		tpt.plan_id = #{planId};
 	</select>
-	
+
 	<select id="getUserTags" resultType="com.DB_PASSWORD_REDACTED.trip.dto.TagDTO">
-		SELECT * FROM tags WHERE type = '성격'
+		SELECT * FROM tags WHERE
+		type = '성격'
 	</select>
-	
+
 	<insert id="insertUserTag">
 		INSERT INTO usertags (user_id, tag_id)
-		VALUES (#{planId}, #{tagId})
+		VALUES
+		(#{userId}, #{tagId})
 	</insert>
-	
-	<select id="getUserTagsName">
-		SELECT u.name
-		FROM usertags u
-		JOIN tags t ON u.tag_id = t.id
+
+	<delete id="deleteUserTags">
+		DELETE FROM usertags WHERE user_id = #{userId}
+	</delete>
+
+	<select id="getUserTagsName" >
+		SELECT t.name
+		FROM tags t
+		JOIN usertags u ON u.tag_id =
+		t.id
 		WHERE u.user_id = #{userId};
 	</select>
-	
+
 </mapper>
