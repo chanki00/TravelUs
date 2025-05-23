@@ -42,13 +42,7 @@
           >
             선호 여행
           </button>
-          <button 
-              @click="showTagFilter = !showTagFilter"
-              class="px-4 py-2 border border-dashed rounded-md flex items-center gap-2"
-            >
-              <tag-icon class="h-4 w-4" />
-              태그 필터
-          </button>
+          
         </div>
 
         <div class="flex flex-wrap gap-2">
