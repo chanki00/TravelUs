@@ -473,7 +473,7 @@ const allTripTags = ref([])
 
 onMounted(async () => {
   editUser.value = {...user.value}
-  if (editUser.value.age == null) user.value.age = '기타'
+  if (editUser.value.age == null) editUser.value.age = '기타'
   if (editUser.value.gender == null) editUser.value.gender = 'O'
   if (editUser.value.address == null) editUser.value.address = '기타'
 
