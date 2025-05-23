@@ -32,6 +32,17 @@
             성격
           </button>
           <button 
+            :class="[
+              'px-4 py-2 rounded-md',
+              activeFilter === 'prefer' 
+                ? 'bg-primary text-white' 
+                : 'bg-white border border-gray-300 text-gray-700'
+            ]"
+            @click="activeFilter = 'prefer'"
+          >
+            선호 여행
+          </button>
+          <button 
               @click="showTagFilter = !showTagFilter"
               class="px-4 py-2 border border-dashed rounded-md flex items-center gap-2"
             >
