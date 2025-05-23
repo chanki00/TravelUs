@@ -7,5 +7,6 @@ import lombok.Data;
 @Data
 public class UserTagUpdateRequest {
     private int userId;
+    private String type;
     private List<Integer> tagIds;
 }

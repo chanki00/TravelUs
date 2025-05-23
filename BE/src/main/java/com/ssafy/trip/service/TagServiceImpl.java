@@ -36,12 +36,16 @@ public class TagServiceImpl implements TagService{
 		return repo.insertUserTag(userId, tagId);
 	}
 	
-	public List<String> getUserTagsName(int userId) {
-		return repo.getUserTagsName(userId);
+	public List<String> getUserPersonalTagsName(int userId) {
+		return repo.getUserPersonalTagsName(userId);
+	}
+
+	public List<String> getUserTripTagsName(int userId) {
+		return repo.getUserTripTagsName(userId);
 	}
 	
-	public void updateUserTags(int userId, List<Integer> tagIds) {
-	    repo.deleteUserTags(userId); // 기존 유저 태그 삭제
+	public void updateUserTags(int userId, String type, List<Integer> tagIds) {
+	    repo.deleteUserTags(userId, type); // 기존 유저 태그 삭제
 	    for (Integer tagId : tagIds) {
 	        repo.insertUserTag(userId, tagId); // 새 태그 등록
 	    }

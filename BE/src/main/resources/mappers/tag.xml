@@ -30,20 +30,32 @@
 
 	<insert id="insertUserTag">
 		INSERT INTO usertags (user_id, tag_id)
-		VALUES
-		(#{userId}, #{tagId})
+		VALUES (#{userId}, #{tagId})
 	</insert>
 
 	<delete id="deleteUserTags">
-		DELETE FROM usertags WHERE user_id = #{userId}
+		DELETE u FROM usertags u
+		JOIN tags t ON u.tag_id = t.id
+		WHERE user_id = #{userId}
+		AND t.type = #{type}
 	</delete>
 
-	<select id="getUserTagsName" >
+	<select id="getUserPersonalTagsName" >
 		SELECT t.name
 		FROM tags t
 		JOIN usertags u ON u.tag_id =
 		t.id
-		WHERE u.user_id = #{userId};
+		WHERE u.user_id = #{userId}
+		AND t.type = '성격'
+	</select>
+	
+	<select id="getUserTripTagsName" >
+		SELECT t.name
+		FROM tags t
+		JOIN usertags u ON u.tag_id =
+		t.id
+		WHERE u.user_id = #{userId}
+		AND t.type = '여행';
 	</select>
 
 </mapper>

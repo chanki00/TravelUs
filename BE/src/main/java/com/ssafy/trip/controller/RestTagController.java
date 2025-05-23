@@ -49,14 +49,28 @@ public class RestTagController {
 		return ResponseEntity.ok(service.insertUserTag(userId, tagId));
 	}
 	
-	@GetMapping("/user/{userId}")
-	public ResponseEntity<List<String>> getUserTagsName(@PathVariable int userId) {
-		return ResponseEntity.ok(service.getUserTagsName(userId));
+	@GetMapping("/user/personal/{userId}")
+	public ResponseEntity<List<String>> getUserPersonalTagsName(@PathVariable int userId) {
+		return ResponseEntity.ok(service.getUserPersonalTagsName(userId));
+	}
+	
+	@GetMapping("/user/trip/{userId}")
+	public ResponseEntity<List<String>> getUserTripTagsName(@PathVariable int userId) {
+		return ResponseEntity.ok(service.getUserTripTagsName(userId));
 	}
 	
 	@PatchMapping("/user")
 	public ResponseEntity<?> updateUserTags(@RequestBody UserTagUpdateRequest dto) {
-	    service.updateUserTags(dto.getUserId(), dto.getTagIds());
+		
+		String type;
+		if (dto.getType().equals("personal")) {
+			type = "성격";
+		}
+		else {
+			type = "여행";
+		}
+		
+	    service.updateUserTags(dto.getUserId(), type, dto.getTagIds());
 	    return ResponseEntity.ok().build();
 	}
 
