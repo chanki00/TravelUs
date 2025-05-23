@@ -10,9 +10,13 @@ import com.DB_PASSWORD_REDACTED.trip.dto.TagDTO;
 public interface TagRepository {
 
 	List<TagDTO> getTripTags();
-
 	int insertplanTag(int planId, int tagId);
-
 	List<String> getTripplanTagsName(int planId);
-
+	
+	List<TagDTO> getUserTags();
+	int insertUserTag(int userId, int tagId);
+	List<String> getUserPersonalTagsName(int userId);
+	List<String> getUserTripTagsName(int userId);
+	
+    int deleteUserTags(int userId, String type);
 }

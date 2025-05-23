@@ -18,29 +18,25 @@
             ]"
             @click="activeFilter = 'recommended'"
           >
-            추천순
+            종합
           </button>
           <button 
             :class="[
               'px-4 py-2 rounded-md',
-              activeFilter === 'latest' 
+              activeFilter === 'personal' 
                 ? 'bg-primary text-white' 
                 : 'bg-white border border-gray-300 text-gray-700'
             ]"
-            @click="activeFilter = 'latest'"
+            @click="activeFilter = 'personal'"
           >
-            최신순
+            성격
           </button>
           <button 
-            :class="[
-              'px-4 py-2 rounded-md',
-              activeFilter === 'location' 
-                ? 'bg-primary text-white' 
-                : 'bg-white border border-gray-300 text-gray-700'
-            ]"
-            @click="activeFilter = 'location'"
-          >
-            지역순
+              @click="showTagFilter = !showTagFilter"
+              class="px-4 py-2 border border-dashed rounded-md flex items-center gap-2"
+            >
+              <tag-icon class="h-4 w-4" />
+              태그 필터
           </button>
         </div>
 
@@ -55,15 +51,8 @@
             <option value="all">모두</option>
             <option value="20s">20대</option>
             <option value="30s">30대</option>
-            <option value="40s">40대 이상</option>
-          </select>
-
-          <select class="w-[120px] px-3 py-2 border border-gray-300 rounded-md">
-            <option value="all">모두</option>
-            <option value="relax">휴양/힐링</option>
-            <option value="active">액티비티</option>
-            <option value="food">맛집 탐방</option>
-            <option value="culture">문화/역사</option>
+            <option value="40s">40대</option>
+            <option value="50s">50대 이상</option>
           </select>
         </div>
       </div>
@@ -86,9 +75,9 @@
                 <div class="flex items-center gap-1 text-sm text-gray-500">
                   <span>{{ companion.age }}</span>
                   <span>•</span>
-                  <span>{{ companion.gender }}</span>
+                  <span>{{ convertGender(companion.gender) }}</span>
                   <span>•</span>
-                  <span>{{ companion.location }}</span>
+                  <span>{{ companion.address }}</span>
                 </div>
               </div>
             </div>
@@ -97,11 +86,11 @@
               <div class="text-sm text-gray-500 mb-1">성격</div>
               <div class="flex flex-wrap gap-2">
                 <span 
-                  v-for="(item, index) in companion.personality" 
-                  :key="index"
-                  class="px-2 py-1 text-xs rounded-full bg-purple-50 border border-purple-100"
+                  v-for="(tag, i) in companion.personality" 
+                  :key="i"
+                  class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs bg-purple-50 text-purple-800"
                 >
-                  {{ item }}
+                  {{ tag }}
                 </span>
               </div>
             </div>
@@ -110,11 +99,11 @@
               <div class="text-sm text-gray-500 mb-1">선호 여행 스타일</div>
               <div class="flex flex-wrap gap-2">
                 <span 
-                  v-for="(item, index) in companion.preference" 
-                  :key="index"
-                  class="px-2 py-1 text-xs rounded-full bg-green-50 border border-green-100"
+                  v-for="(tag, i) in companion.preference" 
+                  :key="i"
+                  class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs bg-green-50 text-green-800"
                 >
-                  {{ item }}
+                  {{ tag }}
                 </span>
               </div>
             </div>
@@ -125,9 +114,6 @@
                 <div class="font-bold text-purple-600">{{ companion.match }}%</div>
               </div>
               <div class="flex gap-2">
-                <button class="px-3 py-1 text-sm border border-gray-300 rounded-md">
-                  프로필
-                </button>
                 <button class="px-3 py-1 text-sm bg-primary text-white rounded-md">
                   초대하기
                 </button>
@@ -141,76 +127,88 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted, computed } from 'vue';
+import { useUserStore } from '@/store/user';
+import { 
+  Tag as TagIcon
+} from 'lucide-vue-next'
 
-const activeFilter = ref('recommended');
+const userStore = useUserStore()
 
-const companions = [
-  {
-    id: "1",
-    name: "여행자123",
-    age: "20대",
-    gender: "남성",
-    location: "서울",
-    profile:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80",
-    personality: ["친절함", "조용함", "계획적"],
-    preference: ["자연", "사진", "맛집"],
-    match: 92,
-  },
-  {
-    id: "2",
-    name: "여행좋아",
-    age: "30대",
-    gender: "여성",
-    location: "부산",
-    profile:
-      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80",
-    personality: ["활발함", "사교적", "즉흥적"],
-    preference: ["음식", "문화", "쇼핑"],
-    match: 85,
-  },
-  {
-    id: "3",
-    name: "산책러버",
-    age: "20대",
-    gender: "여성",
-    location: "인천",
-    profile:
-      "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80",
-    personality: ["차분함", "예술적", "꼼꼼함"],
-    preference: ["하이킹", "풍경", "카페"],
-    match: 78,
-  },
-  {
-    id: "4",
-    name: "바다사랑",
-    age: "30대",
-    gender: "남성",
-    location: "제주",
-    profile:
-      "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80",
-    personality: ["유머러스", "모험적", "여유로움"],
-    preference: ["해변", "수영", "서핑"],
-    match: 64,
-  },
-  {
-    id: "5",
-    name: "도시탐험가",
-    age: "40대",
-    gender: "여성",
-    location: "대구",
-    profile:
-      "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=100&q=80",
-    personality: ["지적", "열정적", "호기심"],
-    preference: ["역사", "박물관", "도시"],
-    match: 58,
-  },
-];
+const genderFilter = ref('all')
+const ageFilter = ref('all')
+const styleFilter = ref('all')
+
+const currUser = ref(null)
+const companions = computed(() => {
+  if (!currUser.value) return []
+  
+  return userStore.userList
+    .filter(user => user.id !== currUser.value.id)
+    .map(user => ({
+      ...user,
+      match: calculateSimilarity(currUser.value, user, activeFilter.value)
+    }))
+    .sort((a, b) => b.match - a.match) // 높은 점수부터 정렬
+})
+
+const activeFilter = ref('recommended')
+
+const convertGender = (code) => {
+  switch (code) {
+    case 'M':
+      return '남성'
+    case 'F':
+      return '여성'
+    case 'O':
+      return '기타'
+    default:
+      return '알 수 없음'
+  }
+}
+
+onMounted(async () => {
+  await userStore.getUserList()
+  currUser.value = userStore.userList.find(
+    (user) => user.id === userStore.loginUser.id
+  )
+})
+
+const getCommonCount = (arr1, arr2) => {
+  const set1 = new Set(arr1)
+  const set2 = new Set(arr2)
+  let count = 0
+  for (const item of set1) {
+    if (set2.has(item)) count++
+  }
+  return count
+}
+
+const calculateSimilarity = (user, target, type) => {
+  const commonPersonality = getCommonCount(user.personality, target.personality)
+  const commonPreference = getCommonCount(user.preference, target.preference)
+
+  const totalPersonality = new Set([...user.personality, ...target.personality]).size
+  const totalPreference = new Set([...user.preference, ...target.preference]).size
+
+  const personalityScore = totalPersonality ? commonPersonality / totalPersonality : 0
+  const preferenceScore = totalPreference ? commonPreference / totalPreference : 0
+
+  let weightPersonality = 0.5
+  let weightPreference = 0.5
+
+  if (type === 'personal') {
+    weightPersonality = 0.7
+    weightPreference = 0.3
+  } else if (type === 'prefer') {
+    weightPersonality = 0.3
+    weightPreference = 0.7
+  }
+
+  const finalScore = (personalityScore * weightPersonality + preferenceScore * weightPreference) * 100
+  return Math.round(finalScore)
+}
 </script>
 
 <style scoped>
-.bg-primary {
-  @apply bg-purple-600;
-}
 </style>

@@ -19,8 +19,8 @@ public class UserInfoDto {
 	private Long id;
 	private @NonNull String name;
 	private @NonNull String userEmail;
-	private @NonNull String address;
-	private @NonNull String age;
-	private @NonNull Gender gender;
-	private @NonNull String intro;
+	private String address;
+	private String age;
+	private Gender gender;
+	private String intro;
 }
