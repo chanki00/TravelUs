@@ -38,12 +38,20 @@
                     {{ selectedRegion ? getSelectedRegionName() : '지역 선택' }}
                   </span>
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M19 9l-7 7-7-7"
+                    ></path>
                   </svg>
                 </button>
-                
+
                 <!-- 지역 드롭다운 -->
-                <div v-if="showRegionFilter" class="absolute top-full left-0 mt-1 w-full sm:w-48 bg-white border rounded-md shadow-lg z-10 max-h-60 overflow-y-auto">
+                <div
+                  v-if="showRegionFilter"
+                  class="absolute top-full left-0 mt-1 w-full sm:w-48 bg-white border rounded-md shadow-lg z-10 max-h-60 overflow-y-auto"
+                >
                   <button
                     @click="selectRegion('')"
                     class="w-full px-3 py-2 text-left hover:bg-gray-50 text-sm"
@@ -56,7 +64,7 @@
                     @click="selectRegion(sido.sidoCode)"
                     :class="[
                       'w-full px-3 py-2 text-left hover:bg-gray-50 text-sm',
-                      selectedRegion === sido.sidoCode ? 'bg-blue-50 text-blue-600' : ''
+                      selectedRegion === sido.sidoCode ? 'bg-blue-50 text-blue-600' : '',
                     ]"
                   >
                     {{ sido.sidoName }}
@@ -71,15 +79,27 @@
                   class="flex items-center justify-between w-full sm:w-48 px-3 py-2 border rounded-md hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500 h-10"
                 >
                   <span class="text-sm">
-                    {{ tempSelectedTags.length > 0 ? `태그 ${tempSelectedTags.length}개 선택` : '태그 선택' }}
+                    {{
+                      tempSelectedTags.length > 0
+                        ? `태그 ${tempSelectedTags.length}개 선택`
+                        : '태그 선택'
+                    }}
                   </span>
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M19 9l-7 7-7-7"
+                    ></path>
                   </svg>
                 </button>
-                
+
                 <!-- 태그 드롭다운 -->
-                <div v-if="showTagFilter" class="absolute top-full left-0 mt-1 w-full sm:w-64 bg-white border rounded-md shadow-lg z-10">
+                <div
+                  v-if="showTagFilter"
+                  class="absolute top-full left-0 mt-1 w-full sm:w-64 bg-white border rounded-md shadow-lg z-10"
+                >
                   <div class="p-3">
                     <div class="grid grid-cols-2 gap-2 mb-3 max-h-48 overflow-y-auto">
                       <button
@@ -90,7 +110,7 @@
                           'px-3 py-1 text-sm rounded-full transition-colors',
                           tempSelectedTags.includes(tag)
                             ? 'bg-blue-600 text-white'
-                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200',
                         ]"
                       >
                         {{ tag }}
@@ -122,7 +142,7 @@
                     placeholder="여행 계획 검색하기"
                     class="px-3 py-2 border rounded-l-md focus:outline-none focus:ring-1 focus:ring-blue-500 flex-grow h-10"
                   />
-                  <button 
+                  <button
                     class="px-4 py-2 bg-blue-600 text-white rounded-r-md hover:bg-blue-700 h-10"
                     @click="searchTrips"
                   >
@@ -134,15 +154,18 @@
 
             <!-- 선택된 필터 표시 -->
             <div v-if="hasActiveFilters" class="mt-4 flex flex-wrap gap-2 items-center">
-              <div v-if="selectedRegion" class="flex items-center bg-blue-50 px-3 py-1 rounded-full">
+              <div
+                v-if="selectedRegion"
+                class="flex items-center bg-blue-50 px-3 py-1 rounded-full"
+              >
                 <span class="text-sm text-blue-700">{{ getSelectedRegionName() }}</span>
                 <button @click="clearRegionFilter" class="ml-2 text-blue-700 hover:text-blue-900">
                   ✕
                 </button>
               </div>
-              <div 
-                v-for="tag in selectedTags" 
-                :key="tag" 
+              <div
+                v-for="tag in selectedTags"
+                :key="tag"
                 class="flex items-center bg-blue-50 px-3 py-1 rounded-full"
               >
                 <span class="text-sm text-blue-700">{{ tag }}</span>
@@ -156,8 +179,8 @@
                   ✕
                 </button>
               </div>
-              <button 
-                @click="clearAllFilters" 
+              <button
+                @click="clearAllFilters"
                 class="text-sm text-blue-600 hover:text-blue-800 ml-auto"
               >
                 필터 초기화
@@ -300,37 +323,38 @@ const hasActiveFilters = computed(() => {
 // 필터링된 여행 계획 목록
 const filteredTrips = computed(() => {
   let result = [...trips.value]
-  
+
   // 지역 필터링
   if (selectedRegion.value) {
-    result = result.filter(trip => Number(trip.destination) === Number(selectedRegion.value))
+    result = result.filter((trip) => Number(trip.destination) === Number(selectedRegion.value))
   }
-  
+
   // 태그 필터링
   if (selectedTags.value.length > 0) {
-    result = result.filter(trip => {
-      return selectedTags.value.some(tag => trip.tags.includes(tag))
+    result = result.filter((trip) => {
+      return selectedTags.value.some((tag) => trip.tags.includes(tag))
     })
   }
-  
+
   // 검색어 필터링
   if (searchTerm.value) {
     const term = searchTerm.value.toLowerCase()
-    result = result.filter(trip => 
-      trip.title.toLowerCase().includes(term) || 
-      trip.tags.some(tag => tag.toLowerCase().includes(term))
+    result = result.filter(
+      (trip) =>
+        trip.title.toLowerCase().includes(term) ||
+        trip.tags.some((tag) => tag.toLowerCase().includes(term)),
     )
   }
-  
+
   // 정렬 적용
   if (activeFilter.value === 'popular') {
     result.sort((a, b) => b.likes - a.likes)
   } else if (activeFilter.value === 'recent') {
     result.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0))
   } else if (activeFilter.value === 'recommended') {
-    result.sort((a, b) => (b.likes + b.shares) - (a.likes + a.shares))
+    result.sort((a, b) => b.likes + b.shares - (a.likes + a.shares))
   }
-  
+
   return result
 })
 
@@ -348,7 +372,7 @@ const clearRegionFilter = () => {
 // 임시 태그 토글
 const toggleTempTag = (tag) => {
   if (tempSelectedTags.value.includes(tag)) {
-    tempSelectedTags.value = tempSelectedTags.value.filter(t => t !== tag)
+    tempSelectedTags.value = tempSelectedTags.value.filter((t) => t !== tag)
   } else {
     tempSelectedTags.value.push(tag)
   }
@@ -368,8 +392,8 @@ const cancelTagFilter = () => {
 
 // 태그 제거
 const removeTag = (tag) => {
-  selectedTags.value = selectedTags.value.filter(t => t !== tag)
-  tempSelectedTags.value = tempSelectedTags.value.filter(t => t !== tag)
+  selectedTags.value = selectedTags.value.filter((t) => t !== tag)
+  tempSelectedTags.value = tempSelectedTags.value.filter((t) => t !== tag)
 }
 
 // 모든 필터 초기화
@@ -385,7 +409,7 @@ const searchTrips = () => {
   console.log('검색 실행:', {
     region: selectedRegion.value,
     tags: selectedTags.value,
-    term: searchTerm.value
+    term: searchTerm.value,
   })
 }
 
@@ -402,18 +426,27 @@ const fetchAllTags = async () => {
   try {
     // 모든 여행 계획에서 사용된 태그를 추출하여 중복 제거
     const uniqueTags = new Set()
-    
-    trips.value.forEach(trip => {
+
+    trips.value.forEach((trip) => {
       if (trip.tags && Array.isArray(trip.tags)) {
-        trip.tags.forEach(tag => uniqueTags.add(tag))
+        trip.tags.forEach((tag) => uniqueTags.add(tag))
       }
     })
-    
+
     allTags.value = Array.from(uniqueTags)
   } catch (error) {
     console.error('태그 목록 조회 실패:', error)
     // 기본 태그 제공
-    allTags.value = ['가족여행', '혼자여행', '커플여행', '맛집투어', '자연경관', '역사탐방', '쇼핑', '축제']
+    allTags.value = [
+      '가족여행',
+      '혼자여행',
+      '커플여행',
+      '맛집투어',
+      '자연경관',
+      '역사탐방',
+      '쇼핑',
+      '축제',
+    ]
   }
 }
 
@@ -434,7 +467,7 @@ const fetchTrips = async () => {
   )
 
   trips.value = enrichedTrips
-  
+
   // 모든 태그 가져오기
   fetchAllTags()
 }
@@ -481,7 +514,7 @@ const handleApplyTrip = async (selectedTrip) => {
   console.log('선택한 여행 계획:', selectedTrip)
 
   const response = await api.patch(`/api/v1/plan/updateShare/${selectedTrip.id}`)
-  
+
   await fetchTrips()
   alert('여행 계획이 성공적으로 업로드되었습니다!')
 }
