@@ -21,7 +21,7 @@
           <div class="flex-1">
             <div class="flex items-center gap-2 mb-3">
               <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
-                {{ place.category }}
+                {{ place.contentTypeId==12?'명소':(place.contentTypeId==32?'숙소':'식당') }}
               </span>
               <div class="flex items-center text-yellow-500">
                 <star-icon class="h-4 w-4 fill-current" />
@@ -119,12 +119,13 @@ import {
   Star as StarIcon,
 } from 'lucide-vue-next'
 
-defineProps({
+const props = defineProps({
   place: {
     type: Object,
     required: true,
   },
 })
 
+console.log(props.place)
 defineEmits(['close', 'add-to-itinerary'])
 </script>

@@ -107,7 +107,7 @@
 </template>
 
 <script setup>
-import { ref, nextTick, onMounted, watch } from 'vue'
+import { ref, nextTick, onMounted, computed } from 'vue'
 import TripPlannerMap from '@/components/trip/TripPlannerMap.vue'
 import TripMembers from '@/components/trip/TripMembers.vue'
 import TripSearch from '@/components/trip/TripSearch.vue'
@@ -119,9 +119,12 @@ import { useRoute, useRouter } from 'vue-router'
 import api from '@/api'
 import { defineProps, defineEmits } from 'vue'
 import TripimageModal from '@/components/trip/TripimageModal.vue'
+import { useUserStore } from '@/store/user'
 
 const route = useRoute()
 const router = useRouter()
+const userStore = useUserStore()
+const user = computed(() => userStore.loginUser)
 
 // Get data from query parameters
 const tripData = ref({
@@ -308,7 +311,7 @@ const createPlan = async () => {
       duration: tripData.value.duration,
       members: tripData.value.members,
       transport: tripData.value.transport,
-      userId : 1,
+      userId : user.value.id,
       title: title.value,
       description: description.value,
       likes : 0,

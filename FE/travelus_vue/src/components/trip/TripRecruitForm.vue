@@ -329,6 +329,7 @@ const fetchTravelPlans = async () => {
 
     // 사용자의 여행 계획 가져오기
     const response = await api.get(`/api/v1/plan/user/${user.value.id}`)
+    console.log(response)
     const trips = response.data
 
     // 각 여행 계획에 태그를 병렬로 가져와서 추가
