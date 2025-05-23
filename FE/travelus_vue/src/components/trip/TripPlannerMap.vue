@@ -139,7 +139,7 @@ const updateMapMarkers = () => {
     })
 
     markers.push(marker)
-  })
+  })  
 
   // 경로선 그리기
   if (places.length > 1) {

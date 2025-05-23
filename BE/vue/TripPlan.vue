@@ -75,8 +75,7 @@
             v-model="activeDay" 
             :itinerary="itinerary" 
             @remove-item="removeFromItinerary" 
-            @update-memo="updateItineraryMemo"
-            @reorder-items="reorderItineraryItems"
+            @update-memo="updateItineraryMemo" 
           />
         </div>
 
@@ -86,31 +85,8 @@
         </div>
 
         <!-- 채팅 영역 -->
-        <div class="w-1/5 p-4 h-full overflow-hidden flex flex-col">
-          <div class="flex-1 overflow-y-auto mb-4">
-            <TripChat />
-          </div>
-          
-          <!-- 여행 팁 및 추천 맛집 섹션 -->
-          <div v-if="aiPlanData && (aiPlanData.tips || aiPlanData.restaurants)" class="bg-white rounded-lg shadow p-4 overflow-y-auto max-h-[40%]">
-            <div v-if="aiPlanData.tips && aiPlanData.tips.length > 0" class="mb-4">
-              <h3 class="font-bold text-gray-700 mb-2">여행 팁</h3>
-              <ul class="list-disc pl-5 text-sm text-gray-600">
-                <li v-for="(tip, index) in aiPlanData.tips" :key="`tip-${index}`" class="mb-1">
-                  {{ tip }}
-                </li>
-              </ul>
-            </div>
-            
-            <div v-if="aiPlanData.restaurants && aiPlanData.restaurants.length > 0">
-              <h3 class="font-bold text-gray-700 mb-2">추천 맛집</h3>
-              <ul class="list-disc pl-5 text-sm text-gray-600">
-                <li v-for="(restaurant, index) in aiPlanData.restaurants" :key="`restaurant-${index}`" class="mb-1">
-                  {{ restaurant }}
-                </li>
-              </ul>
-            </div>
-          </div>
+        <div class="w-1/5 p-4 h-full overflow-hidden">
+          <TripChat />
         </div>
       </div>
     </main>
@@ -118,10 +94,7 @@
      <TripimageModal 
       :is-open="isImageModalOpen" 
       @close="closeImageModal" 
-      @save="onImageSelected"
-      :itinerary="itinerary"
-      :title="title"
-      :description="description"
+      @save="onImageSelected" 
     />
 
     <TripTagModal 
@@ -134,17 +107,18 @@
 </template>
 
 <script setup>
-import { ref, nextTick, onMounted, computed, watch } from 'vue'
+import { ref, nextTick, onMounted, computed } from 'vue'
 import TripPlannerMap from '@/components/trip/TripPlannerMap.vue'
 import TripMembers from '@/components/trip/TripMembers.vue'
 import TripSearch from '@/components/trip/TripSearch.vue'
 import TripItinerary from '@/components/trip/TripItinerary.vue'
 import TripChat from '@/components/trip/TripChat.vue'
 import TripTagModal from '@/components/trip/TripTagModal.vue'
-import TripimageModal from '@/components/trip/TripimageModal.vue'
 import { Pencil as PencilIcon } from 'lucide-vue-next'
 import { useRoute, useRouter } from 'vue-router'
 import api from '@/api'
+import { defineProps, defineEmits } from 'vue'
+import TripimageModal from '@/components/trip/TripimageModal.vue'
 import { useUserStore } from '@/store/user'
 
 const route = useRoute()
@@ -159,11 +133,6 @@ const tripData = ref({
   members: parseInt(route.query.members) || 1,
   transport: route.query.transport || 'car'
 })
-
-// AI generated plan data
-const aiPlanData = ref(null)
-// 관광지 정보 맵
-const attractionsMap = ref({})
 
 const destination = ref(parseInt(tripData.value.destination) || null)
 const planId = ref(null)
@@ -184,113 +153,24 @@ const itinerary = ref([])
 
 const isTagModalOpen = ref(false)
 const isImageModalOpen = ref(false)
-const image = ref({})
+const image = ref({
+
+})
 
 const tags = ref({
   id : []
 })
-
-// AI 생성 데이터 파싱
-const parseAiPlanData = () => {
-  if (route.query.aiPlan) {
-    try {
-      aiPlanData.value = JSON.parse(route.query.aiPlan)
-      
-      // AI 생성 데이터로 제목과 설명 설정
-      if (aiPlanData.value.title) {
-        title.value = aiPlanData.value.title
-      }
-      
-      if (aiPlanData.value.description) {
-        description.value = aiPlanData.value.description
-      }
-    } catch (e) {
-      console.error('Failed to parse AI plan data:', e)
-    }
-  }
-}
-
-// 관광지 정보 맵 파싱
-const parseAttractionsMap = () => {
-  if (route.query.attractions) {
-    try {
-      attractionsMap.value = JSON.parse(route.query.attractions)
-    } catch (e) {
-      console.error('Failed to parse attractions data:', e)
-    }
-  }
-}
-
-// 일정 초기화 함수
-const initializeItinerary = () => {
-  if (aiPlanData.value?.itinerary && aiPlanData.value.itinerary.length > 0) {
-    // AI 생성 데이터가 있으면 변환하여 사용
-    itinerary.value = convertAiPlanToItinerary() || []
-  } else {
-    // 기본 빈 일정 생성
-    for (let i = 0; i < tripData.value.duration; i++) {
-      itinerary.value.push({ day: i, items: [] })
-    }
-  }
-}
-
 onMounted(() => {
-  parseAiPlanData()
-  parseAttractionsMap()
-  initializeItinerary()
+  // Initialize itinerary based on duration
+  for (let i = 0; i < tripData.value.duration; i++) {
+    itinerary.value.push({ day: i, items: [] })
+  }
   
   // If planId exists in route params, fetch the plan
   if (route.params.planId) {
     fetchPlan(route.params.planId)
   }
 })
-
-// AI 생성 데이터를 itinerary 형식으로 변환
-const convertAiPlanToItinerary = () => {
-  if (!aiPlanData.value?.itinerary) return
-  
-  return aiPlanData.value.itinerary.map((day, index) => {
-    return {
-      day: index,
-      items: day.places.map(place => {
-        // 관광지 ID로 실제 관광지 정보 가져오기
-        const attractionId = place.id
-        const attractionInfo = attractionsMap.value[attractionId] || null
-        
-        return {
-          title: place.name,
-          type: place.type || '관광',
-          memo: place.description || '',
-          time: '',
-          image: attractionInfo?.image || '/placeholder.svg?height=150&width=150',
-          placeData: {
-            no: attractionId,
-            latitude: attractionInfo?.latitude || 0,
-            longitude: attractionInfo?.longitude || 0,
-            contentTypeId: getContentTypeId(place.type),
-            title: place.name,
-            addr: attractionInfo?.addr || '',
-            image: attractionInfo?.image || '/placeholder.svg?height=150&width=150'
-          }
-        }
-      })
-    }
-  })
-}
-
-// 장소 유형에 따른 contentTypeId 반환
-const getContentTypeId = (type) => {
-  switch (type) {
-    case '식당': return 39
-    case '숙소': return 32
-    case '문화시설': return 14
-    case '축제/공연/행사': return 15
-    case '여행코스': return 25
-    case '레포츠': return 28
-    case '쇼핑': return 38
-    default: return 12 // 기본값은 관광지
-  }
-}
 
 // Fetch plan if editing an existing plan
 const fetchPlan = async (id) => {
@@ -408,6 +288,7 @@ const mockMembers = [
 const addToItinerary = (item) => {
   // 현재 활성화된 일차에 항목 추가
   itinerary.value[activeDay.value].items.push(item)
+  
 }
 
 // 일정에서 장소 제거
@@ -421,18 +302,7 @@ const updateItineraryMemo = ({ dayIndex, itemIndex, memo }) => {
   itinerary.value[dayIndex].items[itemIndex].memo = memo
 }
 
-// 일정 항목 순서 변경
-const reorderItineraryItems = ({ dayIndex, fromIndex, toIndex }) => {
-  const day = itinerary.value[dayIndex]
-  if (!day || !day.items) return
-  
-  // 항목 이동
-  const item = day.items[fromIndex]
-  day.items.splice(fromIndex, 1)
-  day.items.splice(toIndex, 0, item)
-}
-
-// 일정 생성
+// 일정 생성 (이전에 updatePlan이었던 함수를 createPlan으로 변경)
 const createPlan = async () => {
   try {
     // Create the plan with the data from TripHumanPlan
@@ -466,12 +336,38 @@ const createPlan = async () => {
       await api.post(`/api/v1/tag/tripplan/${planId.value}/${tagId}`)
     });
    
+
     router.push("/")
   } catch (error) {
     console.error('Error creating plan:', error)
     alert('일정 저장 중 오류가 발생했습니다.')
   }
 }
+
+// 일정 업데이트 (기존 계획을 수정할 때 사용)
+// const updatePlan = async () => {
+//   if (!planId.value) {
+//     // If no planId, create a new plan
+//     return createPlan()
+//   }
+  
+//   try {
+//     await api.put(`/api/v1/plan/${planId.value}`, {
+//       destination: destination.value,
+//       duration: itinerary.value.length,
+//       members: tripData.value.members,
+//       transport: tripData.value.transport,
+//       title: title.value,
+//       description: description.value,
+//       itinerary: itinerary.value
+//     })
+    
+//     router.push(`/planresult/${planId.value}`)
+//   } catch (error) {
+//     console.error('Error updating plan:', error)
+//     alert('일정 업데이트 중 오류가 발생했습니다.')
+//   }
+// }
 </script>
 
 <style scoped>
