@@ -1,8 +1,5 @@
 <template>
-  <div 
-    ref="mapContainer" 
-    class="bg-gray-100 rounded-lg overflow-hidden relative h-full" 
-  >
+  <div ref="mapContainer" class="bg-gray-100 rounded-lg overflow-hidden relative h-full">
     <div v-if="!mapLoaded" class="absolute inset-0 flex items-center justify-center">
       <div class="text-center">
         <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-2"></div>
@@ -18,18 +15,17 @@ import { ref, onMounted, watch, onBeforeUnmount } from 'vue'
 const props = defineProps({
   locations: {
     type: Array,
-    default: () => []
+    default: () => [],
   },
   itinerary: {
     type: Array,
-    default: () => []
+    default: () => [],
   },
   activeDay: {
     type: Number,
-    default: 0
-  }
+    default: 0,
+  },
 })
-
 const mapContainer = ref(null)
 const mapLoaded = ref(false)
 let map = null
@@ -45,19 +41,19 @@ const initMap = () => {
 
   const options = {
     center: new window.kakao.maps.LatLng(33.450701, 126.570667),
-    level: 7
+    level: 7,
   }
 
   map = new window.kakao.maps.Map(mapContainer.value, options)
   mapLoaded.value = true
-  
+
   // 지도 컨트롤 추가
   const zoomControl = new window.kakao.maps.ZoomControl()
   map.addControl(zoomControl, window.kakao.maps.ControlPosition.RIGHT)
-  
+
   const mapTypeControl = new window.kakao.maps.MapTypeControl()
   map.addControl(mapTypeControl, window.kakao.maps.ControlPosition.TOPRIGHT)
-  
+
   // 초기 마커 및 경로 표시
   updateMapMarkers()
 }
@@ -65,37 +61,42 @@ const initMap = () => {
 // 마커 및 경로 업데이트
 const updateMapMarkers = () => {
   if (!map) return
-  
+
   // 기존 마커 제거
-  markers.forEach(marker => marker.setMap(null))
+  markers.forEach((marker) => marker.setMap(null))
   markers = []
-  
+
   // 기존 경로선 제거
   if (polyline) {
     polyline.setMap(null)
     polyline = null
   }
-  
+
   // 현재 활성화된 일차의 장소들
   const items = props.itinerary[props.activeDay]?.items || []
   const places = items
-    .filter(item => item.placeData && item.placeData.longitude && item.placeData.latitude)
-    .map(item => ({
+    .filter((item) => item.placeData && item.placeData.longitude && item.placeData.latitude)
+    .map((item) => ({
       title: item.title,
       latlng: new window.kakao.maps.LatLng(
-        parseFloat(item.placeData.latitude), 
-        parseFloat(item.placeData.longitude)
+        parseFloat(item.placeData.latitude),
+        parseFloat(item.placeData.longitude),
       ),
       image: item.image,
-      type: item.placeData.contentTypeId==12?'명소':(item.placeData.contentTypeId==32?'숙소':'식당'),
+      type:
+        item.placeData.contentTypeId == 12
+          ? '명소'
+          : item.placeData.contentTypeId == 32
+            ? '숙소'
+            : '식당',
     }))
-  
+
   if (places.length === 0) {
     // 장소가 없으면 기본 위치로 이동
     map.setCenter(new window.kakao.maps.LatLng(33.450701, 126.570667))
     return
   }
-  
+
   // 마커 이미지 설정
   const createMarkerImage = (index) => {
     return new window.kakao.maps.MarkerImage(
@@ -104,11 +105,11 @@ const updateMapMarkers = () => {
       {
         offset: new window.kakao.maps.Point(13, 37),
         spriteSize: new window.kakao.maps.Size(36, 691),
-        spriteOrigin: new window.kakao.maps.Point(0, (index * 46) + 10)
-      }
+        spriteOrigin: new window.kakao.maps.Point(0, index * 46 + 10),
+      },
     )
   }
-  
+
   // 마커 생성
   places.forEach((place, index) => {
     const marker = new window.kakao.maps.Marker({
@@ -116,9 +117,9 @@ const updateMapMarkers = () => {
       map: map,
       title: place.title,
       image: createMarkerImage(index),
-      zIndex: places.length - index
+      zIndex: places.length - index,
     })
-    
+
     // 인포윈도우 생성
     const infoContent = `
       <div class="p-2 max-w-[200px]">
@@ -126,39 +127,39 @@ const updateMapMarkers = () => {
         <div class="text-xs text-blue-600 bg-blue-50 px-1 py-0.5 rounded-full inline-block">${place.type}</div>
       </div>
     `
-    
+
     const infoWindow = new window.kakao.maps.InfoWindow({
       content: infoContent,
-      removable: true
+      removable: true,
     })
-    
+
     // 마커 클릭 시 인포윈도우 표시
-    window.kakao.maps.event.addListener(marker, 'click', function() {
+    window.kakao.maps.event.addListener(marker, 'click', function () {
       infoWindow.open(map, marker)
     })
-    
+
     markers.push(marker)
   })
-  
+
   // 경로선 그리기
   if (places.length > 1) {
-    const linePath = places.map(place => place.latlng)
-    
+    const linePath = places.map((place) => place.latlng)
+
     polyline = new window.kakao.maps.Polyline({
       path: linePath,
       strokeWeight: 3,
       strokeColor: '#5882FA',
       strokeOpacity: 0.8,
-      strokeStyle: 'solid'
+      strokeStyle: 'solid',
     })
-    
+
     polyline.setMap(map)
   }
-  
+
   // 모든 마커가 보이도록 지도 범위 재설정
   if (places.length > 0) {
     const bounds = new window.kakao.maps.LatLngBounds()
-    places.forEach(place => bounds.extend(place.latlng))
+    places.forEach((place) => bounds.extend(place.latlng))
     map.setBounds(bounds)
   }
 }
@@ -175,7 +176,7 @@ onMounted(() => {
         initMap()
       }
     }, 100)
-    
+
     // 10초 후에도 로드되지 않으면 타이머 중지
     setTimeout(() => {
       clearInterval(checkKakaoMaps)
@@ -185,11 +186,15 @@ onMounted(() => {
 })
 
 // itinerary 또는 activeDay가 변경될 때 마커와 경로 업데이트
-watch([() => props.itinerary, () => props.activeDay], () => {
-  if (map) {
-    updateMapMarkers()
-  }
-}, { deep: true })
+watch(
+  [() => props.itinerary, () => props.activeDay],
+  () => {
+    if (map) {
+      updateMapMarkers()
+    }
+  },
+  { deep: true },
+)
 </script>
 
 <style scoped>

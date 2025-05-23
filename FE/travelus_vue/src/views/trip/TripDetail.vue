@@ -1,6 +1,5 @@
 <template>
   <div class="min-h-screen">
-
     <div class="relative">
       <div class="h-80 w-full overflow-hidden">
         <img :src="tripDetails.image" :alt="tripDetails.title" class="w-full h-full object-cover" />
@@ -10,13 +9,19 @@
       <div class="absolute bottom-0 left-0 right-0 p-6 text-white">
         <div class="max-w-7xl mx-auto">
           <div class="flex items-center gap-2 mb-2">
-            <span class="px-2 py-1 bg-white/20 backdrop-blur-sm rounded-full text-sm">{{ tripDetails.location }}</span>
-            <span class="px-2 py-1 bg-white/20 backdrop-blur-sm rounded-full text-sm">{{ tripDetails.duration -1}}박 {{ tripDetails.duration }}일</span>
+            <span class="px-2 py-1 bg-white/20 backdrop-blur-sm rounded-full text-sm">{{
+              tripDetails.location
+            }}</span>
+            <span class="px-2 py-1 bg-white/20 backdrop-blur-sm rounded-full text-sm"
+              >{{ tripDetails.duration - 1 }}박 {{ tripDetails.duration }}일</span
+            >
           </div>
           <h1 class="text-3xl md:text-4xl font-bold mb-2">{{ tripDetails.title }}</h1>
           <div class="flex items-center gap-3">
             <div class="flex items-center gap-2">
-              <div class="w-8 h-8 rounded-full bg-white/30 backdrop-blur-sm flex items-center justify-center">
+              <div
+                class="w-8 h-8 rounded-full bg-white/30 backdrop-blur-sm flex items-center justify-center"
+              >
                 <span>{{ tripDetails.userId.charAt(0) }}</span>
               </div>
               <span>{{ tripDetails.userId }}</span>
@@ -38,7 +43,9 @@
 
             <div class="flex gap-3">
               <button class="px-4 py-2 border rounded-md hover:bg-gray-50">♥ 좋아요</button>
-              <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">내 플래너에 가져오기</button>
+              <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                내 플래너에 가져오기
+              </button>
             </div>
           </div>
 
@@ -48,12 +55,14 @@
 
           <div class="border-b mb-6">
             <div class="flex">
-              <button 
-                v-for="(day, index) in tripDetails.itinerary" 
+              <button
+                v-for="(day, index) in tripDetails.itinerary"
                 :key="index"
                 :class="[
                   'px-4 py-2 text-center',
-                  activeDay === index ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-500'
+                  activeDay === index
+                    ? 'border-b-2 border-blue-600 text-blue-600'
+                    : 'text-gray-500',
                 ]"
                 @click="activeDay = index"
               >
@@ -62,21 +71,31 @@
             </div>
           </div>
 
-          <div v-for="(day, dayIndex) in tripDetails.itinerary" :key="dayIndex" v-show="activeDay === dayIndex">
+          <div
+            v-for="(day, dayIndex) in tripDetails.itinerary"
+            :key="dayIndex"
+            v-show="activeDay === dayIndex"
+          >
             <div class="bg-white rounded-lg border shadow-sm overflow-hidden">
               <div class="p-4 border-b bg-gray-50">
-                <h3 class="text-lg font-medium">Day {{ dayIndex + 1 }}: {{ day.title }}</h3>
+                <h3 class="text-lg font-medium">Day {{ dayIndex + 1 }}:</h3>
               </div>
               <div class="p-4">
                 <div class="space-y-6">
                   <div v-for="(item, itemIndex) in day.items" :key="itemIndex" class="flex gap-4">
                     <div class="w-16 text-sm font-medium text-gray-500">{{ item.time }}</div>
                     <div class="relative">
-                      <div class="w-3 h-3 rounded-full bg-blue-500 absolute left-0 top-2.5 -translate-x-[7px]"></div>
-                      <div class="border-l-2 border-gray-200 pl-4 ml-0.5 pb-6 last:border-l-0 last:pb-0">
+                      <div
+                        class="w-3 h-3 rounded-full bg-blue-500 absolute left-0 top-2.5 -translate-x-[7px]"
+                      ></div>
+                      <div
+                        class="border-l-2 border-gray-200 pl-4 ml-0.5 pb-6 last:border-l-0 last:pb-0"
+                      >
                         <h4 class="font-medium">{{ item.title }}</h4>
                         <p class="text-sm text-gray-500 mt-1">{{ item.description }}</p>
-                        <span class="mt-2 px-2 py-0.5 bg-blue-50 text-blue-600 text-xs rounded-full inline-block">
+                        <span
+                          class="mt-2 px-2 py-0.5 bg-blue-50 text-blue-600 text-xs rounded-full inline-block"
+                        >
                           {{ item.type }}
                         </span>
                       </div>
@@ -89,7 +108,15 @@
 
           <div class="mt-8">
             <h3 class="text-xl font-medium mb-4">지도 보기</h3>
-            <TripPlannerMap height="400px" />
+            <div class="h-[400px] border rounded-lg">
+              <!-- 높이 지정 -->
+              <TripPlannerMap
+                v-if="processedItinerary.length > 0"
+                :locations="[]"
+                :itinerary="processedItinerary"
+                :active-day="activeDay"
+              />
+            </div>
           </div>
 
           <div class="mt-8">
@@ -112,8 +139,8 @@
               <div>
                 <h4 class="text-sm text-gray-500 mb-1">작성자 성격(미구현)</h4>
                 <div class="flex flex-wrap gap-2">
-                  <span 
-                    v-for="(tag, index) in tripDetails.personalityTags" 
+                  <span
+                    v-for="(tag, index) in tripDetails.personalityTags"
                     :key="index"
                     class="px-2 py-1 bg-purple-50 text-purple-600 text-xs rounded-full"
                   >
@@ -125,8 +152,8 @@
               <div>
                 <h4 class="text-sm text-gray-500 mb-1">여행 스타일</h4>
                 <div class="flex flex-wrap gap-2">
-                  <span 
-                    v-for="(tag, index) in tripDetails.travelTags" 
+                  <span
+                    v-for="(tag, index) in tripDetails.travelTags"
                     :key="index"
                     class="px-2 py-1 bg-blue-50 text-blue-600 text-xs rounded-full"
                   >
@@ -136,7 +163,9 @@
               </div>
 
               <div class="pt-4 border-t">
-                <button class="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center justify-center">
+                <button
+                  class="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center justify-center"
+                >
                   내 플래너에 가져오기
                   <arrow-right-icon class="ml-2 h-4 w-4" />
                 </button>
@@ -146,19 +175,13 @@
                 <h4 class="text-sm text-gray-500 mb-2">이 작성자의 다른 여행 계획</h4>
                 <ul class="space-y-3">
                   <li>
-                    <a href="#" class="text-sm text-blue-600 hover:underline">
-                      미구현 상태
-                    </a>
+                    <a href="#" class="text-sm text-blue-600 hover:underline"> 미구현 상태 </a>
                   </li>
                   <li>
-                    <a href="#" class="text-sm text-blue-600 hover:underline">
-                      미구현 상태
-                    </a>
+                    <a href="#" class="text-sm text-blue-600 hover:underline"> 미구현 상태 </a>
                   </li>
                   <li>
-                    <a href="#" class="text-sm text-blue-600 hover:underline">
-                      미구현 상태
-                    </a>
+                    <a href="#" class="text-sm text-blue-600 hover:underline"> 미구현 상태 </a>
                   </li>
                 </ul>
               </div>
@@ -167,19 +190,13 @@
                 <h4 class="text-sm text-gray-500 mb-2">비슷한 여행 계획</h4>
                 <ul class="space-y-3">
                   <li>
-                    <a href="#" class="text-sm text-blue-600 hover:underline">
-                      미구현 상태
-                    </a>
+                    <a href="#" class="text-sm text-blue-600 hover:underline"> 미구현 상태 </a>
                   </li>
                   <li>
-                    <a href="#" class="text-sm text-blue-600 hover:underline">
-                      미구현 상태
-                    </a>
+                    <a href="#" class="text-sm text-blue-600 hover:underline"> 미구현 상태 </a>
                   </li>
                   <li>
-                    <a href="#" class="text-sm text-blue-600 hover:underline">
-                      미구현 상태 
-                    </a>
+                    <a href="#" class="text-sm text-blue-600 hover:underline"> 미구현 상태 </a>
                   </li>
                 </ul>
               </div>
@@ -192,75 +209,167 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { ArrowRight as ArrowRightIcon } from 'lucide-vue-next'
+import { useUserStore } from '@/store/user'
 import TripPlannerMap from '@/components/trip/TripPlannerMap.vue'
 import api from '@/api'
 
-
+const userStore = useUserStore()
+const user = computed(() => userStore.loginUser)
 const route = useRoute()
 const activeDay = ref(0)
-// 실제 구현에서는 ID를 기반으로 데이터를 가져오는 로직 추가
 const tripDetails = ref({
-  id: route.params.id || "id",
-  title: "제목",
-  location: "지역",
+  id: route.params.id || 'id',
+  title: '제목',
+  location: '지역',
   duration: 0,
-  userId: "유저ID",
+  userId: '유저ID',
   image:
-    "https://images.unsplash.com/photo-1601621915196-2ad9b06857b3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80",
+    'https://images.unsplash.com/photo-1601621915196-2ad9b06857b3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80',
   personalityTags: [],
   travelTags: [],
   likes: 0,
   shares: 0,
-  description: "여행 계획 설명",
-  itinerary: [
-  ],
+  description: '여행 계획 설명',
+  itinerary: [],
 })
 
+// 원본 일정 데이터
+const itinerary = ref([])
+
+// 지도 컴포넌트에 전달할 처리된 일정 데이터
+const processedItinerary = ref([])
+
+// Kakao Maps API 로드 여부를 나타내는 ref
+const isKakaoMapsLoaded = ref(false)
+
+// 일정 데이터 처리 함수
+const processItineraryData = () => {
+  processedItinerary.value = itinerary.value.map((day) => {
+    return {
+      day: day.day,
+      title: `Day ${day.day + 1}`,
+      items: day.items.map((item) => {
+        // items가 객체인 경우 (현재 구조)
+        if (item.items && typeof item.items === 'object') {
+          return {
+            title: item.items.title,
+            time: item.items.time || '',
+            description: item.items.memo || '',
+            type: item.items.type,
+            placeData: item.items.placeData,
+          }
+        }
+        // items가 이미 올바른 형식인 경우
+        return item
+      }),
+    }
+  })
+}
+
+// Kakao Maps API 로드 확인
+const checkKakaoMapsLoaded = () => {
+  if (!window.kakao || !window.kakao.maps) {
+    console.warn("Kakao Maps API is not loaded. Make sure it's included in your index.html")
+    isKakaoMapsLoaded.value = false
+    return false
+  }
+  isKakaoMapsLoaded.value = true
+  return true
+}
+
 onMounted(async () => {
-    const response = await api.get(`/api/v1/plan/${route.params.id}`);
-    tripDetails.value.title = response.data.title;
-    tripDetails.value.duration = response.data.duration;
-    tripDetails.value.userId = response.data.userId + '님';
+  try {
+    // 기존 데이터 로드 코드
+    const response = await api.get(`/api/v1/plan/${route.params.id}`)
+    tripDetails.value.title = response.data.title
+    tripDetails.value.duration = response.data.duration
+    tripDetails.value.userId = user.value.name + '님'
     tripDetails.value.description = response.data.description
     tripDetails.value.likes = response.data.likes
     tripDetails.value.shares = response.data.shares
     tripDetails.value.location = response.data.destination
     tripDetails.value.image = response.data.image
+
+    // 일정 초기화
+    itinerary.value = []
+    for (let i = 0; i < response.data.duration; i++) {
+      itinerary.value.push({ day: i, items: [] })
+    }
+
     const tagRes = await api.get(`/api/v1/tag/plan/${route.params.id}`)
     tripDetails.value.travelTags = tagRes.data
+
     const itineraryRes = await api.get(`/api/v1/plan/itinerary/${route.params.id}`)
     const typeMap = {
-      12: "관광",
-      39: "식당",
-      32: "숙박",
-      // 필요한 다른 매핑 추가
-    };
+      12: '관광',
+      39: '식당',
+      32: '숙박',
+    }
 
-    // 날짜별로 그룹핑
+    // 날짜별로 그룹핑 (tripDetails용)
     const grouped = itineraryRes.data.reduce((acc, cur) => {
-      const { dayNumber } = cur;
-      if (!acc[dayNumber]) acc[dayNumber] = [];
+      const { dayNumber } = cur
+      if (!acc[dayNumber]) acc[dayNumber] = []
 
       acc[dayNumber].push({
-        time: "", // 현재 시간 정보가 없으므로 빈 문자열
+        time: '',
         title: cur.title,
-        description: cur.memo || "",
-        type: typeMap[cur.contentTypeId] || "기타", // fallback
-      });
+        description: cur.memo || '',
+        type: typeMap[cur.contentTypeId] || '기타',
+      })
 
-      return acc;
-    }, {});
+      return acc
+    }, {})
 
     // tripDetails.itinerary 구성
     tripDetails.value.itinerary = Object.entries(grouped).map(([day, items]) => ({
       day: Number(day),
-      title: "", // 서버에서 안 준다면 비워둡니다 (또는 직접 작성)
+      title: `Day ${day}`,
       items,
-    }));
+    }))
+
+    // 지도용 itinerary 데이터 구성
+    itineraryRes.data.forEach((res) => {
+      const dayIndex = res.dayNumber - 1
+      if (dayIndex >= 0 && dayIndex < itinerary.value.length) {
+        itinerary.value[dayIndex].items.push({
+          title: res.title,
+          time: '',
+          description: res.memo || '',
+          type: typeMap[res.contentTypeId] || '기타',
+          placeData: {
+            latitude: res.latitude,
+            longitude: res.longitude,
+            contentTypeId: res.contentTypeId,
+            title: res.title,
+            addr: res.addr,
+            image: res.image,
+          },
+        })
+      }
     })
+
+    // 지도용 데이터 처리
+    processItineraryData()
+
+    // Kakao Maps API 로드 확인
+    checkKakaoMapsLoaded()
+  } catch (error) {
+    console.error('Failed to fetch trip details:', error)
+  }
+})
+
+// itinerary 또는 activeDay가 변경될 때 데이터 재처리
+watch(
+  [() => itinerary.value, () => activeDay.value],
+  () => {
+    processItineraryData()
+  },
+  { deep: true },
+)
 </script>
 
 <style scoped>

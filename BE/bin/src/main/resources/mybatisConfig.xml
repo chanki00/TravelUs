@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<typeAliases>
+		<typeAlias type="com.DB_PASSWORD_REDACTED.trip.dto.user.UserDto" alias="user" />
+		<typeAlias type="com.DB_PASSWORD_REDACTED.trip.dto.BasicPlanDTO" alias="BasicPlanDTO" />
+		<typeAlias type="com.DB_PASSWORD_REDACTED.trip.dto.Sido" alias="Sido" />
+	</typeAliases>
+
+</configuration>

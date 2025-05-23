@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.DB_PASSWORD_REDACTED.trip.repository.RefreshRepository">
+
+	<insert id="saveToken">
+		INSERT INTO refresh_token (username, token)
+		VALUES (#{username}, #{token})
+		ON DUPLICATE KEY UPDATE token = #{token}
+	</insert>
+
+	<select id="findByUsername"
+		resultType="com.DB_PASSWORD_REDACTED.trip.dto.RefreshToken">
+		SELECT username, token FROM refresh_token WHERE username = #{username}
+	</select>
+
+	<delete id="deleteToken">
+		DELETE FROM refresh_token WHERE username = #{username}
+	</delete>
+
+</mapper>

@@ -31,4 +31,6 @@ public class RestTripController {
 	public ResponseEntity<List<Attraction>> getAttractionBysidoCode(@PathVariable int sidoCode){
 		return ResponseEntity.ok(service.getAttractionBysidoCode(sidoCode));
 	}
+	
+	
 }

@@ -24,7 +24,7 @@
 	</select>
 	
 	<select id="getTripplanByUserId" parameterType="int" resultMap="TripplanResultMap">
-	  SELECT * FROM TripPlans WHERE user_id = #{userId}
+	  SELECT * FROM TripPlans WHERE user_id = #{userId} and is_shared = false
 	</select>
 	
 	<select id="getPlanDaysId" parameterType="int">

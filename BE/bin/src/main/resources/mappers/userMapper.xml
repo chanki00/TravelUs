@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.DB_PASSWORD_REDACTED.trip.repository.UserRepository">
+
+  <!-- ✅ 명시적 매핑 설정 -->
+  <resultMap id="userResultMap" type="com.DB_PASSWORD_REDACTED.trip.dto.user.UserDto">
+    <id property="id" column="id"/>
+    <result property="userId" column="user_id"/>
+    <result property="userPw" column="user_pw"/>
+    <result property="userEmail" column="user_email"/>
+    <result property="name" column="name"/>
+    <result property="age" column="age"/>
+    <result property="gender" column="gender"/>
+    <result property="address" column="address"/>
+    <result property="intro" column="intro"/>
+    <result property="role" column="role"/>
+    <result property="allowInvite" column="allow_invite"/>
+    <result property="createdAt" column="created_at"/>
+  </resultMap>
+
+  <insert id="insertUser" parameterType="UserDto" useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO users (user_id, user_pw, user_email, name, age, gender, address)
+    VALUES (#{userId}, #{userPw}, #{userEmail}, #{name}, #{age}, #{gender}, #{address})
+  </insert>
+
+  <select id="selectUser" resultMap="userResultMap">
+    SELECT * FROM users WHERE id = #{id}
+  </select>
+
+  <select id="selectAllUser" resultMap="userResultMap">
+    SELECT * FROM users
+  </select>
+
+  <update id="updateInfo" parameterType="UserInfoDto">
+    UPDATE users 
+    SET name = #{name}, user_email = #{userEmail}, address = #{address}, age = #{age}, gender=#{gender}, intro=#{intro}
+    WHERE id = #{id}
+  </update>
+
+  <update id="updatePw" parameterType="UserPwDto">
+    UPDATE users SET user_pw = #{userPw} WHERE id = #{id}
+  </update>
+
+  <delete id="deleteUser" parameterType="long">
+    DELETE FROM users WHERE id = #{id}
+  </delete>
+
+  <select id="selectUserByUserid" parameterType="string" resultMap="userResultMap">
+    SELECT id, user_id, user_pw, user_email, name, age, gender, address, intro,
+           role, allow_invite, created_at
+    FROM users
+    WHERE user_id = #{userId}
+  </select>
+
+</mapper>

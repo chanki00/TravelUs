@@ -9,7 +9,7 @@
           'flex-1 py-2 px-4 text-center',
           activeTab === tab ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-500',
         ]"
-        @click="activeTab = tab"
+        @click="activeTab = tab; "
       >
         {{ label }}
       </button>
@@ -21,6 +21,8 @@
         <div class="flex-1 relative">
           <input
             type="text"
+            v-model="searchText"
+            @keyup.enter="searchByKeyword"
             placeholder="장소 검색하기"
             class="w-full px-3 py-2 pl-10 border rounded-md"
           />
@@ -44,6 +46,7 @@
         </div>
         <button
           class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+          @click="searchByKeyword"
         >
           검색
         </button>
@@ -63,7 +66,7 @@
       <div v-else-if="!isLoading" class="space-y-3 pr-2">
         <div
           v-for="place in visiblePlaces"
-          :key="place.contentId"
+          :key="place.contentTypeId"
           class="border rounded-md p-3 flex items-center gap-3 cursor-pointer hover:border-blue-200 transition-colors"
         >
           <div class="flex-1 flex items-center gap-3" @click="showPlaceDetail(place)">
@@ -71,7 +74,7 @@
             <div>
               <h4 class="font-medium">{{ place.title }}</h4>
               <div class="flex items-center gap-1 text-sm text-gray-500">
-                <span>{{ place.category }}</span>
+                <span>{{ place.contentTypeId==12?'명소':(place.contentTypeId==32?'숙소':'식당') }}</span>
                 <span>•</span>
                 <span>★ {{ place.rating }}</span>
               </div>
@@ -131,7 +134,7 @@ const selectedPlace = ref(null)
 const emit = defineEmits(['add-to-itinerary'])
 const scrollContainer = ref(null)
 const loadMoreTrigger = ref(null)
-
+const searchText = ref('')
 const tabLabels = {
   attractions: '명소',
   restaurants: '식당',
@@ -157,6 +160,15 @@ const visiblePlaces = computed(() => {
 // 탭 바뀔 때마다 보여줄 개수 초기화
 watch(activeTab, () => {
   visibleCount.value = 10
+  searchText.value = ''
+
+  const tab = activeTab.value
+  filteredPlaces.value[tab] = rawPlaces.value.filter((p) => {
+    if (tab === 'attractions') return p.contentTypeId === 12
+    if (tab === 'restaurants') return p.contentTypeId === 39
+    if (tab === 'accommodations') return p.contentTypeId === 32
+    return false
+  })
   // 탭 변경 시 스크롤 맨 위로
   if (scrollContainer.value) {
     scrollContainer.value.scrollTop = 0
@@ -170,7 +182,6 @@ watch(activeTab, () => {
 // 데이터 로딩
 const fetchAttractions = async () => {
   try {
-    console.log('Fetching attractions for destination:', props.destination)
     isLoading.value = true
     const res = await api.get(`/api/v1/attractions/${props.destination}`)
     rawPlaces.value = res.data
@@ -311,6 +322,40 @@ const loadMore = async () => {
 const getTotalCount = computed(() => {
   return filteredPlaces.value[activeTab.value]?.length || 0
 })
+
+const searchByKeyword = () => {
+  const text = searchText.value.trim().toLowerCase()
+  const tab = activeTab.value
+
+  if (!text) {
+    // 검색어가 비어있으면 원래 데이터로 복원
+    filteredPlaces.value[tab] = rawPlaces.value.filter((p) => {
+      if (tab === 'attractions') return p.contentTypeId === 12
+      if (tab === 'restaurants') return p.contentTypeId === 39
+      if (tab === 'accommodations') return p.contentTypeId === 32
+      return false
+    })
+  } else {
+    // 해당 탭 데이터만 검색
+    const originalList = rawPlaces.value.filter((p) => {
+      if (tab === 'attractions') return p.contentTypeId === 12
+      if (tab === 'restaurants') return p.contentTypeId === 39
+      if (tab === 'accommodations') return p.contentTypeId === 32
+      return false
+    })
+
+    filteredPlaces.value[tab] = originalList.filter((place) =>
+      place.title.toLowerCase().includes(text)
+    )
+  }
+
+  // 검색 시 보여줄 개수 초기화
+  visibleCount.value = 10
+  nextTick(() => {
+    setupScrollDetection()
+  })
+}
+
 </script>
 
 <style scoped>
