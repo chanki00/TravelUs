@@ -9,7 +9,7 @@
           'flex-1 py-2 px-4 text-center',
           activeTab === tab ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-500',
         ]"
-        @click="activeTab = tab; "
+        @click="activeTab = tab"
       >
         {{ label }}
       </button>
@@ -74,7 +74,9 @@
             <div>
               <h4 class="font-medium">{{ place.title }}</h4>
               <div class="flex items-center gap-1 text-sm text-gray-500">
-                <span>{{ place.contentTypeId==12?'명소':(place.contentTypeId==32?'숙소':'식당') }}</span>
+                <span>{{
+                  place.contentTypeId == 12 ? '명소' : place.contentTypeId == 32 ? '숙소' : '식당'
+                }}</span>
                 <span>•</span>
                 <span>★ {{ place.rating }}</span>
               </div>
@@ -123,7 +125,7 @@ import { defineProps, defineEmits } from 'vue'
 const props = defineProps({
   destination: {
     type: [Number, String],
-    required: true
+    required: true,
   },
 })
 
@@ -199,12 +201,16 @@ const fetchAttractions = async () => {
   }
 }
 // destination 변경 시 재요청
-watch(() => props.destination, (newVal) => {
-  if (newVal) {
-    console.log('Destination changed to:', newVal)
-    fetchAttractions()
-  }
-}, { immediate: true })
+watch(
+  () => props.destination,
+  (newVal) => {
+    if (newVal) {
+      console.log('Destination changed to:', newVal)
+      fetchAttractions()
+    }
+  },
+  { immediate: true },
+)
 
 // 장소 상세
 const showPlaceDetail = (place) => {
@@ -216,13 +222,20 @@ const addToItinerary = (place) => {
   emit('add-to-itinerary', {
     id: place.id ?? place.contentId,
     title: place.name ?? place.title,
-    type: place.contentTypeId==12?'명소':(place.contentTypeId==32?'숙소':'식당'),
+    type: place.contentTypeId == 12 ? '명소' : place.contentTypeId == 32 ? '숙소' : '식당',
     time: new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' }),
     image: place.image ?? '',
-    placeData: place,
-    memo: ''
+    placeData: {
+      no: place.no, // no 필드 추가
+      latitude: place.latitude,
+      longitude: place.longitude,
+      contentTypeId: place.content_type_id,
+      title: place.title,
+      addr: place.addr1,
+      image: place.first_image1 || '/placeholder.svg?height=150&width=150',
+    },
+    memo: '',
   })
-  
 }
 
 // 스크롤 이벤트 리스너
@@ -276,7 +289,7 @@ const setupScrollDetection = () => {
 
 onMounted(() => {
   // 컴포넌트 마운트 후 스크롤 감지 설정
-  
+
   nextTick(() => {
     setupScrollDetection()
   })
@@ -345,7 +358,7 @@ const searchByKeyword = () => {
     })
 
     filteredPlaces.value[tab] = originalList.filter((place) =>
-      place.title.toLowerCase().includes(text)
+      place.title.toLowerCase().includes(text),
     )
   }
 
@@ -355,7 +368,6 @@ const searchByKeyword = () => {
     setupScrollDetection()
   })
 }
-
 </script>
 
 <style scoped>

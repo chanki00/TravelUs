@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.DB_PASSWORD_REDACTED.trip.repository.TripPlanLikeRepository">
+
+    <insert id="insertLike" parameterType="com.DB_PASSWORD_REDACTED.trip.dto.TripPlanLike">
+        INSERT INTO TripPlanLikes (plan_id, user_id)
+        VALUES (#{planId}, #{userId})
+    </insert>
+    
+    <delete id="deleteLike">
+        DELETE FROM TripPlanLikes 
+        WHERE plan_id = #{planId} AND user_id = #{userId}
+    </delete>
+    
+    <select id="checkUserLike" resultType="int">
+        SELECT COUNT(*) 
+        FROM TripPlanLikes 
+        WHERE plan_id = #{planId} AND user_id = #{userId}
+    </select>
+    
+    <select id="getLikeCount" resultType="int">
+        SELECT COUNT(*) 
+        FROM TripPlanLikes 
+        WHERE plan_id = #{planId}
+    </select>
+    
+    <select id="getTopLikedPlans" resultMap="TripplanResultMap">
+        SELECT t.*, COUNT(l.id) as like_count
+        FROM TripPlans t
+        LEFT JOIN TripPlanLikes l ON t.id = l.plan_id
+        WHERE t.is_shared = true
+        GROUP BY t.id
+        ORDER BY like_count DESC, t.created_at DESC
+        LIMIT #{limit}
+    </select>
+    
+    <update id="updatePlanLikeCount">
+        UPDATE TripPlans 
+        SET likes = #{likeCount}
+        WHERE id = #{planId}
+    </update>
+    
+    <resultMap id="TripplanResultMap" type="com.DB_PASSWORD_REDACTED.trip.dto.Tripplan">
+        <id property="id" column="id" />
+        <result property="userId" column="user_id"/>
+        <result property="title" column="title"/>
+        <result property="description" column="description"/>
+        <result property="likes" column="likes"/>
+        <result property="shares" column="shares"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="updatedAt" column="updated_at"/>
+        <result property="isShared" column="is_shared"/>
+        <result property="image" column="image"/>
+        <result property="destination" column="destination"/>
+        <result property="duration" column="duration"/>
+        <result property="members" column="members"/>
+        <result property="transport" column="transport"/>
+    </resultMap>
+
+</mapper>

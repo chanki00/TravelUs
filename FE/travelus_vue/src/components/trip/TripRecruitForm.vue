@@ -1,10 +1,7 @@
 <template>
   <div>
     <!-- 여행 계획 선택 섹션 -->
-    <div
-      v-if="!selectedPlan || isLoading || myTravelPlans.length === 0"
-      class="bg-white rounded-lg border shadow-sm overflow-hidden mb-6"
-    >
+    <div class="bg-white rounded-lg border shadow-sm overflow-hidden mb-6">
       <div class="p-4 border-b flex justify-between items-center">
         <h3 class="text-lg font-medium">내 여행 계획 목록</h3>
         <button
@@ -184,21 +181,24 @@
 
         <div class="space-y-2">
           <label class="block text-sm font-medium text-gray-700"
-            >선호하는 여행자 태그 (최대 5개)</label
+            >선호하는 성격 태그 (최대 5개)</label
           >
           <div class="flex flex-wrap gap-2">
             <span
-              v-for="tag in availableTags"
+              v-for="tag in personalityTags"
               :key="tag"
               :class="[
                 'px-2 py-1 text-xs rounded-full cursor-pointer',
-                recruitForm.tags.includes(tag)
+                recruitForm.personalityTags.includes(tag)
                   ? 'bg-green-600 text-white'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200',
               ]"
-              @click="toggleRecruitTag(tag)"
+              @click="togglePersonalityTag(tag)"
             >
-              <check-icon v-if="recruitForm.tags.includes(tag)" class="inline-block h-3 w-3 mr-1" />
+              <check-icon
+                v-if="recruitForm.personalityTags.includes(tag)"
+                class="inline-block h-3 w-3 mr-1"
+              />
               {{ tag }}
             </span>
           </div>
@@ -277,26 +277,24 @@ const recruitForm = ref({
   startDate: '',
   endDate: '',
   maxMembers: 4,
-  tags: [],
+  personalityTags: [], // 성격 태그 추가
   content: '',
 })
 
-// 사용 가능한 태그
-const availableTags = [
-  '식도락',
-  '자연',
-  '문화',
-  '쇼핑',
-  '힐링',
-  '액티비티',
-  '사진',
-  '도시',
-  '가족',
-  '커플',
-  '친구',
-  '혼자',
-  '저예산',
-  '럭셔리',
+// 성격 태그 목록
+const personalityTags = [
+  '활발한',
+  '조용한',
+  '계획적인',
+  '즉흥적인',
+  '사교적인',
+  '내향적인',
+  '모험적인',
+  '안전한',
+  '유머러스한',
+  '진지한',
+  '친화적인',
+  '독립적인',
 ]
 
 // 시도 목록 가져오기
@@ -355,14 +353,14 @@ const fetchTravelPlans = async () => {
 const selectPlan = (plan) => {
   selectedPlan.value = plan
 
-  // 선택한 계획에서 여행지와 태그를 가져옴
+  // 선택한 계획에서 여행지를 가져옴 (성격 태그는 초기화)
   recruitForm.value = {
     title: '',
     location: plan.destination,
     startDate: '',
     endDate: '',
     maxMembers: 4,
-    tags: [...plan.tags], // 태그는 가져옴
+    personalityTags: [], // 성격 태그는 초기화
     content: '',
   }
 }
@@ -401,7 +399,7 @@ const resetSelection = () => {
     startDate: '',
     endDate: '',
     maxMembers: 4,
-    tags: [],
+    personalityTags: [],
     content: '',
   }
 }
@@ -411,13 +409,13 @@ const showNewForm = () => {
   showForm.value = true
 }
 
-// 모집글 작성 태그 토글 함수
-const toggleRecruitTag = (tag) => {
-  if (recruitForm.value.tags.includes(tag)) {
-    recruitForm.value.tags = recruitForm.value.tags.filter((t) => t !== tag)
+// 성격 태그 토글 함수
+const togglePersonalityTag = (tag) => {
+  if (recruitForm.value.personalityTags.includes(tag)) {
+    recruitForm.value.personalityTags = recruitForm.value.personalityTags.filter((t) => t !== tag)
   } else {
-    if (recruitForm.value.tags.length < 5) {
-      recruitForm.value.tags.push(tag)
+    if (recruitForm.value.personalityTags.length < 5) {
+      recruitForm.value.personalityTags.push(tag)
     }
   }
 }
@@ -436,7 +434,8 @@ const submitForm = async () => {
       endDate: recruitForm.value.endDate,
       title: recruitForm.value.title,
       content: recruitForm.value.content,
-      currentMembers: recruitForm.value.maxMembers, // 작성자 포함 1명으로 시작
+      currentMembers: recruitForm.value.maxMembers,
+      personalityTags: JSON.stringify(recruitForm.value.personalityTags), // JSON 문자열로 변환
     }
 
     // API 호출하여 모집글 저장

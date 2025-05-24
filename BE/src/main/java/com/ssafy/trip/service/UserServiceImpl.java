@@ -64,5 +64,10 @@ public class UserServiceImpl implements UserService {
 		
 		return cnt;
 	}
+
+	 @Override
+	    public UserDto getUserById(int userId) {
+	        return repo.getUserById(userId);
+	    }
 	
 }

@@ -13,7 +13,8 @@
       end_date,
       title,
       content,
-      current_members
+      current_members,
+      personalityTags
     )
     VALUES (
       #{planId},
@@ -22,7 +23,8 @@
       #{endDate},
       #{title},
       #{content},
-      #{currentMembers}
+      #{currentMembers},
+      #{personalityTags}
     )
   </insert>
    <select id="getALlRecruitPost" resultType="com.DB_PASSWORD_REDACTED.trip.dto.Post">
@@ -35,6 +37,7 @@
       title,
       content,
       current_members AS currentMembers,
+      personalityTags AS personalityTags,
       created_at AS createdAt,
       updated_at AS updatedAt
     FROM Posts

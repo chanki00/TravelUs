@@ -53,5 +53,11 @@
     FROM users
     WHERE user_id = #{userId}
   </select>
+  
+  <select id="getUserById" parameterType="int" resultMap="userResultMap">
+        SELECT id, user_id, name, user_email, age, gender, address, intro, role, allow_invite, created_at
+        FROM Users 
+        WHERE id = #{userId}
+    </select>
 
 </mapper>

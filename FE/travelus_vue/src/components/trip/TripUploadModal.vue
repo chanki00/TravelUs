@@ -1,5 +1,5 @@
 <template>
-  <div v-if="isOpen" class="fixed inset-0 z-50 flex items-center justify-center">
+  <div class="fixed inset-0 z-50 flex items-center justify-center" v-if="isOpen">
     <!-- Backdrop with click-outside to close -->
     <div class="absolute inset-0 bg-black/50" @click="closeModal"></div>
 
@@ -32,9 +32,12 @@
       <div class="p-6 overflow-y-auto flex-grow">
         <div v-if="myTrips.length === 0" class="text-center py-12">
           <p class="text-gray-500">저장된 여행 계획이 없습니다.</p>
-          <button class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+          <router-link
+            to="/plan"
+            class="mt-4 inline-block px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+          >
             새 여행 계획 만들기
-          </button>
+          </router-link>
         </div>
 
         <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -53,7 +56,7 @@
                 <span
                   class="px-2 py-1 bg-white/70 backdrop-blur-sm text-gray-800 text-xs rounded-full"
                 >
-                  {{ trip.location }}
+                  {{ getSidoName(Number(trip.destination)) }}
                 </span>
               </div>
 
@@ -90,8 +93,8 @@
               </div>
 
               <div class="flex items-center justify-between text-xs text-gray-500">
-                <span>{{ formatDate(trip.created) }}</span>
-                <span>{{ trip.days }}일 일정</span>
+                <span>{{ formatDate(trip.createdAt) }}</span>
+                <span>{{ trip.duration }}일 일정</span>
               </div>
             </div>
           </div>
@@ -158,16 +161,29 @@ const closeModal = () => {
   emit('close')
   getPlans()
 }
+const sidos = ref([])
+// 시도 코드로 시도 이름 가져오기
+const getSidoName = (sidoCode) => {
+  if (!sidoCode || !sidos.value.length) return '지역 정보 없음'
 
+  const sido = sidos.value.find((sido) => sido.sidoCode === sidoCode)
+  return sido ? sido.sidoName : '지역 정보 없음'
+}
+
+// 시도 목록 가져오기
+const fetchSidos = async () => {
+  try {
+    const response = await api.get('/api/v1/sidos')
+    sidos.value = response.data
+  } catch (error) {
+    console.error('시도 목록 조회 실패:', error)
+  }
+}
 // 날짜 포맷팅
 const formatDate = (dateString) => {
   const date = new Date(dateString)
   return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, '0')}.${String(date.getDate()).padStart(2, '0')}`
 }
-
-onMounted(async () => {
-  getPlans()
-})
 
 const getPlans = async () => {
   // const response = await api.get(`/api/v1/plan/user/${userId}`)
@@ -187,4 +203,9 @@ const getPlans = async () => {
 
   myTrips.value = enrichedTrips
 }
+
+onMounted(() => {
+  fetchSidos()
+  getPlans()
+})
 </script>

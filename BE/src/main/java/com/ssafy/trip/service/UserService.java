@@ -14,4 +14,5 @@ public interface UserService {
 	public int updateInfo(UserInfoDto dto) throws SQLException;
 	public int updatePw(UserPwDto dto) throws SQLException;
 	public int deleteUser(Long id) throws SQLException;
+	public UserDto getUserById(int userId);
 }

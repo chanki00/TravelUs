@@ -16,7 +16,7 @@
                   ? 'border-b-2 border-blue-600 text-blue-600'
                   : 'text-gray-500',
               ]"
-              @click="activeFilter = tab.value"
+              @click="changeTab(tab.value)"
             >
               {{ tab.label }}
             </button>
@@ -141,6 +141,7 @@
                     v-model="searchTerm"
                     placeholder="여행 계획 검색하기"
                     class="px-3 py-2 border rounded-l-md focus:outline-none focus:ring-1 focus:ring-blue-500 flex-grow h-10"
+                    @keyup.enter="searchTrips"
                   />
                   <button
                     class="px-4 py-2 bg-blue-600 text-white rounded-r-md hover:bg-blue-700 h-10"
@@ -175,7 +176,7 @@
               </div>
               <div v-if="searchTerm" class="flex items-center bg-blue-50 px-3 py-1 rounded-full">
                 <span class="text-sm text-blue-700">"{{ searchTerm }}"</span>
-                <button @click="searchTerm = ''" class="ml-2 text-blue-700 hover:text-blue-900">
+                <button @click="clearSearchTerm" class="ml-2 text-blue-700 hover:text-blue-900">
                   ✕
                 </button>
               </div>
@@ -204,10 +205,32 @@
           {{ filteredTrips.length }}개의 검색 결과가 있습니다.
         </div>
 
+        <!-- 로딩 상태 -->
+        <div v-if="isLoading && displayedTrips.length === 0" class="text-center py-8">
+          <div
+            class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"
+          ></div>
+          <p class="text-gray-500">여행 계획을 불러오는 중...</p>
+        </div>
+
+        <!-- 검색 결과 없음 메시지 -->
+        <div v-else-if="filteredTrips.length === 0 && !isLoading" class="mt-8 text-center py-12">
+          <div class="text-gray-400 text-lg mb-2">
+            {{ hasActiveFilters ? '검색 결과가 없습니다' : '등록된 여행 계획이 없습니다' }}
+          </div>
+          <p class="text-gray-500">
+            {{
+              hasActiveFilters
+                ? '다른 검색어나 필터를 사용해 보세요'
+                : '첫 번째 여행 계획을 업로드해 보세요'
+            }}
+          </p>
+        </div>
+
         <!-- 여행 계획 카드 그리드 -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <router-link
-            v-for="trip in filteredTrips"
+            v-for="trip in displayedTrips"
             :key="trip.id"
             :to="`/tripdetail/${trip.id}`"
             class="block"
@@ -231,6 +254,11 @@
               </div>
               <div class="p-4">
                 <h3 class="font-medium text-lg mb-2">{{ trip.title }}</h3>
+
+                <!-- 수정: duration + 1일로 표시 -->
+                <p class="text-sm text-gray-500 mb-3">
+                  {{ trip.duration }}박 {{ trip.duration + 1 }}일
+                </p>
 
                 <div class="flex flex-wrap gap-1 mb-3">
                   <span
@@ -260,15 +288,17 @@
           </router-link>
         </div>
 
-        <!-- 더 보기 버튼 -->
-        <div v-if="filteredTrips.length > 0" class="mt-8 flex justify-center">
-          <button class="px-4 py-2 border rounded-md hover:bg-gray-50">더 보기</button>
+        <!-- 무한 스크롤 로딩 -->
+        <div v-if="isLoadingMore" class="mt-8 text-center py-4">
+          <div
+            class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-2"
+          ></div>
+          <p class="text-gray-500 text-sm">더 많은 여행 계획을 불러오는 중...</p>
         </div>
 
-        <!-- 검색 결과 없음 메시지 -->
-        <div v-if="hasActiveFilters && filteredTrips.length === 0" class="mt-8 text-center py-12">
-          <div class="text-gray-400 text-lg mb-2">검색 결과가 없습니다</div>
-          <p class="text-gray-500">다른 검색어나 필터를 사용해 보세요</p>
+        <!-- 모든 데이터 로드 완료 -->
+        <div v-if="hasReachedEnd && displayedTrips.length > 0" class="mt-8 text-center py-4">
+          <p class="text-gray-500 text-sm">모든 여행 계획을 확인했습니다.</p>
         </div>
       </div>
     </div>
@@ -283,7 +313,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch, onUnmounted } from 'vue'
 import { useUserStore } from '@/store/user'
 import TripUploadModal from '@/components/trip/TripUploadModal.vue'
 import api from '@/api'
@@ -299,6 +329,14 @@ const tempSelectedTags = ref([]) // 임시 선택된 태그들 (적용하기 전
 const showRegionFilter = ref(false)
 const showTagFilter = ref(false)
 const isUploadModalOpen = ref(false)
+const isLoading = ref(false)
+const isLoadingMore = ref(false)
+
+// 무한 스크롤 관련 상태
+const itemsPerPage = 9
+const currentPage = ref(1)
+const hasReachedEnd = ref(false)
+
 const tabs = [
   { value: 'all', label: '전체' },
   { value: 'popular', label: '인기순' },
@@ -308,12 +346,7 @@ const tabs = [
 
 const trips = ref([])
 const sidos = ref([])
-
-// popularTags 대신 allTags 사용
 const allTags = ref([])
-
-// 인기 태그 목록
-// const popularTags = ref(['가족여행', '혼자여행', '커플여행', '맛집투어', '자연경관', '역사탐방', '쇼핑', '축제'])
 
 // 필터가 활성화되었는지 확인
 const hasActiveFilters = computed(() => {
@@ -358,15 +391,75 @@ const filteredTrips = computed(() => {
   return result
 })
 
+// 현재 표시할 여행 계획들
+const displayedTrips = computed(() => {
+  return filteredTrips.value.slice(0, currentPage.value * itemsPerPage)
+})
+
+// 무한 스크롤 핸들러
+const handleScroll = () => {
+  if (isLoadingMore.value || hasReachedEnd.value) return
+
+  const scrollTop = window.pageYOffset || document.documentElement.scrollTop
+  const windowHeight = window.innerHeight
+  const documentHeight = document.documentElement.scrollHeight
+
+  // 스크롤이 하단에서 200px 이내에 도달했을 때
+  if (scrollTop + windowHeight >= documentHeight - 200) {
+    loadMoreItems()
+  }
+}
+
+// 더 많은 아이템 로드
+const loadMoreItems = () => {
+  if (isLoadingMore.value || hasReachedEnd.value) return
+
+  const totalItems = filteredTrips.value.length
+  const currentDisplayed = currentPage.value * itemsPerPage
+
+  if (currentDisplayed >= totalItems) {
+    hasReachedEnd.value = true
+    return
+  }
+
+  isLoadingMore.value = true
+
+  // 실제 API 호출 시뮬레이션 (현재는 클라이언트 사이드 페이지네이션)
+  setTimeout(() => {
+    currentPage.value += 1
+    isLoadingMore.value = false
+
+    // 모든 데이터를 로드했는지 확인
+    if (currentPage.value * itemsPerPage >= totalItems) {
+      hasReachedEnd.value = true
+    }
+  }, 500)
+}
+
+// 필터 변경 시 페이지 초기화
+const resetPagination = () => {
+  currentPage.value = 1
+  hasReachedEnd.value = false
+  isLoadingMore.value = false
+}
+
+// 탭 변경
+const changeTab = (tabValue) => {
+  activeFilter.value = tabValue
+  resetPagination()
+}
+
 // 지역 선택
 const selectRegion = (regionCode) => {
   selectedRegion.value = regionCode
   showRegionFilter.value = false
+  resetPagination()
 }
 
 // 지역 필터 초기화
 const clearRegionFilter = () => {
   selectedRegion.value = ''
+  resetPagination()
 }
 
 // 임시 태그 토글
@@ -382,6 +475,7 @@ const toggleTempTag = (tag) => {
 const applyTagFilter = () => {
   selectedTags.value = [...tempSelectedTags.value]
   showTagFilter.value = false
+  resetPagination()
 }
 
 // 태그 필터 취소
@@ -394,6 +488,13 @@ const cancelTagFilter = () => {
 const removeTag = (tag) => {
   selectedTags.value = selectedTags.value.filter((t) => t !== tag)
   tempSelectedTags.value = tempSelectedTags.value.filter((t) => t !== tag)
+  resetPagination()
+}
+
+// 검색어 초기화
+const clearSearchTerm = () => {
+  searchTerm.value = ''
+  resetPagination()
 }
 
 // 모든 필터 초기화
@@ -402,15 +503,12 @@ const clearAllFilters = () => {
   selectedTags.value = []
   tempSelectedTags.value = []
   searchTerm.value = ''
+  resetPagination()
 }
 
 // 검색 실행
 const searchTrips = () => {
-  console.log('검색 실행:', {
-    region: selectedRegion.value,
-    tags: selectedTags.value,
-    term: searchTerm.value,
-  })
+  resetPagination()
 }
 
 // 외부 클릭 시 드롭다운 닫기
@@ -424,7 +522,6 @@ const handleClickOutside = (event) => {
 // 모든 태그 가져오기
 const fetchAllTags = async () => {
   try {
-    // 모든 여행 계획에서 사용된 태그를 추출하여 중복 제거
     const uniqueTags = new Set()
 
     trips.value.forEach((trip) => {
@@ -436,7 +533,6 @@ const fetchAllTags = async () => {
     allTags.value = Array.from(uniqueTags)
   } catch (error) {
     console.error('태그 목록 조회 실패:', error)
-    // 기본 태그 제공
     allTags.value = [
       '가족여행',
       '혼자여행',
@@ -450,26 +546,31 @@ const fetchAllTags = async () => {
   }
 }
 
-// fetchTrips 함수 수정 - 태그 가져온 후 fetchAllTags 호출
+// fetchTrips 함수
 const fetchTrips = async () => {
-  const response = await api.get(`/api/v1/plan/share`)
-  const trip = response.data
+  try {
+    isLoading.value = true
+    const response = await api.get(`/api/v1/plan/share`)
+    const trip = response.data
 
-  const enrichedTrips = await Promise.all(
-    trip.map(async (tripPlan) => {
-      const tagRes = await api.get(`/api/v1/tag/plan/${tripPlan.id}`)
-      return {
-        ...tripPlan,
-        tags: tagRes.data,
-        createdAt: tripPlan.createdAt || new Date().toISOString(),
-      }
-    }),
-  )
+    const enrichedTrips = await Promise.all(
+      trip.map(async (tripPlan) => {
+        const tagRes = await api.get(`/api/v1/tag/plan/${tripPlan.id}`)
+        return {
+          ...tripPlan,
+          tags: tagRes.data,
+          createdAt: tripPlan.createdAt || new Date().toISOString(),
+        }
+      }),
+    )
 
-  trips.value = enrichedTrips
-
-  // 모든 태그 가져오기
-  fetchAllTags()
+    trips.value = enrichedTrips
+    fetchAllTags()
+  } catch (error) {
+    console.error('여행 계획 조회 실패:', error)
+  } finally {
+    isLoading.value = false
+  }
 }
 
 const fetchSidos = async () => {
@@ -493,23 +594,14 @@ const getSelectedRegionName = () => {
   return getSidoName(Number(selectedRegion.value))
 }
 
-onMounted(async () => {
-  fetchTrips()
-  fetchSidos()
-  document.addEventListener('click', handleClickOutside)
-})
-
-// 모달 열기
 const openUploadModal = () => {
   isUploadModalOpen.value = true
 }
 
-// 모달 닫기
 const closeUploadModal = () => {
   isUploadModalOpen.value = false
 }
 
-// 선택한 여행 계획 적용하기
 const handleApplyTrip = async (selectedTrip) => {
   console.log('선택한 여행 계획:', selectedTrip)
 
@@ -518,4 +610,21 @@ const handleApplyTrip = async (selectedTrip) => {
   await fetchTrips()
   alert('여행 계획이 성공적으로 업로드되었습니다!')
 }
+
+// 필터 변경 감지하여 페이지네이션 리셋
+watch([selectedRegion, selectedTags, searchTerm, activeFilter], () => {
+  resetPagination()
+})
+
+onMounted(async () => {
+  fetchTrips()
+  fetchSidos()
+  document.addEventListener('click', handleClickOutside)
+  window.addEventListener('scroll', handleScroll)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside)
+  window.removeEventListener('scroll', handleScroll)
+})
 </script>
