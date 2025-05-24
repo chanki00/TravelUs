@@ -21,9 +21,7 @@
                 @click="startEditingTitle"
               >
                 {{ title }}
-                <pencil-icon
-                  class="h-5 w-5 ml-2 text-gray-400"
-                />
+                <pencil-icon class="h-5 w-5 ml-2 text-gray-400" />
               </h1>
             </div>
 
@@ -43,9 +41,7 @@
                 @click="startEditingDescription"
               >
                 {{ description }}
-                <pencil-icon
-                  class="h-4 w-4 ml-1 text-gray-400 mt-0.5"
-                />
+                <pencil-icon class="h-4 w-4 ml-1 text-gray-400 mt-0.5" />
               </p>
             </div>
           </div>
@@ -53,7 +49,10 @@
           <div class="flex gap-3 mt-4 md:mt-0">
             <TripMembers :members="mockMembers" />
             <button class="px-4 py-2 border rounded-md hover:bg-gray-50">공유하기</button>
-            <button @click="openImageModal()" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+            <button
+              @click="openImageModal()"
+              class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            >
               일정 저장
             </button>
           </div>
@@ -71,37 +70,34 @@
 
         <!-- 일정 목록 -->
         <div class="w-1/5 p-4 border-r h-full overflow-hidden">
-          <TripItinerary 
-            v-model="activeDay" 
-            :itinerary="itinerary" 
-            @remove-item="removeFromItinerary" 
-            @update-memo="updateItineraryMemo" 
+          <TripItinerary
+            v-model="activeDay"
+            :itinerary="itinerary"
+            @remove-item="removeFromItinerary"
+            @update-memo="updateItineraryMemo"
           />
         </div>
 
         <!-- 지도 -->
         <div class="w-2/5 p-4 h-full overflow-hidden">
-          <TripPlannerMap :locations="[]" :itinerary="itinerary" :active-day="activeDay"/>
+          <TripPlannerMap :locations="[]" :itinerary="itinerary" :active-day="activeDay" />
         </div>
 
         <!-- 채팅 영역 -->
+        <!-- 채팅 영역 -->
         <div class="w-1/5 p-4 h-full overflow-hidden">
-          <TripChat />
+          <TripChat :chatroom-id="planId" v-if="planId" />
         </div>
       </div>
     </main>
-    
-     <TripimageModal 
-      :is-open="isImageModalOpen" 
-      @close="closeImageModal" 
-      @save="onImageSelected" 
-    />
 
-    <TripTagModal 
-      :is-open="isTagModalOpen" 
+    <TripimageModal :is-open="isImageModalOpen" @close="closeImageModal" @save="onImageSelected" />
+
+    <TripTagModal
+      :is-open="isTagModalOpen"
       :initial-tags="tags"
-      @close="closeTagModal" 
-      @save="saveWithTags" 
+      @close="closeTagModal"
+      @save="saveWithTags"
     />
   </div>
 </template>
@@ -131,7 +127,7 @@ const tripData = ref({
   destination: route.query.destination || '',
   duration: parseInt(route.query.duration) || 3,
   members: parseInt(route.query.members) || 1,
-  transport: route.query.transport || 'car'
+  transport: route.query.transport || 'car',
 })
 
 const destination = ref(parseInt(tripData.value.destination) || null)
@@ -153,19 +149,17 @@ const itinerary = ref([])
 
 const isTagModalOpen = ref(false)
 const isImageModalOpen = ref(false)
-const image = ref({
-
-})
+const image = ref({})
 
 const tags = ref({
-  id : []
+  id: [],
 })
 onMounted(() => {
   // Initialize itinerary based on duration
   for (let i = 0; i < tripData.value.duration; i++) {
     itinerary.value.push({ day: i, items: [] })
   }
-  
+
   // If planId exists in route params, fetch the plan
   if (route.params.planId) {
     fetchPlan(route.params.planId)
@@ -179,12 +173,12 @@ const fetchPlan = async (id) => {
     planId.value = id
     destination.value = parseInt(response.data.basicplan.destination) || null
     const resp_duration = response.data.basicplan.duration
-    title.value = `${resp_duration}박 ${resp_duration+1}일 여행 계획`
-    
+    title.value = `${resp_duration}박 ${resp_duration + 1}일 여행 계획`
+
     // Reset itinerary
     itinerary.value = []
     for (let i = 0; i < resp_duration; i++) {
-      itinerary.value.push({day: i, items: []})
+      itinerary.value.push({ day: i, items: [] })
     }
   } catch (error) {
     console.error('Error fetching plan:', error)
@@ -238,7 +232,7 @@ const closeImageModal = () => {
 }
 
 const onImageSelected = (selectedImage) => {
-  // 이미지 선택 후 image modal 닫고 tag modal 열기 
+  // 이미지 선택 후 image modal 닫고 tag modal 열기
   image.value = selectedImage
   isImageModalOpen.value = false
   isTagModalOpen.value = true
@@ -257,7 +251,7 @@ const closeTagModal = () => {
 const saveWithTags = (selectedTags) => {
   tags.value = selectedTags
   isTagModalOpen.value = false
-  createPlan() 
+  createPlan()
 }
 
 const mockMembers = [
@@ -288,7 +282,6 @@ const mockMembers = [
 const addToItinerary = (item) => {
   // 현재 활성화된 일차에 항목 추가
   itinerary.value[activeDay.value].items.push(item)
-  
 }
 
 // 일정에서 장소 제거
@@ -311,33 +304,32 @@ const createPlan = async () => {
       duration: tripData.value.duration,
       members: tripData.value.members,
       transport: tripData.value.transport,
-      userId : user.value.id,
+      userId: user.value.id,
       title: title.value,
       description: description.value,
-      likes : 0,
-      shares : 0,
-      image : image.value.img
+      likes: 0,
+      shares: 0,
+      image: image.value.img,
     })
-    
+
     planId.value = response.data
-    
+
     for (let i = 0; i < tripData.value.duration; i++) {
-      const dayId_resp = await api.get(`/api/v1/plan/tripplandays/${planId.value}/${i + 1}`);
-      for (let j = 0; j < itinerary.value[i].items.length; j++){
-          const response = await api.post(`/api/v1/plan/itinerary`,{
-            dayId : dayId_resp.data,
-            attractionId : itinerary.value[i].items[j].placeData.no,
-            placeOrder : j + 1,
-            memo : itinerary.value[i].items[j].memo
-          });
+      const dayId_resp = await api.get(`/api/v1/plan/tripplandays/${planId.value}/${i + 1}`)
+      for (let j = 0; j < itinerary.value[i].items.length; j++) {
+        const response = await api.post(`/api/v1/plan/itinerary`, {
+          dayId: dayId_resp.data,
+          attractionId: itinerary.value[i].items[j].placeData.no,
+          placeOrder: j + 1,
+          memo: itinerary.value[i].items[j].memo,
+        })
       }
     }
     tags.value.id.forEach(async (tagId) => {
       await api.post(`/api/v1/tag/tripplan/${planId.value}/${tagId}`)
-    });
-   
+    })
 
-    router.push("/")
+    router.push('/')
   } catch (error) {
     console.error('Error creating plan:', error)
     alert('일정 저장 중 오류가 발생했습니다.')
@@ -350,7 +342,7 @@ const createPlan = async () => {
 //     // If no planId, create a new plan
 //     return createPlan()
 //   }
-  
+
 //   try {
 //     await api.put(`/api/v1/plan/${planId.value}`, {
 //       destination: destination.value,
@@ -361,7 +353,7 @@ const createPlan = async () => {
 //       description: description.value,
 //       itinerary: itinerary.value
 //     })
-    
+
 //     router.push(`/planresult/${planId.value}`)
 //   } catch (error) {
 //     console.error('Error updating plan:', error)

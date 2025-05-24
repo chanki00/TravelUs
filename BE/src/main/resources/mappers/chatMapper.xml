@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.DB_PASSWORD_REDACTED.trip.chat.ChatRepository">
+
+	<!-- 다음 chat_id 가져오기 -->
+	<select id="getNextChatId" resultType="int">
+		SELECT IFNULL(MAX(chat_id), 0) + 1
+		FROM chat
+		WHERE chatroom_id = #{chatroomId}
+	</select>
+
+	<!-- 채팅 메시지 삽입 -->
+	<insert id="insertChatMessage">
+		INSERT INTO chat (chatroom_id, chat_id, users_id, content, created_at)
+		VALUES (#{chatroomId}, #{chatId}, #{usersId}, #{content}, NOW())
+	</insert>
+
+	<!-- 채팅방에 유저 존재 여부 -->
+	<select id="existsInChatroomUsers" resultType="boolean">
+		SELECT COUNT(*) > 0
+		FROM chatroom_users
+		WHERE chatroom_id = #{chatroomId} AND users_id = #{usersId}
+	</select>
+
+	<!-- 유저 채팅방에 등록 -->
+	<insert id="insertChatroomUser">
+		INSERT INTO chatroom_users (chatroom_id, users_id)
+		VALUES (#{chatroomId}, #{usersId})
+	</insert>
+
+	<select id="getMessagesByRoomId"
+		resultType="com.DB_PASSWORD_REDACTED.trip.chat.ChatMessage">
+		SELECT chatroom_id AS chatroomId,
+		chat_id AS chatId,
+		users_id AS usersId,
+		content,
+		created_at AS createdAt
+		FROM chat
+		WHERE chatroom_id = #{chatroomId}
+		ORDER BY chat_id ASC
+	</select>
+
+</mapper>
