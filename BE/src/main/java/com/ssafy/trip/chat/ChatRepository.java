@@ -5,6 +5,8 @@ import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import com.DB_PASSWORD_REDACTED.trip.dto.user.UserDto;
+
 @Mapper
 public interface ChatRepository {
 
@@ -24,4 +26,8 @@ public interface ChatRepository {
     
     void insertEmptyChatRoom(); // 채팅방 생성
     int getLastInsertedRoomId(); // 방금 삽입한 채팅방 ID 반환
+
+    List<UserDto> getUsersInTripPlan(@Param("planId") int planId); // 여행 계획 참여자 조회
+
+    List<Integer> findChatroomIdsByUserId(int userId);
 }

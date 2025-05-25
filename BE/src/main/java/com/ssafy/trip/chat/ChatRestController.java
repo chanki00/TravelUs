@@ -33,4 +33,36 @@ public class ChatRestController {
         int newRoomId = chatService.createChatRoom((int) userId);
         return ResponseEntity.ok(newRoomId);
     }
+    
+    
+    @PostMapping("/invite")
+    public ResponseEntity<Void> inviteUser(@RequestBody InviteRequest dto) {
+    	System.out.println("채팅: " + dto.getChatroomId());
+    	chatService.inviteUserToChatroom(dto.getChatroomId(), dto.getInviterId(), dto.getInviteeId());
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/invite/{userId}")
+    public ResponseEntity<List<ChatInviteResponse>> getPending(@PathVariable int userId) {
+    	System.out.println("유저아이디: " + userId);
+        ResponseEntity<List<ChatInviteResponse>> ok = ResponseEntity.ok(chatService.getPendingInvites(userId));
+        System.out.println(ok);
+        return ok;
+    }
+
+    @PatchMapping("/invite/{inviteId}")
+    public ResponseEntity<Void> respond(@PathVariable int inviteId, @RequestParam String response) {
+    	chatService.respondToInvite(inviteId, response);
+        return ResponseEntity.ok().build();
+    }
+    
+ // ChatRestController.java
+    @GetMapping("/rooms/{userId}")
+    public ResponseEntity<List<Integer>> getChatroomIds(@PathVariable int userId) {
+        List<Integer> roomIds = chatService.getChatroomIdsByUserId(userId);
+        return ResponseEntity.ok(roomIds);
+    }
+
+    
+
 }

@@ -247,9 +247,17 @@
               <div class="flex gap-2">
                 <button
                   class="px-4 py-2 text-sm bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
+                  @click="openInviteModal"
                 >
                   초대하기
                 </button>
+                <InvitePlanModal
+                  :show="showInviteModal"
+                  :plans="myPlans"
+                  :invitee-id="companion"
+                  @select="inviteToPlan"
+                  @close="showInviteModal = false"
+                />
               </div>
             </div>
           </div>
@@ -282,9 +290,11 @@
 </template>
 
 <script setup>
+import InvitePlanModal from '@/components/trip/InvitePlanModel.vue'
 import { ref, onMounted, computed, watch, onUnmounted } from 'vue'
 import { useUserStore } from '@/store/user'
 import { ChevronDown as ChevronDownIcon, Users as UsersIcon } from 'lucide-vue-next'
+import api from '@/api'
 
 const userStore = useUserStore()
 
@@ -592,6 +602,33 @@ const calculateSimilarity = (user, target, type) => {
   const result = Math.round(Math.max(0, Math.min(100, finalScore)))
 
   return result
+}
+
+// ---------------
+const showInviteModal = ref(false)
+const myPlans = ref([])
+const openInviteModal = async () => {
+  showInviteModal.value = true
+  const res = await api.get(`/api/v1/plan/user/${userStore.loginUser.id}`)
+  myPlans.value = res.data
+}
+const inviteToPlan = async (currPlan) => {
+  try {
+    console.log('계획', currPlan.plan.chatroomId)
+    console.log('로그인', userStore.loginUser.id)
+    console.log('상대', currPlan.inviteeId.id)
+
+    await api.post('/api/v1/chat/invite', {
+      chatroomId: currPlan.plan.chatroomId, // 여행 계획에 연결된 chatroomId
+      inviterId: userStore.loginUser.id,
+      inviteeId: currPlan.inviteeId.id,
+    })
+    alert('초대를 보냈습니다!')
+    showInviteModal.value = false
+  } catch (err) {
+    console.error(err)
+    alert('초대에 실패했습니다.')
+  }
 }
 </script>
 
