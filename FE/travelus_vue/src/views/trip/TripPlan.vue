@@ -129,8 +129,6 @@
       </div>
     </main>
 
-    <TripimageModal :is-open="isImageModalOpen" @close="closeImageModal" @save="onImageSelected" />
-
     <TripimageModal
       :is-open="isImageModalOpen"
       @close="closeImageModal"
@@ -207,17 +205,6 @@ const image = ref({})
 
 const tags = ref({
   id: [],
-})
-onMounted(() => {
-  // Initialize itinerary based on duration
-  for (let i = 0; i < tripData.value.duration; i++) {
-    itinerary.value.push({ day: i, items: [] })
-  }
-
-  // If planId exists in route params, fetch the plan
-  if (route.params.planId) {
-    fetchPlan(route.params.planId)
-  }
 })
 // 일정 초기화 함수
 const initializeItinerary = () => {
@@ -441,7 +428,7 @@ const createPlan = async () => {
       likes: 0,
       shares: 0,
       image: image.value.img,
-      chatroomId: chatroomId, // ✅ 포함
+      chatroomId: chatroomId?.value, // ✅ 포함
     })
 
     planId.value = planRes.data
