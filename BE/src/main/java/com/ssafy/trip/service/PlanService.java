@@ -31,6 +31,21 @@ public class PlanService {
 		    }
 	}
 
+	public int updatePlan(Tripplan dto) {
+		try {
+			return repo.updatePlan(dto);
+		} catch (Exception e) {
+			throw e;
+		}
+	}
+	
+	public int deleteAllItinerary(int planId) {
+		try {
+			return repo.deleteAllItinerary(planId);
+		} catch (Exception e) {
+			throw e;
+		}
+	}
 	public void makeDaysPlan(Tripplan dto) {
 		for (int day = 1; day <= dto.getDuration() ; day++) {
 			repo.insertDay(dto.getId(), day);
@@ -161,5 +176,18 @@ public boolean deleteTripplan(int planId, int userId) {
     } catch (Exception e) {
         throw new RuntimeException("여행계획 삭제 중 오류가 발생했습니다: " + e.getMessage(), e);
     }
+}
+
+public List<Tripplan> getAllTripplan() {
+	return repo.getAllTripplan();
+}
+
+public boolean deleteTripplanAdmin(int planId) {
+	int result = repo.deleteTripplanAdmin(planId);
+	return result > 0;
+}
+
+public Tripplan getTripplanByChatroomId(Integer chatroomId) {
+	return repo.getTripplanByChatroomId(chatroomId);
 }
 }

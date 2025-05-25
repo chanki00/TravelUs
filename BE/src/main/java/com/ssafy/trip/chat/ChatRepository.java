@@ -24,4 +24,6 @@ public interface ChatRepository {
     
     void insertEmptyChatRoom(); // 채팅방 생성
     int getLastInsertedRoomId(); // 방금 삽입한 채팅방 ID 반환
+
+	List<Integer> getChatroomIdByuserId(int userId);
 }

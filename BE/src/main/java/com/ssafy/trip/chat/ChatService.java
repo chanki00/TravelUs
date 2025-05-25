@@ -35,4 +35,8 @@ public class ChatService {
         repo.insertChatroomUser(newRoomId, userId);   // 현재 사용자 참여 등록
         return newRoomId;
     }
+
+	public List<Integer> getChatroomIdByuserId(int userId) {
+		return repo.getChatroomIdByuserId(userId);
+	}
 }

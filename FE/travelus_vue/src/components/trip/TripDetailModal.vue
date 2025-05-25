@@ -226,7 +226,7 @@ const fetchSidos = async () => {
 // 여행 일정 가져오기
 const fetchItinerary = async () => {
   if (!props.post || !props.post.planId) return
-
+  console.log(props.post)
   try {
     // 일정 데이터 가져오기
     const itineraryRes = await api.get(`/api/v1/plan/itinerary/${props.post.planId}`)

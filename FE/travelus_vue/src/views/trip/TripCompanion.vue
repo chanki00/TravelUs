@@ -236,7 +236,11 @@
                 </span>
               </div>
             </div>
-
+            <div class="mb-4">
+              <div class="text-sm mb-1">
+                {{ companion.intro }}
+              </div>
+            </div>
             <div class="flex justify-between items-center mt-6">
               <div>
                 <div class="text-xs text-gray-500">매칭 점수</div>

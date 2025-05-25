@@ -226,6 +226,7 @@ const getInitialCenter = () => {
 // 일정표의 모든 장소 가져오기
 const getAllPlacesFromItinerary = () => {
   const places = []
+  console.log(props.itinerary)
   props.itinerary.forEach((day) => {
     day.items.forEach((item) => {
       if (item.placeData && item.placeData.longitude && item.placeData.latitude) {

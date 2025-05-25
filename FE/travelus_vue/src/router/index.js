@@ -13,6 +13,7 @@ import AdminDashboard from '@/views/admin/AdminDashboard.vue'
 import TripPlan from '@/views/trip/TripPlan.vue'
 import TripBoard from '@/views/trip/TripBoard.vue'
 import TripDetail from '@/views/trip/TripDetail.vue'
+import TripPlanUpdate from '@/views/trip/TripPlanUpdate.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -87,6 +88,11 @@ const router = createRouter({
       path: '/tripdetail/:id',
       name: 'TripDetail',
       component: TripDetail,
+    },
+    {
+      path: '/tripplanupdate/:planId',
+      name: 'TripPlanUpdate',
+      component: TripPlanUpdate,
     },
   ],
 })

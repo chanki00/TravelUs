@@ -17,6 +17,10 @@ public interface PlanRepository {
 
 	void insertDay(int plan_id, int day_number);
 
+	int updatePlan(Tripplan dto);
+
+	int deleteAllItinerary(int planId);
+
 	Tripplan selectTripplanById(int planId);
 
 	int getPlanDaysId(int planId, int dayNumber);
@@ -36,4 +40,10 @@ public interface PlanRepository {
 	
 	// 계획 소유권 확인
 	int checkPlanOwnership(Map<String, Object> params);
+
+	List<Tripplan> getAllTripplan();
+
+	int deleteTripplanAdmin(int planId);
+
+	Tripplan getTripplanByChatroomId(Integer chatroomId);
 }

@@ -61,6 +61,14 @@
                 <heart-icon :class="['h-4 w-4', isLiked ? 'fill-current text-red-500' : '']" />
                 {{ isLiked ? '좋아요 취소' : '좋아요' }} ({{ likeCount }})
               </button>
+
+              <!-- 수정하기 버튼 추가 -->
+              <button
+                @click="goToEdit"
+                class="px-4 py-2 border border-blue-300 rounded-md transition-colors flex items-center gap-2 hover:bg-blue-50 text-blue-600"
+              >
+                수정하기
+              </button>
             </div>
           </div>
 
@@ -527,6 +535,11 @@ const loadTripData = async (tripId) => {
   } catch (error) {
     console.error('Failed to fetch trip details:', error)
   }
+}
+
+// 수정하기 페이지로 이동하는 함수
+const goToEdit = () => {
+  router.push(`/tripplanupdate/${route.params.id}`)
 }
 
 // onMounted에서 작성자 정보도 가져오도록 수정:
