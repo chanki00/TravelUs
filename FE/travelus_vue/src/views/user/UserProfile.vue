@@ -462,7 +462,50 @@
           </div>
 
           <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- 초대 목록이 있을 경우 표시될 내용 -->
+            <div
+              v-for="invite in invites"
+              :key="invite.id"
+              class="border rounded-lg p-4 shadow-sm flex flex-col gap-2"
+            >
+              <div class="flex justify-between items-center">
+                <div>
+                  <p class="text-sm text-gray-600">
+                    <strong>{{ invite.name }}</strong> 님이 초대했습니다.
+                  </p>
+                  <p class="text-xs text-gray-400">
+                    {{ formatDate(invite.createdAt) }}
+                  </p>
+                </div>
+
+                <span
+                  v-if="invite.status === 'ACCEPTED'"
+                  class="text-green-600 text-sm font-semibold"
+                >
+                  수락됨
+                </span>
+                <span
+                  v-else-if="invite.status === 'DECLINED'"
+                  class="text-red-500 text-sm font-semibold"
+                >
+                  거절됨
+                </span>
+              </div>
+
+              <div v-if="invite.status === 'PENDING'" class="flex gap-2 mt-2">
+                <button
+                  class="flex-1 bg-blue-600 text-white text-sm py-1 rounded hover:bg-blue-700"
+                  @click="respondToInvite(invite.id, 'ACCEPTED')"
+                >
+                  수락
+                </button>
+                <button
+                  class="flex-1 bg-gray-200 text-gray-800 text-sm py-1 rounded hover:bg-gray-300"
+                  @click="respondToInvite(invite.id, 'DECLINED')"
+                >
+                  거절
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -632,7 +675,6 @@ const deleteUser = () => {
 }
 
 const trips = ref([])
-const invites = ref([])
 const allowInvites = ref(false)
 
 const activeTab = ref('edit')
@@ -654,6 +696,7 @@ onMounted(async () => {
   await getTripTag()
   await fetchMyTrips() // 내 여행 계획 가져오기 추가
   await fetchSidos()
+  await fetchInvites()
 })
 
 const sidos = ref([])
@@ -671,6 +714,36 @@ const getSidoName = (sidoCode) => {
 
   const sido = sidos.value.find((sido) => sido.sidoCode === sidoCode)
   return sido ? sido.sidoName : '지역 정보 없음'
+}
+
+// -------------------------
+const invites = ref([])
+
+const fetchInvites = async () => {
+  try {
+    const res = await api.get(`/api/v1/chat/invite/${userStore.loginUser.id}`)
+    invites.value = res.data
+    console.log('초대', invites.value)
+  } catch (err) {
+    console.error('초대 목록 불러오기 실패', err)
+  }
+}
+
+const respondToInvite = async (inviteId, response) => {
+  try {
+    console.log('초대임', inviteId)
+    await api.patch(`/api/v1/chat/invite/${inviteId}`, null, {
+      params: { response }, // ✅ GET param으로 response 전송
+    })
+
+    // 프론트 상태 업데이트
+    invites.value = invites.value.map((inv) =>
+      inv.id === inviteId ? { ...inv, status: response } : inv,
+    )
+  } catch (err) {
+    console.error('초대 응답 실패', err)
+    alert('초대 응답에 실패했습니다.')
+  }
 }
 </script>
 <style scoped></style>
