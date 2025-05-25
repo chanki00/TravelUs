@@ -21,8 +21,7 @@ public class PostServiceImpl implements PostService{
         try {
             // 1. 선택한 여행계획이 있는 경우 복사본 생성
             if (req.getPlanId() != null && req.getPlanId() > 0) {
-                int newPlanId = planService.copyTripPlan(req.getPlanId(), req.getUserId());
-                
+                int newPlanId = planService.copyTripPlan(req.getPlanId(), req.getUserId(), req.getChatroomId());
                 // 새로운 planId로 변경
                 Post newPost = new Post(
                     req.getId(),

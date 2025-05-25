@@ -70,6 +70,7 @@
 	    <result property="duration" column="duration"/>
 	    <result property="members" column="members"/>
 	    <result property="transport" column="transport"/>
+	    <result property="chatroomId" column="chatroom_id"/>
 	  </resultMap>
 
 

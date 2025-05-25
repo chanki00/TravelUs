@@ -65,7 +65,7 @@ public class PlanService {
 		return repo.getItineraryByPlanId(planId);
 	}
 
-	public int copyTripPlan(int originalPlanId, int newUserId) {
+	public int copyTripPlan(int originalPlanId, int newUserId, int chatroomid) {
     try {
         // 1. 원본 여행계획 조회
         Tripplan originalPlan = repo.selectTripplanById(originalPlanId);
@@ -80,6 +80,7 @@ public class PlanService {
             originalPlan.getDuration(),
             originalPlan.getMembers(),
             originalPlan.getTransport(),
+            chatroomid,
             newUserId, // 새로운 사용자 ID
             originalPlan.getTitle() + " (모집용)",
             originalPlan.getDescription(),

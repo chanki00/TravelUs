@@ -119,7 +119,6 @@ const navigateToTripPlan = async () => {
 
   const res = await userAi.post('/api/v1/chat') // 🔹 채팅방 생성
   const chatroomId = res.data // 생성된 채팅방 ID (백엔드에서 int 또는 DTO 형태로 반환되었을 것)
-
   // Navigate to TripPlan with query parameters
   router.push({
     path: '/tripplan',

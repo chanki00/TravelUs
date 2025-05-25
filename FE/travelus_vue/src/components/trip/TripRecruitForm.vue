@@ -257,6 +257,7 @@ import { useRouter } from 'vue-router'
 import { useUserStore } from '@/store/user'
 import api from '@/api'
 import { Check as CheckIcon, MapPin as MapPinIcon, Calendar as CalendarIcon } from 'lucide-vue-next'
+import { userAi } from '@/axios'
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -353,7 +354,6 @@ const fetchTravelPlans = async () => {
 const selectPlan = (plan) => {
   selectedPlan.value = plan
   showForm.value = true
-  console.log(selectedPlan.value)
   // 선택한 계획에서 여행지를 가져옴 (성격 태그는 초기화)
   recruitForm.value = {
     title: '',
@@ -427,7 +427,9 @@ const submitForm = async () => {
   console.log(selectedPlan.value)
   try {
     isSubmitting.value = true
-
+    const res = await userAi.post('/api/v1/chat') // 🔹 채팅방 생성
+    const newchatroomId = res.data
+    console.log(newchatroomId)
     const postData = {
       planId: selectedPlan.value ? selectedPlan.value.id : null,
       userId: user.value.id,
@@ -437,9 +439,9 @@ const submitForm = async () => {
       content: recruitForm.value.content,
       currentMembers: recruitForm.value.maxMembers,
       personalityTags: JSON.stringify(recruitForm.value.personalityTags), // JSON 문자열로 변환
-      chatroomId: selectedPlan.value.chatroomId,
+      chatroomId: newchatroomId,
     }
-
+    console.log(postData)
     // API 호출하여 모집글 저장
     const response = await api.post('/api/v1/post/recruit', postData)
 

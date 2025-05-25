@@ -55,6 +55,7 @@ import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import QuestionCard from '@/components/ui/QuestionCard.vue'
 import api from '@/api'
+import { userAi } from '@/axios'
 
 const router = useRouter()
 const questions = [
@@ -208,6 +209,8 @@ const generateTravelPlan = async () => {
     }
 
     // 여행 계획 데이터를 TripPlan.vue로 전달
+    const res = await userAi.post('/api/v1/chat') // 🔹 채팅방 생성
+    const chatroomId = res.data
     router.push({
       path: '/tripplan',
       query: {
@@ -220,6 +223,7 @@ const generateTravelPlan = async () => {
         aiPlan: JSON.stringify(planData),
         // 관광지 정보 맵 (문자열로 변환)
         attractions: JSON.stringify(attractionsMap),
+        chatroomId,
       },
     })
   } catch (error) {

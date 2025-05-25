@@ -219,6 +219,18 @@ onMounted(() => {
     fetchPlan(route.params.planId)
   }
 })
+// 일정 초기화 함수
+const initializeItinerary = () => {
+  if (aiPlanData.value?.itinerary && aiPlanData.value.itinerary.length > 0) {
+    // AI 생성 데이터가 있으면 변환하여 사용
+    itinerary.value = convertAiPlanToItinerary() || []
+  } else {
+    // 기본 빈 일정 생성
+    for (let i = 0; i < tripData.value.duration; i++) {
+      itinerary.value.push({ day: i, items: [] })
+    }
+  }
+}
 
 const fetchPlan = async (id) => {
   try {
@@ -417,9 +429,6 @@ const reorderItineraryItems = ({ dayIndex, fromIndex, toIndex }) => {
 // 일정 생성
 const createPlan = async () => {
   try {
-    // 먼저 채팅방을 생성
-    const chatroomId = ref(null)
-
     // 이후 plan 생성 요청에 chatroomId 포함
     const planRes = await api.post('/api/v1/plan', {
       destination: tripData.value.destination,
@@ -470,6 +479,7 @@ const createPlan = async () => {
         }
       }
     }
+    console.log('aaaaaaaaaaaaaaa')
     tags.value.id.forEach(async (tagId) => {
       await api.post(`/api/v1/tag/tripplan/${planId.value}/${tagId}`)
     })
@@ -480,6 +490,66 @@ const createPlan = async () => {
     alert('일정 저장 중 오류가 발생했습니다.')
   }
 }
+// AI 생성 데이터 파싱
+const parseAiPlanData = () => {
+  if (route.query.aiPlan) {
+    try {
+      aiPlanData.value = JSON.parse(route.query.aiPlan)
+
+      // AI 생성 데이터로 제목과 설명 설정
+      if (aiPlanData.value.title) {
+        title.value = aiPlanData.value.title
+      }
+
+      if (aiPlanData.value.description) {
+        description.value = aiPlanData.value.description
+      }
+    } catch (e) {
+      console.error('Failed to parse AI plan data:', e)
+    }
+  }
+}
+// 관광지 정보 맵 파싱
+const parseAttractionsMap = () => {
+  if (route.query.attractions) {
+    try {
+      attractionsMap.value = JSON.parse(route.query.attractions)
+    } catch (e) {
+      console.error('Failed to parse attractions data:', e)
+    }
+  }
+}
+
+onMounted(() => {
+  parseAiPlanData()
+  parseAttractionsMap()
+
+  // 가져온 여행 계획 데이터 처리
+  if (route.query.itinerary) {
+    try {
+      const importedItinerary = JSON.parse(route.query.itinerary)
+      itinerary.value = importedItinerary
+
+      // 제목과 설명 설정
+      if (route.query.title) {
+        title.value = route.query.title
+      }
+      if (route.query.description) {
+        description.value = route.query.description
+      }
+    } catch (e) {
+      console.error('Failed to parse imported itinerary:', e)
+      initializeItinerary()
+    }
+  } else {
+    initializeItinerary()
+  }
+
+  // If planId exists in route params, fetch the plan
+  if (route.params.planId) {
+    fetchPlan(route.params.planId)
+  }
+})
 
 // 일정 업데이트 (기존 계획을 수정할 때 사용)
 // const updatePlan = async () => {
