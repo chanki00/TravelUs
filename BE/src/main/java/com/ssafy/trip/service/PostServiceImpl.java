@@ -35,7 +35,8 @@ public class PostServiceImpl implements PostService{
                     req.getCurrentMembers(),
                     req.getCreatedAt(),
                     req.getUpdatedAt(),
-                    req.getPersonalityTags()
+                    req.getPersonalityTags(),
+                    req.getChatroomId()
                 );
                 
                 return repo.createRecruitPost(newPost);

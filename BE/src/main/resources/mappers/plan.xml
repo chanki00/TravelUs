@@ -5,8 +5,8 @@
 
 <mapper namespace="com.DB_PASSWORD_REDACTED.trip.repository.PlanRepository">
 	<insert id="insert" parameterType="Tripplan" useGeneratedKeys="true" keyProperty="id">
-		INSERT INTO tripplans (destination, duration, members, transport, user_id, title, description, image )
-		VALUES (#{destination}, #{duration}, #{members}, #{transport}, #{userId}, #{title}, #{description}, #{image})
+		INSERT INTO tripplans (destination, duration, members, transport, user_id, title, description, image, chatroom_id )
+		VALUES (#{destination}, #{duration}, #{members}, #{transport}, #{userId}, #{title}, #{description}, #{image}, #{chatroomId})
 	</insert>
 	
 	<insert id="insertDay">

@@ -24,4 +24,5 @@ public class Post {
 	private LocalDateTime createdAt;
 	private LocalDateTime updatedAt;
 	private String personalityTags; // 성격 태그들을 JSON 문자열로 저장
+	private int chatroomId;
 }

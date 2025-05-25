@@ -435,7 +435,7 @@ const createPlan = async () => {
       chatroomId: chatroomId, // ✅ 포함
     })
 
-    planId.value = response.data
+    planId.value = planRes.data
 
     for (let i = 0; i < tripData.value.duration; i++) {
       const dayId_resp = await api.get(`/api/v1/plan/tripplandays/${planId.value}/${i + 1}`)

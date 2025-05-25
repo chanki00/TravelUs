@@ -14,7 +14,8 @@
       title,
       content,
       current_members,
-      personalityTags
+      personalityTags,
+      chatroom_id
     )
     VALUES (
       #{planId},
@@ -24,7 +25,8 @@
       #{title},
       #{content},
       #{currentMembers},
-      #{personalityTags}
+      #{personalityTags},
+      #{chatroomId}
     )
   </insert>
    <select id="getALlRecruitPost" resultType="com.DB_PASSWORD_REDACTED.trip.dto.Post">

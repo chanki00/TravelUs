@@ -353,6 +353,7 @@ const fetchTravelPlans = async () => {
 const selectPlan = (plan) => {
   selectedPlan.value = plan
   showForm.value = true
+  console.log(selectedPlan.value)
   // 선택한 계획에서 여행지를 가져옴 (성격 태그는 초기화)
   recruitForm.value = {
     title: '',
@@ -423,7 +424,7 @@ const togglePersonalityTag = (tag) => {
 // 폼 제출 함수
 const submitForm = async () => {
   if (!validateForm()) return
-
+  console.log(selectedPlan.value)
   try {
     isSubmitting.value = true
 
@@ -436,6 +437,7 @@ const submitForm = async () => {
       content: recruitForm.value.content,
       currentMembers: recruitForm.value.maxMembers,
       personalityTags: JSON.stringify(recruitForm.value.personalityTags), // JSON 문자열로 변환
+      chatroomId: selectedPlan.value.chatroomId,
     }
 
     // API 호출하여 모집글 저장

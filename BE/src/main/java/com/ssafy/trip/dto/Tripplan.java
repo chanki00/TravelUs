@@ -17,6 +17,7 @@ public class Tripplan {
 	private int duration;
 	private int members;
 	private String transport;
+	private int chatroomId;
 	private int userId;
 	private String title;
 	private String description;
