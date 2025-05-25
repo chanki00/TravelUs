@@ -13,8 +13,7 @@
       end_date,
       title,
       content,
-      current_members,
-      personalityTags
+      current_members
     )
     VALUES (
       #{planId},
@@ -23,8 +22,7 @@
       #{endDate},
       #{title},
       #{content},
-      #{currentMembers},
-      #{personalityTags}
+      #{currentMembers}
     )
   </insert>
    <select id="getALlRecruitPost" resultType="com.DB_PASSWORD_REDACTED.trip.dto.Post">
@@ -37,14 +35,9 @@
       title,
       content,
       current_members AS currentMembers,
-      personalityTags AS personalityTags,
       created_at AS createdAt,
       updated_at AS updatedAt
     FROM Posts
     ORDER BY created_at DESC
   </select>
-    <delete id="deleteRecruitPost" parameterType="int">
-        DELETE FROM posts
-        WHERE id = #{postId}
-    </delete>
 </mapper>

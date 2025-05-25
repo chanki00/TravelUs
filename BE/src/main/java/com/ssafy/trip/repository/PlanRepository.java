@@ -1,6 +1,7 @@
 package com.DB_PASSWORD_REDACTED.trip.repository;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 
@@ -29,4 +30,10 @@ public interface PlanRepository {
 	List<Tripplan> getAllSharePlan();
 
 	List<ItineraryPlaceResponseDto> getItineraryByPlanId(int planId);
+
+	// CASCADE를 활용한 단순화된 삭제
+	int deleteTripPlan(Map<String, Object> params);
+	
+	// 계획 소유권 확인
+	int checkPlanOwnership(Map<String, Object> params);
 }

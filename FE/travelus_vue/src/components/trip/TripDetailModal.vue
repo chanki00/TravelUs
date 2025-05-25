@@ -142,9 +142,9 @@
           <div class="font-medium mb-2">호스트 정보</div>
           <div class="flex items-center gap-2">
             <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
-              {{ post.userId ? post.userId.toString().slice(0, 1) : '?' }}
+              {{ post.authorName ? post.authorName.toString().slice(0, 1) : '?' }}
             </div>
-            <span>호스트 ID: {{ post.userId }}</span>
+            <span>호스트 ID: {{ post.authorName }}</span>
           </div>
         </div>
       </div>
@@ -152,6 +152,13 @@
       <div class="p-4 border-t flex justify-end gap-2 mt-auto">
         <button class="px-4 py-2 border rounded-md hover:bg-gray-50" @click="closeModal">
           닫기
+        </button>
+        <button
+          v-if="isAuthor"
+          class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+          @click="deletePost"
+        >
+          삭제
         </button>
         <button
           class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
@@ -169,6 +176,9 @@
 import { ref, defineProps, defineEmits, onMounted, computed, watch } from 'vue'
 import api from '@/api'
 import { MapPin as MapPinIcon, Users as UsersIcon, Clock as ClockIcon } from 'lucide-vue-next'
+import { useUserStore } from '@/store/user'
+const userStore = useUserStore()
+const user = computed(() => userStore.loginUser)
 
 const props = defineProps({
   show: {
@@ -223,9 +233,6 @@ const fetchItinerary = async () => {
 
     // 컨텐츠 타입 매핑
     const typeMap = {
-      12: '관광',
-      39: '식당',
-      32: '숙박',
       12: '관광',
       39: '식당',
       32: '숙박',
@@ -393,4 +400,26 @@ onMounted(() => {
     fetchItinerary()
   }
 })
+
+const isAuthor = computed(() => {
+  return user.value.id === props.post.userId
+})
+
+// 게시글 삭제하기
+const deletePost = async () => {
+  if (!confirm('정말로 이 게시글을 삭제하시겠습니까?')) {
+    return
+  }
+
+  try {
+    await api.delete(`/api/v1/post/recruit/${props.post.id}`)
+    alert('게시글이 삭제되었습니다.')
+    closeModal()
+    // 부모 컴포넌트에 삭제 완료를 알림
+    emit('deleted', props.post.id)
+  } catch (error) {
+    console.error('게시글 삭제 실패:', error)
+    alert('게시글 삭제에 실패했습니다. 다시 시도해주세요.')
+  }
+}
 </script>

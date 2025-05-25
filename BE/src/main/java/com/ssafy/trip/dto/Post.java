@@ -14,7 +14,7 @@ import lombok.ToString;
 @ToString
 public class Post {
 	private int id;
-	private int planId;
+	private Integer planId;
 	private int userId;
 	private Date startDate;
 	private Date endDate;
@@ -23,4 +23,5 @@ public class Post {
 	private int currentMembers;
 	private LocalDateTime createdAt;
 	private LocalDateTime updatedAt;
+	private String personalityTags; // 성격 태그들을 JSON 문자열로 저장
 }

@@ -34,6 +34,31 @@
                 :key="itemIndex"
                 class="flex items-start gap-3 pb-3 border-b last:border-b-0 last:pb-0 group"
               >
+                <div class="flex flex-col items-center space-y-1 mt-2">
+                  <button 
+                    @click="moveItemUp(dayIndex, itemIndex)" 
+                    :disabled="itemIndex === 0"
+                    :class="[
+                      'p-1 rounded-full transition-colors',
+                      itemIndex === 0 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-400 hover:text-blue-500 hover:bg-gray-100'
+                    ]"
+                    title="위로 이동"
+                  >
+                    <chevron-up-icon class="h-4 w-4" />
+                  </button>
+                  <button 
+                    @click="moveItemDown(dayIndex, itemIndex)" 
+                    :disabled="itemIndex === day.items.length - 1"
+                    :class="[
+                      'p-1 rounded-full transition-colors',
+                      itemIndex === day.items.length - 1 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-400 hover:text-blue-500 hover:bg-gray-100'
+                    ]"
+                    title="아래로 이동"
+                  >
+                    <chevron-down-icon class="h-4 w-4" />
+                  </button>
+                </div>
+                
                 <div class="text-sm font-medium text-gray-500 w-12">{{ item.time }}</div>
                 <div class="flex-1">
                   <div class="font-medium">{{ item.title }}</div>
@@ -106,7 +131,9 @@ import { ref, nextTick, defineEmits, computed } from 'vue'
 import { 
   Trash as TrashIcon,
   Calendar as CalendarIcon,
-  Pencil as PencilIcon
+  Pencil as PencilIcon,
+  ChevronUp as ChevronUpIcon,
+  ChevronDown as ChevronDownIcon
 } from 'lucide-vue-next'
 
 const props = defineProps({
@@ -117,7 +144,7 @@ const props = defineProps({
   modelValue: Number
 })
 
-const emit = defineEmits(['update:modelValue', 'remove-item', 'update-memo'])
+const emit = defineEmits(['update:modelValue', 'remove-item', 'update-memo', 'reorder-items'])
 
 const activeDay = computed({
   get: () => props.modelValue,
@@ -133,7 +160,6 @@ const descriptionTextarea = ref(null)
 const startEditingDescription = (dayIndex, itemIndex, currentDescription) => {
   editingItemId.value = `${dayIndex}-${itemIndex}`
   editedDescription.value = currentDescription
-  
 }
 
 // 메모 저장
@@ -145,11 +171,6 @@ const saveDescription = (dayIndex, itemIndex) => {
       itemIndex, 
       memo: editedDescription.value.trim() 
     })
-    
-    // 로컬 데이터 업데이트 (props는 직접 수정하지 않음)
-    if (props.itinerary[dayIndex] && props.itinerary[dayIndex].items[itemIndex]) {
-      // 이 부분은 실제로 props를 직접 수정하지 않고, 부모 컴포넌트에서 처리하도록 함
-    }
   }
   editingItemId.value = null
 }
@@ -162,6 +183,28 @@ const cancelEditing = () => {
 // 일정 항목 제거
 const removeItem = (dayIndex, itemIndex) => {
   emit('remove-item', { dayIndex, itemIndex })
+}
+
+// 일정 항목 위로 이동
+const moveItemUp = (dayIndex, itemIndex) => {
+  if (itemIndex > 0) {
+    emit('reorder-items', { 
+      dayIndex, 
+      fromIndex: itemIndex, 
+      toIndex: itemIndex - 1 
+    })
+  }
+}
+
+// 일정 항목 아래로 이동
+const moveItemDown = (dayIndex, itemIndex) => {
+  if (itemIndex < props.itinerary[dayIndex].items.length - 1) {
+    emit('reorder-items', { 
+      dayIndex, 
+      fromIndex: itemIndex, 
+      toIndex: itemIndex + 1 
+    })
+  }
 }
 
 // 아이템의 메모 가져오기 - memo 필드로 변경

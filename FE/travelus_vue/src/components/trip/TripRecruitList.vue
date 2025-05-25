@@ -13,12 +13,20 @@
               {{ selectedRegion ? getSelectedRegionName() : '지역 선택' }}
             </span>
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 9l-7 7-7-7"
+              ></path>
             </svg>
           </button>
-          
+
           <!-- 지역 드롭다운 -->
-          <div v-if="showRegionFilter" class="absolute top-full left-0 mt-1 w-full sm:w-48 bg-white border rounded-md shadow-lg z-10 max-h-60 overflow-y-auto">
+          <div
+            v-if="showRegionFilter"
+            class="absolute top-full left-0 mt-1 w-full sm:w-48 bg-white border rounded-md shadow-lg z-10 max-h-60 overflow-y-auto"
+          >
             <button
               @click="selectRegion('')"
               class="w-full px-3 py-2 text-left hover:bg-gray-50 text-sm"
@@ -31,7 +39,7 @@
               @click="selectRegion(sido.sidoCode)"
               :class="[
                 'w-full px-3 py-2 text-left hover:bg-gray-50 text-sm',
-                selectedRegion === sido.sidoCode ? 'bg-blue-50 text-blue-600' : ''
+                selectedRegion === sido.sidoCode ? 'bg-blue-50 text-blue-600' : '',
               ]"
             >
               {{ sido.sidoName }}
@@ -39,33 +47,45 @@
           </div>
         </div>
 
-        <!-- 태그 필터 -->
+        <!-- 성격 태그 필터 -->
         <div class="relative">
           <button
-            @click="showTagFilter = !showTagFilter"
+            @click="showPersonalityTagFilter = !showPersonalityTagFilter"
             class="flex items-center justify-between w-full sm:w-48 px-3 py-2 border rounded-md hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500 h-10"
           >
             <span class="text-sm">
-              {{ tempSelectedTags.length > 0 ? `태그 ${tempSelectedTags.length}개 선택` : '태그 선택' }}
+              {{
+                tempSelectedPersonalityTags.length > 0
+                  ? `성격 ${tempSelectedPersonalityTags.length}개 선택`
+                  : '성격 태그'
+              }}
             </span>
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 9l-7 7-7-7"
+              ></path>
             </svg>
           </button>
-          
-          <!-- 태그 드롭다운 -->
-          <div v-if="showTagFilter" class="absolute top-full left-0 mt-1 w-full sm:w-64 bg-white border rounded-md shadow-lg z-10">
+
+          <!-- 성격 태그 드롭다운 -->
+          <div
+            v-if="showPersonalityTagFilter"
+            class="absolute top-full left-0 mt-1 w-full sm:w-64 bg-white border rounded-md shadow-lg z-10"
+          >
             <div class="p-3">
               <div class="grid grid-cols-2 gap-2 mb-3 max-h-48 overflow-y-auto">
                 <button
-                  v-for="tag in allTags"
+                  v-for="tag in allPersonalityTags"
                   :key="tag"
-                  @click="toggleTempTag(tag)"
+                  @click="toggleTempPersonalityTag(tag)"
                   :class="[
                     'px-3 py-1 text-sm rounded-full transition-colors',
-                    tempSelectedTags.includes(tag)
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    tempSelectedPersonalityTags.includes(tag)
+                      ? 'bg-green-600 text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200',
                   ]"
                 >
                   {{ tag }}
@@ -73,13 +93,75 @@
               </div>
               <div class="flex gap-2">
                 <button
-                  @click="applyTagFilter"
+                  @click="applyPersonalityTagFilter"
+                  class="flex-1 px-3 py-2 bg-green-600 text-white text-sm rounded-md hover:bg-green-700"
+                >
+                  적용하기
+                </button>
+                <button
+                  @click="cancelPersonalityTagFilter"
+                  class="px-3 py-2 bg-gray-200 text-gray-700 text-sm rounded-md hover:bg-gray-300"
+                >
+                  취소
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 여행 태그 필터 -->
+        <div class="relative">
+          <button
+            @click="showTravelTagFilter = !showTravelTagFilter"
+            class="flex items-center justify-between w-full sm:w-48 px-3 py-2 border rounded-md hover:bg-gray-50 focus:outline-none focus:ring-1 focus:ring-blue-500 h-10"
+          >
+            <span class="text-sm">
+              {{
+                tempSelectedTravelTags.length > 0
+                  ? `여행 ${tempSelectedTravelTags.length}개 선택`
+                  : '여행 태그'
+              }}
+            </span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M19 9l-7 7-7-7"
+              ></path>
+            </svg>
+          </button>
+
+          <!-- 여행 태그 드롭다운 -->
+          <div
+            v-if="showTravelTagFilter"
+            class="absolute top-full left-0 mt-1 w-full sm:w-64 bg-white border rounded-md shadow-lg z-10"
+          >
+            <div class="p-3">
+              <div class="grid grid-cols-2 gap-2 mb-3 max-h-48 overflow-y-auto">
+                <button
+                  v-for="tag in allTravelTags"
+                  :key="tag"
+                  @click="toggleTempTravelTag(tag)"
+                  :class="[
+                    'px-3 py-1 text-sm rounded-full transition-colors',
+                    tempSelectedTravelTags.includes(tag)
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200',
+                  ]"
+                >
+                  {{ tag }}
+                </button>
+              </div>
+              <div class="flex gap-2">
+                <button
+                  @click="applyTravelTagFilter"
                   class="flex-1 px-3 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700"
                 >
                   적용하기
                 </button>
                 <button
-                  @click="cancelTagFilter"
+                  @click="cancelTravelTagFilter"
                   class="px-3 py-2 bg-gray-200 text-gray-700 text-sm rounded-md hover:bg-gray-300"
                 >
                   취소
@@ -98,20 +180,30 @@
             ✕
           </button>
         </div>
-        <div 
-          v-for="tag in selectedTags" 
-          :key="tag" 
-          class="flex items-center bg-blue-50 px-3 py-1 rounded-full"
+        <div
+          v-for="tag in selectedPersonalityTags"
+          :key="'personality-' + tag"
+          class="flex items-center bg-green-50 px-3 py-1 rounded-full"
         >
-          <span class="text-sm text-blue-700">{{ tag }}</span>
-          <button @click="removeTag(tag)" class="ml-2 text-blue-700 hover:text-blue-900">
+          <span class="text-sm text-green-700">성격: {{ tag }}</span>
+          <button
+            @click="removePersonalityTag(tag)"
+            class="ml-2 text-green-700 hover:text-green-900"
+          >
             ✕
           </button>
         </div>
-        <button 
-          @click="clearAllFilters" 
-          class="text-sm text-blue-600 hover:text-blue-800 ml-auto"
+        <div
+          v-for="tag in selectedTravelTags"
+          :key="'travel-' + tag"
+          class="flex items-center bg-blue-50 px-3 py-1 rounded-full"
         >
+          <span class="text-sm text-blue-700">여행: {{ tag }}</span>
+          <button @click="removeTravelTag(tag)" class="ml-2 text-blue-700 hover:text-blue-900">
+            ✕
+          </button>
+        </div>
+        <button @click="clearAllFilters" class="text-sm text-blue-600 hover:text-blue-800 ml-auto">
           필터 초기화
         </button>
       </div>
@@ -122,7 +214,7 @@
       {{ filteredPosts.length }}개의 검색 결과가 있습니다.
     </div>
 
-    <div v-if="isLoading" class="text-center py-8">
+    <div v-if="isLoading && displayedPosts.length === 0" class="text-center py-8">
       <div
         class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"
       ></div>
@@ -130,7 +222,7 @@
     </div>
 
     <div
-      v-else-if="filteredPosts.length === 0"
+      v-else-if="filteredPosts.length === 0 && !isLoading"
       class="text-center py-8 bg-white rounded-lg border shadow-sm"
     >
       <users-icon class="h-12 w-12 mx-auto mb-3 text-gray-400" />
@@ -147,7 +239,7 @@
 
     <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       <div
-        v-for="post in filteredPosts"
+        v-for="post in displayedPosts"
         :key="post.id"
         class="bg-white rounded-lg border shadow-sm overflow-hidden cursor-pointer hover:shadow-md transition-shadow"
         @click="openTripDetails(post)"
@@ -173,15 +265,31 @@
           </div>
         </div>
         <div class="p-4">
-          <div class="flex flex-wrap gap-1 mb-3">
+          <!-- 성격 태그 표시 (상단) -->
+          <div
+            v-if="post.personalityTags && post.personalityTags.length > 0"
+            class="flex flex-wrap gap-1 mb-2"
+          >
             <span
-              v-for="tag in post.tags || []"
-              :key="tag"
-              class="px-2 py-0.5 bg-gray-100 text-gray-700 text-xs rounded-full"
+              v-for="tag in post.personalityTags"
+              :key="'personality-' + tag"
+              class="px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded-full"
             >
               {{ tag }}
             </span>
           </div>
+
+          <!-- 여행 태그 표시 (하단) -->
+          <div class="flex flex-wrap gap-1 mb-3">
+            <span
+              v-for="tag in post.tags || []"
+              :key="'travel-' + tag"
+              class="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded-full"
+            >
+              {{ tag }}
+            </span>
+          </div>
+
           <div class="flex items-center justify-between text-sm mb-3">
             <div class="text-gray-500">{{ formatDateRange(post.startDate, post.endDate) }}</div>
             <div class="flex items-center">
@@ -192,10 +300,21 @@
           <p class="text-sm text-gray-500 line-clamp-2">{{ post.content }}</p>
         </div>
         <div class="p-4 border-t flex justify-between">
-          <div class="text-sm">호스트: {{ post.userId }}</div>
+          <div class="text-sm">호스트: {{ post.authorName }}</div>
           <div class="text-xs text-gray-500">{{ formatDate(post.createdAt) }}</div>
         </div>
       </div>
+    </div>
+
+    <!-- 무한 스크롤 로딩 -->
+    <div v-if="isLoadingMore" class="mt-8 text-center py-4">
+      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-2"></div>
+      <p class="text-gray-500 text-sm">더 많은 모집글을 불러오는 중...</p>
+    </div>
+
+    <!-- 모든 데이터 로드 완료 -->
+    <div v-if="hasReachedEnd && displayedPosts.length > 0" class="mt-8 text-center py-4">
+      <p class="text-gray-500 text-sm">모든 모집글을 확인했습니다.</p>
     </div>
 
     <!-- 여행 모집 상세 모달 -->
@@ -204,12 +323,13 @@
       :show="showTripDetails"
       :post="selectedPost"
       @close="closeTripDetails"
+      @deleted="fetchRecruitPosts"
     />
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch, onUnmounted } from 'vue'
 import api from '@/api'
 import { MapPin as MapPinIcon, Users as UsersIcon } from 'lucide-vue-next'
 import TripDetailModal from './TripDetailModal.vue'
@@ -217,115 +337,233 @@ import TripDetailModal from './TripDetailModal.vue'
 // 상태 관리
 const recruitPosts = ref([])
 const isLoading = ref(false)
+const isLoadingMore = ref(false)
 const sidos = ref([])
 const showTripDetails = ref(false)
 const selectedPost = ref(null)
 
+// 무한 스크롤 관련 상태
+const itemsPerPage = 9
+const currentPage = ref(1)
+const hasReachedEnd = ref(false)
+
 // 필터 상태
 const selectedRegion = ref('')
-const selectedTags = ref([])
-const tempSelectedTags = ref([]) // 임시 선택된 태그들 (적용하기 전)
+const selectedPersonalityTags = ref([])
+const selectedTravelTags = ref([])
+const tempSelectedPersonalityTags = ref([]) // 임시 선택된 성격 태그들
+const tempSelectedTravelTags = ref([]) // 임시 선택된 여행 태그들
 const showRegionFilter = ref(false)
-const showTagFilter = ref(false)
-const allTags = ref([])
+const showPersonalityTagFilter = ref(false)
+const showTravelTagFilter = ref(false)
+const allPersonalityTags = ref([])
+const allTravelTags = ref([])
 
 // 필터가 활성화되었는지 확인
 const hasActiveFilters = computed(() => {
-  return selectedRegion.value || selectedTags.value.length > 0
+  return (
+    selectedRegion.value ||
+    selectedPersonalityTags.value.length > 0 ||
+    selectedTravelTags.value.length > 0
+  )
 })
 
 // 필터링된 모집글 목록
 const filteredPosts = computed(() => {
   let result = [...recruitPosts.value]
-  
+
   // 지역 필터링
   if (selectedRegion.value) {
-    result = result.filter(post => {
+    result = result.filter((post) => {
       return post.plan && Number(post.plan.destination) === Number(selectedRegion.value)
     })
   }
-  
-  // 태그 필터링
-  if (selectedTags.value.length > 0) {
-    result = result.filter(post => {
-      if (!post.tags || post.tags.length === 0) return false
-      return selectedTags.value.some(tag => post.tags.includes(tag))
+
+  // 성격 태그 필터링
+  if (selectedPersonalityTags.value.length > 0) {
+    result = result.filter((post) => {
+      if (!post.personalityTags || post.personalityTags.length === 0) return false
+      return selectedPersonalityTags.value.some((tag) => post.personalityTags.includes(tag))
     })
   }
-  
+
+  // 여행 태그 필터링
+  if (selectedTravelTags.value.length > 0) {
+    result = result.filter((post) => {
+      if (!post.tags || post.tags.length === 0) return false
+      return selectedTravelTags.value.some((tag) => post.tags.includes(tag))
+    })
+  }
+
   return result
 })
+
+// 현재 표시할 모집글들
+const displayedPosts = computed(() => {
+  return filteredPosts.value.slice(0, currentPage.value * itemsPerPage)
+})
+
+// 무한 스크롤 핸들러
+const handleScroll = () => {
+  if (isLoadingMore.value || hasReachedEnd.value) return
+
+  const scrollTop = window.pageYOffset || document.documentElement.scrollTop
+  const windowHeight = window.innerHeight
+  const documentHeight = document.documentElement.scrollHeight
+
+  // 스크롤이 하단에서 200px 이내에 도달했을 때
+  if (scrollTop + windowHeight >= documentHeight - 200) {
+    loadMoreItems()
+  }
+}
+
+// 더 많은 아이템 로드
+const loadMoreItems = () => {
+  if (isLoadingMore.value || hasReachedEnd.value) return
+
+  const totalItems = filteredPosts.value.length
+  const currentDisplayed = currentPage.value * itemsPerPage
+
+  if (currentDisplayed >= totalItems) {
+    hasReachedEnd.value = true
+    return
+  }
+
+  isLoadingMore.value = true
+
+  // 실제 API 호출 시뮬레이션 (현재는 클라이언트 사이드 페이지네이션)
+  setTimeout(() => {
+    currentPage.value += 1
+    isLoadingMore.value = false
+
+    // 모든 데이터를 로드했는지 확인
+    if (currentPage.value * itemsPerPage >= totalItems) {
+      hasReachedEnd.value = true
+    }
+  }, 500)
+}
+
+// 필터 변경 시 페이지 초기화
+const resetPagination = () => {
+  currentPage.value = 1
+  hasReachedEnd.value = false
+  isLoadingMore.value = false
+}
 
 // 지역 선택
 const selectRegion = (regionCode) => {
   selectedRegion.value = regionCode
   showRegionFilter.value = false
+  resetPagination()
 }
 
 // 지역 필터 초기화
 const clearRegionFilter = () => {
   selectedRegion.value = ''
+  resetPagination()
 }
 
-// 임시 태그 토글
-const toggleTempTag = (tag) => {
-  if (tempSelectedTags.value.includes(tag)) {
-    tempSelectedTags.value = tempSelectedTags.value.filter(t => t !== tag)
+// 임시 성격 태그 토글
+const toggleTempPersonalityTag = (tag) => {
+  if (tempSelectedPersonalityTags.value.includes(tag)) {
+    tempSelectedPersonalityTags.value = tempSelectedPersonalityTags.value.filter((t) => t !== tag)
   } else {
-    tempSelectedTags.value.push(tag)
+    tempSelectedPersonalityTags.value.push(tag)
   }
 }
 
-// 태그 필터 적용
-const applyTagFilter = () => {
-  selectedTags.value = [...tempSelectedTags.value]
-  showTagFilter.value = false
+// 임시 여행 태그 토글
+const toggleTempTravelTag = (tag) => {
+  if (tempSelectedTravelTags.value.includes(tag)) {
+    tempSelectedTravelTags.value = tempSelectedTravelTags.value.filter((t) => t !== tag)
+  } else {
+    tempSelectedTravelTags.value.push(tag)
+  }
 }
 
-// 태그 필터 취소
-const cancelTagFilter = () => {
-  tempSelectedTags.value = [...selectedTags.value]
-  showTagFilter.value = false
+// 성격 태그 필터 적용
+const applyPersonalityTagFilter = () => {
+  selectedPersonalityTags.value = [...tempSelectedPersonalityTags.value]
+  showPersonalityTagFilter.value = false
+  resetPagination()
 }
 
-// 태그 제거
-const removeTag = (tag) => {
-  selectedTags.value = selectedTags.value.filter(t => t !== tag)
-  tempSelectedTags.value = tempSelectedTags.value.filter(t => t !== tag)
+// 성격 태그 필터 취소
+const cancelPersonalityTagFilter = () => {
+  tempSelectedPersonalityTags.value = [...selectedPersonalityTags.value]
+  showPersonalityTagFilter.value = false
+}
+
+// 여행 태그 필터 적용
+const applyTravelTagFilter = () => {
+  selectedTravelTags.value = [...tempSelectedTravelTags.value]
+  showTravelTagFilter.value = false
+  resetPagination()
+}
+
+// 여행 태그 필터 취소
+const cancelTravelTagFilter = () => {
+  tempSelectedTravelTags.value = [...selectedTravelTags.value]
+  showTravelTagFilter.value = false
+}
+
+// 성격 태그 제거
+const removePersonalityTag = (tag) => {
+  selectedPersonalityTags.value = selectedPersonalityTags.value.filter((t) => t !== tag)
+  tempSelectedPersonalityTags.value = tempSelectedPersonalityTags.value.filter((t) => t !== tag)
+  resetPagination()
+}
+
+// 여행 태그 제거
+const removeTravelTag = (tag) => {
+  selectedTravelTags.value = selectedTravelTags.value.filter((t) => t !== tag)
+  tempSelectedTravelTags.value = tempSelectedTravelTags.value.filter((t) => t !== tag)
+  resetPagination()
 }
 
 // 모든 필터 초기화
 const clearAllFilters = () => {
   selectedRegion.value = ''
-  selectedTags.value = []
-  tempSelectedTags.value = []
+  selectedPersonalityTags.value = []
+  selectedTravelTags.value = []
+  tempSelectedPersonalityTags.value = []
+  tempSelectedTravelTags.value = []
+  resetPagination()
 }
 
 // 외부 클릭 시 드롭다운 닫기
 const handleClickOutside = (event) => {
   if (!event.target.closest('.relative')) {
     showRegionFilter.value = false
-    showTagFilter.value = false
+    showPersonalityTagFilter.value = false
+    showTravelTagFilter.value = false
   }
 }
 
 // 모든 태그 가져오기
 const fetchAllTags = async () => {
   try {
-    // 모든 모집글에서 사용된 태그를 추출하여 중복 제거
-    const uniqueTags = new Set()
-    
-    recruitPosts.value.forEach(post => {
+    const uniquePersonalityTags = new Set()
+    const uniqueTravelTags = new Set()
+
+    recruitPosts.value.forEach((post) => {
+      // 성격 태그 추출
+      if (post.personalityTags && Array.isArray(post.personalityTags)) {
+        post.personalityTags.forEach((tag) => uniquePersonalityTags.add(tag))
+      }
+
+      // 여행 태그 추출
       if (post.tags && Array.isArray(post.tags)) {
-        post.tags.forEach(tag => uniqueTags.add(tag))
+        post.tags.forEach((tag) => uniqueTravelTags.add(tag))
       }
     })
-    
-    allTags.value = Array.from(uniqueTags)
+
+    allPersonalityTags.value = Array.from(uniquePersonalityTags)
+    allTravelTags.value = Array.from(uniqueTravelTags)
   } catch (error) {
     console.error('태그 목록 조회 실패:', error)
-    // 기본 태그 제공
-    allTags.value = ['가족여행', '혼자여행', '커플여행', '맛집투어', '자연경관', '역사탐방', '쇼핑', '축제']
+    allPersonalityTags.value = ['활발한', '조용한', '계획적인', '즉흥적인', '사교적인', '내향적인']
+    allTravelTags.value = ['가족여행', '혼자여행', '커플여행', '맛집투어', '자연경관', '역사탐방']
   }
 }
 
@@ -334,29 +572,43 @@ const fetchRecruitPosts = async () => {
   try {
     isLoading.value = true
 
-    // 모든 모집글 가져오기
     const response = await api.get('/api/v1/post/recruit')
     let posts = response.data
-    
-    // 각 모집글에 대해 여행 계획 데이터와 태그 정보 가져오기
+
     posts = await Promise.all(
       posts.map(async (post) => {
         try {
+          // 성격 태그 파싱
+          let personalityTags = []
+          if (post.personalityTags) {
+            try {
+              personalityTags = JSON.parse(post.personalityTags)
+            } catch (e) {
+              console.error('성격 태그 파싱 오류:', e)
+              personalityTags = []
+            }
+          }
+          const authorRes = await api.get(`/api/v1/plan/user-info/${post.userId}`)
           // 여행 계획이 있는 경우에만 조회
           if (post.planId) {
-            // 여행 계획 정보 가져오기
             const planRes = await api.get(`/api/v1/plan/${post.planId}`)
-
-            // 태그 정보 가져오기
             const tagRes = await api.get(`/api/v1/tag/plan/${post.planId}`)
             return {
               ...post,
               plan: planRes.data,
               tags: tagRes.data,
+              personalityTags: personalityTags,
+              authorName: authorRes.data?.name || 'Unknown',
+              authorUserId: authorRes.data?.userId || 'unknown',
             }
           }
 
-          return post
+          return {
+            ...post,
+            personalityTags: personalityTags,
+            authorName: 'Unknown',
+            authorUserId: 'unknown',
+          }
         } catch (error) {
           console.error('모집글 추가 정보 가져오기 실패:', error)
           return post
@@ -365,11 +617,7 @@ const fetchRecruitPosts = async () => {
     )
 
     recruitPosts.value = posts
-    
-    // 모든 태그 가져오기
     fetchAllTags()
-    
-    console.log(recruitPosts.value)
   } catch (error) {
     console.error('모집글 목록 가져오기 실패:', error)
   } finally {
@@ -447,10 +695,21 @@ const formatDateRange = (startDate, endDate) => {
   }
 }
 
+// 필터 변경 감지하여 페이지네이션 리셋
+watch([selectedRegion, selectedPersonalityTags, selectedTravelTags], () => {
+  resetPagination()
+})
+
 // 컴포넌트 마운트 시 모집글과 시도 목록 가져오기
 onMounted(() => {
   fetchRecruitPosts()
   fetchSidos()
   document.addEventListener('click', handleClickOutside)
+  window.addEventListener('scroll', handleScroll)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside)
+  window.removeEventListener('scroll', handleScroll)
 })
 </script>

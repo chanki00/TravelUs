@@ -354,13 +354,97 @@
 
           <div v-if="trips.length === 0" class="text-center py-12">
             <p class="text-gray-500 mb-4">아직 계획된 여행이 없습니다.</p>
-            <button class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+            <router-link
+              to="/plan"
+              class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            >
               여행 계획 시작하기
-            </button>
+            </router-link>
           </div>
 
           <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- 여행 계획 목록이 있을 경우 표시될 내용 -->
+            <div
+              v-for="trip in trips"
+              :key="trip.id"
+              class="border rounded-lg overflow-hidden hover:shadow-md transition-shadow relative group"
+            >
+              <!-- 삭제 버튼 -->
+              <button
+                @click.stop="confirmDelete(trip)"
+                class="absolute top-2 right-2 z-10 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
+                title="여행계획 삭제"
+              >
+                ✕
+              </button>
+
+              <div class="cursor-pointer" @click="$router.push(`/tripdetail/${trip.id}`)">
+                <div class="h-40 overflow-hidden relative">
+                  <img
+                    :src="
+                      trip.image ||
+                      'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?q=80&w=1000&auto=format&fit=crop'
+                    "
+                    :alt="trip.title"
+                    class="w-full h-full object-cover"
+                  />
+                  <div class="absolute top-3 left-3">
+                    <span
+                      class="px-2 py-1 bg-white/70 backdrop-blur-sm text-gray-800 text-xs rounded-full"
+                    >
+                      {{ getSidoName(Number(trip.destination)) }}
+                    </span>
+                  </div>
+                </div>
+
+                <div class="p-3">
+                  <h3 class="font-medium text-base mb-1">{{ trip.title }}</h3>
+
+                  <div class="flex items-center justify-between text-xs text-gray-500 mb-2">
+                    <span>{{ trip.duration - 1 }}박 {{ trip.duration }}일</span>
+                    <span>{{ formatDate(trip.createdAt) }}</span>
+                  </div>
+
+                  <div class="flex items-center justify-between text-xs text-gray-500">
+                    <span class="flex items-center gap-1">
+                      <span>♥ {{ trip.likes }}</span>
+                      <span>💬 {{ trip.shares }}</span>
+                    </span>
+                    <span :class="trip.isShared ? 'text-green-600' : 'text-gray-400'">
+                      {{ trip.isShared ? '공유됨' : '비공개' }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 삭제 확인 모달 -->
+        <div
+          v-if="showDeleteModal"
+          class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+        >
+          <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
+            <h3 class="text-lg font-semibold mb-4">여행계획 삭제</h3>
+            <p class="text-gray-600 mb-6">
+              "{{ tripToDelete?.title }}" 여행계획을 정말 삭제하시겠습니까?<br />
+              <span class="text-red-500 text-sm">삭제된 계획은 복구할 수 없습니다.</span>
+            </p>
+
+            <div class="flex justify-end gap-3">
+              <button
+                @click="showDeleteModal = false"
+                class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
+              >
+                취소
+              </button>
+              <button
+                @click="deleteTrip"
+                class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+              >
+                삭제
+              </button>
+            </div>
           </div>
         </div>
 
@@ -390,7 +474,8 @@
 import { ref, computed, onMounted } from 'vue'
 import { useUserStore } from '@/store/user'
 import { userAi } from '@/axios'
-import {useRouter} from "vue-router"
+import { useRouter } from 'vue-router'
+import api from '@/api'
 const router = useRouter()
 const userStore = useUserStore()
 const user = computed(() => userStore.loginUser)
@@ -413,17 +498,44 @@ const userTags = ref([])
 const selectedTripTagIds = ref([])
 const tripTags = ref([])
 
+const showDeleteModal = ref(false)
+const tripToDelete = ref(null)
+
+const confirmDelete = (trip) => {
+  tripToDelete.value = trip
+  showDeleteModal.value = true
+}
+
+const deleteTrip = async () => {
+  if (!tripToDelete.value) return
+
+  try {
+    await api.delete(`/api/v1/plan/${tripToDelete.value.id}/user/${user.value.id}`)
+
+    // 목록에서 삭제된 여행계획 제거
+    trips.value = trips.value.filter((trip) => trip.id !== tripToDelete.value.id)
+
+    showDeleteModal.value = false
+    tripToDelete.value = null
+    alert('여행계획이 성공적으로 삭제되었습니다.')
+  } catch (error) {
+    console.error('여행계획 삭제 실패:', error)
+    if (error.response?.status === 403) {
+      alert('삭제 권한이 없습니다.')
+    } else {
+      alert('여행계획 삭제에 실패했습니다.')
+    }
+  }
+}
 
 const toggleTag = (type, id) => {
-
   if (type === 'personal') {
     if (selectedUserTagIds.value.includes(id)) {
       selectedUserTagIds.value = selectedUserTagIds.value.filter((tagId) => tagId !== id)
     } else {
       selectedUserTagIds.value.push(id)
     }
-  }
-  else {
+  } else {
     if (selectedTripTagIds.value.includes(id)) {
       selectedTripTagIds.value = selectedTripTagIds.value.filter((tagId) => tagId !== id)
     } else {
@@ -434,11 +546,10 @@ const toggleTag = (type, id) => {
 
 const saveTags = async (type) => {
   try {
-    let selected;
+    let selected
     if (type === 'personal') {
-      selected = selectedUserTagIds.value;
-    }
-    else {
+      selected = selectedUserTagIds.value
+    } else {
       selected = selectedTripTagIds.value
     }
 
@@ -451,11 +562,10 @@ const saveTags = async (type) => {
     // 저장 후 태그 다시 가져오기
     const selectedNames = await userAi.get(`/api/v1/tag/user/${type}/${user.value.id}`)
 
-    if (type === "personal") {
+    if (type === 'personal') {
       userTags.value = selectedNames.data
-    }
-    else {
-      tripTags.value = selectedNames.data;
+    } else {
+      tripTags.value = selectedNames.data
     }
 
     showUserModal.value = false
@@ -471,21 +581,22 @@ const showTripModal = ref(false)
 const allUserTags = ref([])
 const allTripTags = ref([])
 
-onMounted(async () => {
-  editUser.value = {...user.value}
-  if (editUser.value.age == null) editUser.value.age = '기타'
-  if (editUser.value.gender == null) editUser.value.gender = 'O'
-  if (editUser.value.address == null) editUser.value.address = '기타'
+// 날짜 포맷팅 함수 추가
+const formatDate = (dateString) => {
+  if (!dateString) return ''
+  const date = new Date(dateString)
+  return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, '0')}.${String(date.getDate()).padStart(2, '0')}`
+}
 
-  console.log("유저", editUser)
-
+const fetchMyTrips = async () => {
   try {
-    getUserTag()
-    getTripTag()
-  } catch (e) {
-    console.error('태그 불러오기 실패', e)
+    const response = await api.get(`/api/v1/plan/user/${user.value.id}`)
+    trips.value = response.data || []
+  } catch (error) {
+    console.error('내 여행 계획 조회 실패:', error)
+    trips.value = []
   }
-})
+}
 
 const getUserTag = async () => {
   const all = await userAi.get('/api/v1/tag/user', { params: { type: '성격' } })
@@ -502,22 +613,21 @@ const getUserTag = async () => {
 }
 
 const getTripTag = async () => {
-  const all = await userAi.get('/api/v1/tag/trip', {params: {type: '여행'}})
-  allTripTags.value = all.data;
+  const all = await userAi.get('/api/v1/tag/trip', { params: { type: '여행' } })
+  allTripTags.value = all.data
 
   const selectedNames = await userAi.get(`api/v1/tag/user/trip/${user.value.id}`)
-  tripTags.value = selectedNames.data;
-  const tagNames = selectedNames.data;
+  tripTags.value = selectedNames.data
+  const tagNames = selectedNames.data
 
   selectedTripTagIds.value = allTripTags.value
     .filter((tag) => tagNames.includes(tag.name))
     .map((tag) => tag.id)
 }
 
-// --------------------------
 const deleteUser = () => {
-  userStore.deleteUser();
-  router.push("/")
+  userStore.deleteUser()
+  router.push('/')
 }
 
 const trips = ref([])
@@ -530,5 +640,36 @@ const tabs = [
   { id: 'trips', name: '내 여행 계획' },
   { id: 'invites', name: '동행 초대' },
 ]
+
+onMounted(async () => {
+  editUser.value = { ...user.value }
+  if (editUser.value.age == null) editUser.value.age = '기타'
+  if (editUser.value.gender == null) editUser.value.gender = 'O'
+  if (editUser.value.address == null) editUser.value.address = '기타'
+
+  console.log('유저', editUser)
+
+  await getUserTag()
+  await getTripTag()
+  await fetchMyTrips() // 내 여행 계획 가져오기 추가
+  await fetchSidos()
+})
+
+const sidos = ref([])
+const fetchSidos = async () => {
+  try {
+    const response = await api.get('/api/v1/sidos')
+    sidos.value = response.data
+  } catch (error) {
+    console.error('시도 목록 조회 실패:', error)
+  }
+}
+
+const getSidoName = (sidoCode) => {
+  if (!sidoCode || !sidos.value.length) return '지역 정보 없음'
+
+  const sido = sidos.value.find((sido) => sido.sidoCode === sidoCode)
+  return sido ? sido.sidoName : '지역 정보 없음'
+}
 </script>
 <style scoped></style>

@@ -11,12 +11,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.DeleteMapping;
 
 import com.DB_PASSWORD_REDACTED.trip.dto.BasicPlanDTO;
 import com.DB_PASSWORD_REDACTED.trip.dto.Itinerary;
 import com.DB_PASSWORD_REDACTED.trip.dto.ItineraryPlaceResponseDto;
 import com.DB_PASSWORD_REDACTED.trip.dto.Tripplan;
+import com.DB_PASSWORD_REDACTED.trip.dto.user.UserDto;
 import com.DB_PASSWORD_REDACTED.trip.service.PlanService;
+import com.DB_PASSWORD_REDACTED.trip.service.UserService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -26,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 public class RestPlanController {
 	
 	private final PlanService service;
+	private final UserService userService;
 	
 	@PostMapping("")
 	public ResponseEntity<?> createPlan(@RequestBody Tripplan dto){
@@ -81,8 +85,46 @@ public class RestPlanController {
 	
 	@PatchMapping("/updateShare/{planId}")
 	public ResponseEntity<?> updateShare(@PathVariable int planId){
-		int res = service.updateShare(planId);
-		return ResponseEntity.ok(res);
+	    try {
+	        int res = service.updateShare(planId);
+	        if (res > 0) {
+	            // 업데이트된 여행 계획 정보 반환
+	            Tripplan updatedPlan = service.getTripplanById(planId);
+	            return ResponseEntity.ok(updatedPlan);
+	        } else {
+	            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Update failed");
+	        }
+	    } catch (Exception e) {
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Update failed: " + e.getMessage());
+	    }
+	}
+	
+	@GetMapping("/user-info/{userId}")
+	public ResponseEntity<?> getUserById(@PathVariable int userId) {
+	    try {
+	        // UserService를 통해 사용자 정보 조회
+	        UserDto user = userService.getUserById(userId);
+	        if (user == null) {
+	            return ResponseEntity.notFound().build();
+	        }
+	        return ResponseEntity.ok(user);
+	    } catch (Exception e) {
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("User fetch failed: " + e.getMessage());
+	    }
+	}
+	
+	@DeleteMapping("/{planId}/user/{userId}")
+	public ResponseEntity<?> deleteTripplan(@PathVariable int planId, @PathVariable int userId) {
+	    try {
+	        boolean success = service.deleteTripplan(planId, userId);
+	        if (success) {
+	            return ResponseEntity.ok().body("여행계획이 성공적으로 삭제되었습니다.");
+	        } else {
+	            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("삭제 권한이 없거나 존재하지 않는 여행계획입니다.");
+	        }
+	    } catch (Exception e) {
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("삭제 실패: " + e.getMessage());
+	    }
 	}
 	
 }

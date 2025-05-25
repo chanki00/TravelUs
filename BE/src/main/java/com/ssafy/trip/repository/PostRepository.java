@@ -12,5 +12,6 @@ public interface PostRepository {
 	int createRecruitPost(Post req);
 
 	List<Post> getALlRecruitPost();
+    int deleteRecruitPost(int postId);
 
 }

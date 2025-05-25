@@ -73,11 +73,11 @@ const router = createRouter({
       name: 'admin',
       component: AdminDashboard,
     },
-      {
-    path: "/tripplan",
-    name: "TripPlan",
-    component: TripPlan,
-  },
+    {
+      path: '/tripplan',
+      name: 'TripPlan',
+      component: TripPlan,
+    },
     {
       path: '/planresult/:planId',
       name: 'PlanResult',
