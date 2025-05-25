@@ -31,4 +31,6 @@ public interface ChatRepository {
 
     List<Integer> findChatroomIdsByUserId(int userId);
 	List<Integer> getChatroomIdByuserId(int userId);
+
+	List<Integer> getuserIdByChatroomId(int chatroomId);
 }

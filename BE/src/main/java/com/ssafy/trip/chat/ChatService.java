@@ -85,4 +85,8 @@ public class ChatService {
 	public List<Integer> getChatroomIdByuserId(int userId) {
 		return repo.getChatroomIdByuserId(userId);
 	}
+
+	public List<Integer> getuserIdByChatroomId(int chatroomId) {
+		return repo.getuserIdByChatroomId(chatroomId);
+	}
 }

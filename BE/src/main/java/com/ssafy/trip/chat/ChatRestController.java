@@ -78,4 +78,10 @@ public class ChatRestController {
 		}
     	return ResponseEntity.ok(myChatroom);
     }
+    
+    @GetMapping("/user/{chatroomId}")
+    public ResponseEntity<List<Integer>> getuserIdByChatroomId(@PathVariable int chatroomId){
+    	List<Integer> userIds = chatService.getuserIdByChatroomId(chatroomId);
+    	return ResponseEntity.ok(userIds);
+    }
 }
