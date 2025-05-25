@@ -1,13 +1,11 @@
 <template>
   <div class="min-h-screen bg-gray-50">
-
     <div class="py-8 px-6 max-w-7xl mx-auto">
       <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
         <div>
           <h1 class="text-3xl font-bold mb-2">관리자 대시보드</h1>
           <p class="text-gray-500">Travelus 사이트 관리를 위한 대시보드입니다</p>
         </div>
-
         <div class="mt-4 md:mt-0">
           <input
             v-model="searchTerm"
@@ -25,7 +23,9 @@
                 <p class="text-sm text-gray-500">{{ stat.title }}</p>
                 <h3 class="text-2xl font-bold mt-2">{{ stat.value }}</h3>
               </div>
-              <div :class="`text-sm ${stat.change.startsWith('+') ? 'text-green-600' : 'text-red-600'}`">
+              <div
+                :class="`text-sm ${stat.change.startsWith('+') ? 'text-green-600' : 'text-red-600'}`"
+              >
                 {{ stat.change }}
               </div>
             </div>
@@ -34,8 +34,8 @@
       </div>
 
       <div class="tabs mb-8">
-        <a 
-          v-for="tab in ['users', 'trips', 'inquiries']" 
+        <a
+          v-for="tab in ['users', 'trips', 'inquiries']"
           :key="tab"
           :class="['tab tab-bordered', activeTab === tab ? 'tab-active' : '']"
           @click="activeTab = tab"
@@ -66,13 +66,18 @@
               <tbody>
                 <tr v-for="user in filteredUsers" :key="user.id">
                   <td class="font-medium">{{ user.id }}</td>
-                  <td>{{ user.username }}</td>
+                  <td>{{ user.userId }}</td>
                   <td>{{ user.name }}</td>
-                  <td>{{ user.email }}</td>
+                  <td>{{ user.userEmail }}</td>
                   <td>{{ user.gender }}</td>
-                  <td>{{ user.joined }}</td>
+                  <td>{{ user.createdAt }}</td>
                   <td>
-                    <button class="btn btn-ghost btn-sm h-8 text-red-600">삭제</button>
+                    <button
+                      @click="deleteUser(user.id)"
+                      class="btn btn-ghost btn-sm h-8 text-red-600"
+                    >
+                      삭제
+                    </button>
                   </td>
                 </tr>
               </tbody>
@@ -81,6 +86,7 @@
         </div>
       </div>
 
+      <!-- Trips Section -->
       <div v-if="activeTab === 'trips'" class="card bg-base-100 shadow-sm">
         <div class="card-header p-6">
           <h2 class="card-title">여행 계획 목록</h2>
@@ -96,7 +102,7 @@
                   <th>작성자</th>
                   <th>지역</th>
                   <th>작성일</th>
-                  <th>조회수</th>
+                  <th>좋아요수</th>
                   <th>관리</th>
                 </tr>
               </thead>
@@ -104,14 +110,18 @@
                 <tr v-for="trip in filteredTrips" :key="trip.id">
                   <td class="font-medium">{{ trip.id }}</td>
                   <td>{{ trip.title }}</td>
-                  <td>{{ trip.author }}</td>
-                  <td>{{ trip.location }}</td>
-                  <td>{{ trip.created }}</td>
-                  <td>{{ trip.views }}</td>
+                  <td>{{ trip.userId }}</td>
+                  <td>{{ getSidoName(Number(trip.destination)) }}</td>
+                  <td>{{ trip.createdAt }}</td>
+                  <td>{{ trip.likes }}</td>
                   <td>
                     <div class="flex gap-2">
-                      <button class="btn btn-outline btn-sm h-8">보기</button>
-                      <button class="btn btn-ghost btn-sm h-8 text-red-600">삭제</button>
+                      <button
+                        class="btn btn-ghost btn-sm h-8 text-red-600"
+                        @click="deleteTrip(trip.id)"
+                      >
+                        삭제
+                      </button>
                     </div>
                   </td>
                 </tr>
@@ -121,6 +131,7 @@
         </div>
       </div>
 
+      <!-- Inquiries Section -->
       <div v-if="activeTab === 'inquiries'" class="card bg-base-100 shadow-sm">
         <div class="card-header p-6">
           <h2 class="card-title">문의 내역</h2>
@@ -172,132 +183,142 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue'
+import api from '@/api'
 
-const searchTerm = ref('');
-const activeTab = ref('users');
+const searchTerm = ref('')
+const activeTab = ref('users')
+
+const users = ref([])
+const sidos = ref([])
+const trips = ref([])
+const stats = ref([
+  { title: '총 사용자', value: '0', change: '+0%' },
+  { title: '여행 계획 수', value: '3,876', change: '+23.1%' },
+  { title: '동행 매칭 수', value: '572', change: '+8.3%' },
+  { title: '미답변 문의', value: '14', change: '-2' },
+])
 
 const tabLabels = {
   users: '사용자 관리',
   trips: '여행 계획 관리',
-  inquiries: '문의 관리'
-};
+  inquiries: '문의 관리',
+}
 
-// Mock data
-const stats = [
-  { title: "총 사용자", value: "1,243", change: "+12.5%" },
-  { title: "여행 계획 수", value: "3,876", change: "+23.1%" },
-  { title: "동행 매칭 수", value: "572", change: "+8.3%" },
-  { title: "미답변 문의", value: "14", change: "-2" },
-];
+const fetchTrips = async () => {
+  try {
+    const res = await api.get('/api/v1/plan')
+    const tripList = res.data
 
-const users = [
-  {
-    id: "1",
-    username: "traveler123",
-    name: "김여행",
-    email: "traveler123@example.com",
-    gender: "남성",
-    joined: "2023-09-15",
-  },
-  {
-    id: "2",
-    username: "adventurer",
-    name: "이모험",
-    email: "adventure@example.com",
-    gender: "여성",
-    joined: "2023-09-20",
-  },
-  {
-    id: "3",
-    username: "explorer",
-    name: "박탐험",
-    email: "explorer@example.com",
-    gender: "남성",
-    joined: "2023-09-22",
-  },
-  {
-    id: "4",
-    username: "wanderlust",
-    name: "최방랑",
-    email: "wanderlust@example.com",
-    gender: "여성",
-    joined: "2023-09-25",
-  },
-  {
-    id: "5",
-    username: "globetrotter",
-    name: "정세계",
-    email: "globetrotter@example.com",
-    gender: "남성",
-    joined: "2023-09-28",
-  },
-];
+    // userId → username 매핑
+    tripList.forEach((trip) => {
+      const user = users.value.find((u) => u.id === trip.userId)
+      trip.userId = user ? user.userId : '알 수 없음'
+    })
 
-const inquiries = [
-  { id: "1", title: "여행 계획 공유 문제", author: "traveler123", status: "대기중", date: "2023-10-08" },
-  { id: "2", title: "회원 정보 수정 안됨", author: "adventurer", status: "처리중", date: "2023-10-07" },
-  { id: "3", title: "매칭 시스템 문의", author: "explorer", status: "완료", date: "2023-10-05" },
-  { id: "4", title: "계정 삭제 요청", author: "wanderlust", status: "대기중", date: "2023-10-04" },
-  { id: "5", title: "비밀번호 재설정 오류", author: "globetrotter", status: "완료", date: "2023-10-01" },
-];
+    trips.value = tripList
 
-const trips = [
-  {
-    id: "1",
-    title: "제주도 4박 5일 힐링 여행",
-    author: "traveler123",
-    location: "제주도",
-    created: "2023-09-15",
-    views: 324,
-  },
-  {
-    id: "2",
-    title: "서울 근교 당일치기",
-    author: "adventurer",
-    location: "경기도",
-    created: "2023-10-02",
-    views: 156,
-  },
-  {
-    id: "3",
-    title: "부산 해운대 2박 3일 여행",
-    author: "explorer",
-    location: "부산",
-    created: "2023-08-22",
-    views: 482,
-  },
-  {
-    id: "4",
-    title: "강원도 양양 서핑 여행",
-    author: "wanderlust",
-    location: "강원도",
-    created: "2023-09-28",
-    views: 209,
-  },
-  {
-    id: "5",
-    title: "전주 한옥마을 1박 2일",
-    author: "globetrotter",
-    location: "전주",
-    created: "2023-08-14",
-    views: 347,
-  },
-];
+    // 여행 계획 수 통계 업데이트
+    const tripStat = stats.value.find((stat) => stat.title === '여행 계획 수')
+    if (tripStat) {
+      tripStat.value = tripList.length.toString()
+    }
+  } catch (error) {
+    console.error('여행 계획 목록 불러오기 실패:', error)
+  }
+}
 
-// Filter functions
+const inquiries = ref([
+  {
+    id: '1',
+    title: '여행 계획 공유 문제',
+    author: 'traveler123',
+    status: '대기중',
+    date: '2023-10-08',
+  },
+  {
+    id: '2',
+    title: '회원 정보 수정 안됨',
+    author: 'adventurer',
+    status: '처리중',
+    date: '2023-10-07',
+  },
+  { id: '3', title: '매칭 시스템 문의', author: 'explorer', status: '완료', date: '2023-10-05' },
+])
+
+// 필터 함수
 const filterData = (data, term) => {
-  if (!term) return data;
+  if (!term) return data
   return data.filter((item) =>
-    Object.values(item).some((value) => 
-      value.toString().toLowerCase().includes(term.toLowerCase())
-    )
-  );
-};
+    Object.values(item).some((value) =>
+      value.toString().toLowerCase().includes(term.toLowerCase()),
+    ),
+  )
+}
 
-const filteredUsers = computed(() => filterData(users, searchTerm.value));
-const filteredTrips = computed(() => filterData(trips, searchTerm.value));
-const filteredInquiries = computed(() => filterData(inquiries, searchTerm.value));
+const filteredUsers = computed(() => filterData(users.value, searchTerm.value))
+const filteredTrips = computed(() => filterData(trips.value, searchTerm.value))
+const filteredInquiries = computed(() => filterData(inquiries.value, searchTerm.value))
+
+// API로 사용자 목록 불러오기
+const fetchUsers = async () => {
+  try {
+    const res = await api.get('/api/v1/user')
+    users.value = res.data
+
+    stats.value[0].value = res.data.length.toString() // 총 사용자 수 반영
+  } catch (error) {
+    console.error('사용자 목록 불러오기 실패:', error)
+  }
+}
+const deleteUser = async (id) => {
+  if (!confirm('정말 이 사용자를 삭제하시겠습니까?')) return
+  try {
+    await api.delete(`/api/v1/user/${id}`)
+    console.log(`사용자 ${id} 삭제 완료`)
+    await fetchUsers()
+  } catch (error) {
+    console.error(`사용자 ${id} 삭제 실패:`, error)
+  }
+}
+const deleteTrip = async (planId) => {
+  if (!confirm('정말 삭제하시겠습니까?')) return
+
+  try {
+    await api.delete(`/api/v1/plan/${planId}`)
+    trips.value = trips.value.filter((trip) => trip.id !== planId)
+
+    const tripStat = stats.value.find((stat) => stat.title === '여행 계획 수')
+    if (tripStat) {
+      tripStat.value = trips.value.length.toString()
+    }
+
+    alert('삭제되었습니다.')
+  } catch (error) {
+    console.error('삭제 실패:', error)
+    alert('삭제에 실패했습니다.')
+  }
+}
+const fetchSidos = async () => {
+  try {
+    const response = await api.get('/api/v1/sidos')
+    sidos.value = response.data
+  } catch (error) {
+    console.error('시도 목록 조회 실패:', error)
+  }
+}
+
+const getSidoName = (sidoCode) => {
+  if (!sidoCode || !sidos.value.length) return '지역 정보 없음'
+
+  const sido = sidos.value.find((sido) => sido.sidoCode === sidoCode)
+  return sido ? sido.sidoName : '지역 정보 없음'
+}
+onMounted(() => {
+  fetchUsers()
+  fetchTrips()
+  fetchSidos()
+})
 </script>
 
 <style scoped>

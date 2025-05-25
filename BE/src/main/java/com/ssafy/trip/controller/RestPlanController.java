@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -40,7 +41,49 @@ public class RestPlanController {
 		        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Insert failed: " + e.getMessage());
 		    }
 	}
-	
+	// 여행 계획 업데이트 API 추가
+		@PutMapping("/{planId}")
+		public ResponseEntity<?> updatePlan(@PathVariable int planId, @RequestBody Tripplan dto){
+			try {
+				// planId 설정
+				Tripplan updateDto = new Tripplan(
+					planId,
+					dto.getDestination(),
+					dto.getDuration(),
+					dto.getMembers(),
+					dto.getTransport(),
+					dto.getChatroomId(),
+					dto.getUserId(),
+					dto.getTitle(),
+					dto.getDescription(),
+					dto.getLikes(),
+					dto.getShares(),
+					dto.getCreatedAt(),
+					dto.getUpdatedAt(),
+					dto.getIsShared(),
+					dto.getImage()
+				);
+				
+				int res = service.updatePlan(updateDto);
+				if (res > 0) {
+					return ResponseEntity.ok("Plan updated successfully");
+				} else {
+					return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Update failed");
+				}
+			} catch (Exception e) {
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Update failed: " + e.getMessage());
+			}
+		}
+		
+		@DeleteMapping("/itinerary/{planId}")
+		public ResponseEntity<?> deleteAllItinerary(@PathVariable int planId){
+			try {
+				int res = service.deleteAllItinerary(planId);
+				return ResponseEntity.ok("Itinerary deleted successfully");
+			} catch (Exception e) {
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Delete failed: " + e.getMessage());
+			}
+		}
 	@GetMapping("/{planId}")
 	 public ResponseEntity<Tripplan> getTripplan(@PathVariable int planId) {
         Tripplan tripplan = service.getTripplanById(planId);
@@ -49,6 +92,12 @@ public class RestPlanController {
         }
         return ResponseEntity.ok(tripplan);
     }
+	
+	@GetMapping("")
+	public ResponseEntity<List<Tripplan>> getAllTripplan(){
+		List<Tripplan> tripplans = service.getAllTripplan();
+		 return ResponseEntity.ok(tripplans);
+	}
 	
 	@GetMapping("/itinerary/{planId}")
 	 public ResponseEntity<List<ItineraryPlaceResponseDto>> getItineraryByplanId(@PathVariable int planId) {
@@ -117,6 +166,20 @@ public class RestPlanController {
 	public ResponseEntity<?> deleteTripplan(@PathVariable int planId, @PathVariable int userId) {
 	    try {
 	        boolean success = service.deleteTripplan(planId, userId);
+	        if (success) {
+	            return ResponseEntity.ok().body("여행계획이 성공적으로 삭제되었습니다.");
+	        } else {
+	            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("삭제 권한이 없거나 존재하지 않는 여행계획입니다.");
+	        }
+	    } catch (Exception e) {
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("삭제 실패: " + e.getMessage());
+	    }
+	}
+	
+	@DeleteMapping("/{planId}")
+	public ResponseEntity<?> deleteTripplanAdmin(@PathVariable int planId) {
+	    try {
+	        boolean success = service.deleteTripplanAdmin(planId);
 	        if (success) {
 	            return ResponseEntity.ok().body("여행계획이 성공적으로 삭제되었습니다.");
 	        } else {

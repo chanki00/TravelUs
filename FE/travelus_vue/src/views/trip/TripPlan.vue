@@ -466,7 +466,6 @@ const createPlan = async () => {
         }
       }
     }
-    console.log('aaaaaaaaaaaaaaa')
     tags.value.id.forEach(async (tagId) => {
       await api.post(`/api/v1/tag/tripplan/${planId.value}/${tagId}`)
     })

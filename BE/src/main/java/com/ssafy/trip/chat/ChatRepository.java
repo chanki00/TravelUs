@@ -30,4 +30,5 @@ public interface ChatRepository {
     List<UserDto> getUsersInTripPlan(@Param("planId") int planId); // 여행 계획 참여자 조회
 
     List<Integer> findChatroomIdsByUserId(int userId);
+	List<Integer> getChatroomIdByuserId(int userId);
 }

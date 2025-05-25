@@ -21,7 +21,9 @@
           <div class="flex-1">
             <div class="flex items-center gap-2 mb-3">
               <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
-                {{ place.contentTypeId==12?'명소':(place.contentTypeId==32?'숙소':'식당') }}
+                {{
+                  place.contentTypeId == 12 ? '명소' : place.contentTypeId == 32 ? '숙소' : '식당'
+                }}
               </span>
               <div class="flex items-center text-yellow-500">
                 <star-icon class="h-4 w-4 fill-current" />
@@ -47,10 +49,18 @@
                 <span>{{ place.tel }}</span>
               </div>
 
-              <div v-if="place.homepage" class="flex items-start gap-2">
+              <div class="flex items-start gap-2">
                 <globe-icon class="h-5 w-5 text-gray-500 mt-0.5" />
-                <a :href="place.homepage" target="_blank" class="text-blue-600 hover:underline">
-                  웹사이트 방문
+                <a
+                  :href="
+                    place.homepage
+                      ? place.homepage
+                      : `https://www.google.com/search?q=${encodeURIComponent(place.title)}`
+                  "
+                  target="_blank"
+                  class="text-blue-600 hover:underline"
+                >
+                  {{ place.homepage ? '웹사이트 방문' : '구글에서 검색' }}
                 </a>
               </div>
             </div>
@@ -126,6 +136,5 @@ const props = defineProps({
   },
 })
 
-console.log(props.place)
 defineEmits(['close', 'add-to-itinerary'])
 </script>

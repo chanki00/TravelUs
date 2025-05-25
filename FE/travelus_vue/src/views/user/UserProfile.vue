@@ -633,8 +633,9 @@ const formatDate = (dateString) => {
 
 const fetchMyTrips = async () => {
   try {
-    const response = await api.get(`/api/v1/plan/user/${user.value.id}`)
-    trips.value = response.data || []
+    const response = await api.get(`/api/v1/chat/chatroom/${user.value.id}`)
+    // null인 여행계획은 제외
+    trips.value = (response.data || []).filter((plan) => plan !== null)
   } catch (error) {
     console.error('내 여행 계획 조회 실패:', error)
     trips.value = []

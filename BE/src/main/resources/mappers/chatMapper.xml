@@ -40,7 +40,12 @@
 		WHERE chatroom_id = #{chatroomId}
 		ORDER BY chat_id ASC
 	</select>
-
+	
+	<select id="getChatroomIdByuserId" parameterType="integer">
+		select chatroom_id
+		from chatroom_users
+		where user_id = #{userId}
+	</select>
 
 	<!-- 채팅방 생성 (room_id는 AUTO_INCREMENT로 자동 생성) -->
 	<insert id="insertEmptyChatRoom">

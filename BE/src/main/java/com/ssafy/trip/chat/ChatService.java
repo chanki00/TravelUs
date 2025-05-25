@@ -81,4 +81,8 @@ public class ChatService {
     }
 
 
+
+	public List<Integer> getChatroomIdByuserId(int userId) {
+		return repo.getChatroomIdByuserId(userId);
+	}
 }
