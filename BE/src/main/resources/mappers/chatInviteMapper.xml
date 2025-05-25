@@ -3,22 +3,14 @@
 <mapper namespace="com.DB_PASSWORD_REDACTED.trip.chat.ChatInviteRepository">
 
   <!-- 초대 삽입 -->
-  <insert id="insertInvite" parameterType="com.DB_PASSWORD_REDACTED.trip.chat.ChatInvite">
-    INSERT INTO chat_invite (
-      chatroom_id,
-      inviter_id,
-      invitee_id,
-      status,
-      created_at
-    )
-    VALUES (
-      #{chatroomId},
-      #{inviterId},
-      #{inviteeId},
-      #{status},
-      #{createdAt}
-    )
-  </insert>
+<insert id="insertInvite" parameterType="com.DB_PASSWORD_REDACTED.trip.chat.ChatInvite">
+  INSERT INTO chat_invite
+    (chatroom_id, inviter_id, invitee_id, status, type, created_at)
+  VALUES
+    (#{chatroomId}, #{inviterId}, #{inviteeId}, #{status}, #{type}, #{createdAt})
+</insert>
+
+
 
 <!--   특정 유저의 대기중 초대 목록 -->
 <!--  <select id="getInvitesByUserId" resultType="com.DB_PASSWORD_REDACTED.trip.chat.ChatInvite">-->
@@ -50,7 +42,7 @@
   <result property="createdAt" column="created_at"/>
 </resultMap>
   
-  <!-- resources/mappers/chatInviteMapper.xml -->
+<!-- resources/mappers/chatInviteMapper.xml -->
 <resultMap id="ChatInviteResponseMap" type="com.DB_PASSWORD_REDACTED.trip.chat.ChatInviteResponse">
   <id property="id" column="id"/>
   <result property="chatroomId" column="chatroom_id"/>
@@ -58,6 +50,7 @@
   <result property="inviteeId" column="invitee_id"/>
   <result property="name" column="name"/>
   <result property="status" column="status"/>
+  <result property="type" column="type"/>         <!-- ✅ 추가된 라인 -->
   <result property="createdAt" column="created_at"/>
 </resultMap>
 
@@ -69,11 +62,29 @@
     u.name,
     ci.invitee_id,
     ci.status,
+    ci.type,               <!-- ✅ 추가된 라인 -->
     ci.created_at
   FROM chat_invite ci
   JOIN users u ON ci.inviter_id = u.id
   WHERE ci.invitee_id = #{userId}
 </select>
+
+<select id="getRequestsByUserId" resultMap="ChatInviteResponseMap">
+  SELECT
+    ci.id,
+    ci.chatroom_id,
+    ci.inviter_id,
+    ci.invitee_id,
+    ci.status,
+    ci.created_at,
+    ci.type,
+    u.name
+  FROM chat_invite ci
+  JOIN users u ON ci.inviter_id = u.id
+  WHERE ci.invitee_id = #{userId}
+    AND ci.type = 'REQUEST'
+</select>
+
 
 
 </mapper>

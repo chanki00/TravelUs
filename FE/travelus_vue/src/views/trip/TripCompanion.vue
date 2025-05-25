@@ -623,9 +623,10 @@ const inviteToPlan = async (currPlan) => {
     console.log('상대', currPlan.inviteeId.id)
 
     await api.post('/api/v1/chat/invite', {
-      chatroomId: currPlan.plan.chatroomId, // 여행 계획에 연결된 chatroomId
-      inviterId: userStore.loginUser.id,
-      inviteeId: currPlan.inviteeId.id,
+      chatroomId: currPlan.plan.chatroomId, // ✅ 어떤 채팅방인지
+      inviterId: userStore.loginUser.id, // ✅ 보낸 사람
+      inviteeId: currPlan.inviteeId.id, // ✅ 받는 사람
+      type: 'INVITE',
     })
     alert('초대를 보냈습니다!')
     showInviteModal.value = false
