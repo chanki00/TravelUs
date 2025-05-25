@@ -21,5 +21,7 @@ public interface ChatRepository {
     void insertChatroomUser(@Param("chatroomId") int chatroomId, @Param("usersId") int usersId);
     
     List<ChatMessage> getMessagesByRoomId(@Param("chatroomId") int chatroomId);
-
+    
+    void insertEmptyChatRoom(); // 채팅방 생성
+    int getLastInsertedRoomId(); // 방금 삽입한 채팅방 ID 반환
 }

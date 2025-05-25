@@ -24,7 +24,7 @@
 import Hero from '@/components/common/Hero.vue'
 import PopularTrips from '@/components/common/PopularTrips.vue'
 // import Footer from '@/components/common/Footers.vue';
-import TripChat from '@/components/trip/Chat.vue' // ✅ 여기에 import
+// import TripChat from '@/components/trip/TripChat.vue' // ✅ 여기에 import
 </script>
 
 <style scoped>

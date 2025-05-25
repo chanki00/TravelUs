@@ -86,7 +86,7 @@
         <!-- 채팅 영역 -->
         <!-- 채팅 영역 -->
         <div class="w-1/5 p-4 h-full overflow-hidden">
-          <TripChat :chatroom-id="planId" v-if="planId" />
+          <TripChat :chatroom-id="chatroomId" v-if="chatroomId" />
         </div>
       </div>
     </main>
@@ -108,6 +108,7 @@ import TripPlannerMap from '@/components/trip/TripPlannerMap.vue'
 import TripMembers from '@/components/trip/TripMembers.vue'
 import TripSearch from '@/components/trip/TripSearch.vue'
 import TripItinerary from '@/components/trip/TripItinerary.vue'
+// import TripChat from '@/components/trip/Chat.vue'
 import TripChat from '@/components/trip/TripChat.vue'
 import TripTagModal from '@/components/trip/TripTagModal.vue'
 import { Pencil as PencilIcon } from 'lucide-vue-next'
@@ -121,6 +122,7 @@ const route = useRoute()
 const router = useRouter()
 const userStore = useUserStore()
 const user = computed(() => userStore.loginUser)
+const chatroomId = ref(parseInt(route.query.chatroomId) || null)
 
 // Get data from query parameters
 const tripData = ref({
@@ -298,8 +300,11 @@ const updateItineraryMemo = ({ dayIndex, itemIndex, memo }) => {
 // 일정 생성 (이전에 updatePlan이었던 함수를 createPlan으로 변경)
 const createPlan = async () => {
   try {
-    // Create the plan with the data from TripHumanPlan
-    const response = await api.post('/api/v1/plan', {
+    // 먼저 채팅방을 생성
+    const chatroomId = ref(null)
+
+    // 이후 plan 생성 요청에 chatroomId 포함
+    const planRes = await api.post('/api/v1/plan', {
       destination: tripData.value.destination,
       duration: tripData.value.duration,
       members: tripData.value.members,
@@ -310,14 +315,15 @@ const createPlan = async () => {
       likes: 0,
       shares: 0,
       image: image.value.img,
+      chatroomId: chatroomId, // ✅ 포함
     })
 
-    planId.value = response.data
+    planId.value = planRes.data // planId는 이후 TripChat에 사용됨
 
     for (let i = 0; i < tripData.value.duration; i++) {
       const dayId_resp = await api.get(`/api/v1/plan/tripplandays/${planId.value}/${i + 1}`)
       for (let j = 0; j < itinerary.value[i].items.length; j++) {
-        const response = await api.post(`/api/v1/plan/itinerary`, {
+        await api.post(`/api/v1/plan/itinerary`, {
           dayId: dayId_resp.data,
           attractionId: itinerary.value[i].items[j].placeData.no,
           placeOrder: j + 1,
@@ -325,6 +331,7 @@ const createPlan = async () => {
         })
       }
     }
+
     tags.value.id.forEach(async (tagId) => {
       await api.post(`/api/v1/tag/tripplan/${planId.value}/${tagId}`)
     })
@@ -335,31 +342,6 @@ const createPlan = async () => {
     alert('일정 저장 중 오류가 발생했습니다.')
   }
 }
-
-// 일정 업데이트 (기존 계획을 수정할 때 사용)
-// const updatePlan = async () => {
-//   if (!planId.value) {
-//     // If no planId, create a new plan
-//     return createPlan()
-//   }
-
-//   try {
-//     await api.put(`/api/v1/plan/${planId.value}`, {
-//       destination: destination.value,
-//       duration: itinerary.value.length,
-//       members: tripData.value.members,
-//       transport: tripData.value.transport,
-//       title: title.value,
-//       description: description.value,
-//       itinerary: itinerary.value
-//     })
-
-//     router.push(`/planresult/${planId.value}`)
-//   } catch (error) {
-//     console.error('Error updating plan:', error)
-//     alert('일정 업데이트 중 오류가 발생했습니다.')
-//   }
-// }
 </script>
 
 <style scoped>
