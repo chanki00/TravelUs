@@ -273,14 +273,22 @@
                 <div class="flex items-center justify-between">
                   <div class="flex items-center gap-2">
                     <div class="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center">
-                      <span class="text-xs">{{ user.image }}</span>
+                      <span class="text-xs">{{
+                        trip.authorName ? trip.authorName.charAt(0) : 'U'
+                      }}</span>
                     </div>
-                    <span class="text-xs text-gray-600">{{ user.name }}</span>
+                    <span class="text-xs text-gray-600">{{ trip.authorName || 'Unknown' }}</span>
                   </div>
 
                   <div class="flex items-center gap-3 text-xs text-gray-500">
-                    <span>❤️{{ trip.likes }}</span>
-                    <span>💬 {{ trip.shares }}</span>
+                    <span class="flex items-center gap-1">
+                      🧡
+                      {{ trip.likes }}
+                    </span>
+                    <span class="flex items-center gap-1">
+                      <share-icon class="h-3 w-3" />
+                      {{ trip.shares }}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -317,7 +325,7 @@ import { ref, onMounted, computed, watch, onUnmounted } from 'vue'
 import { useUserStore } from '@/store/user'
 import TripUploadModal from '@/components/trip/TripUploadModal.vue'
 import api from '@/api'
-
+import { Heart as HeartIcon, Share as ShareIcon } from 'lucide-vue-next'
 const userStore = useUserStore()
 const user = computed(() => userStore.loginUser)
 
@@ -556,10 +564,14 @@ const fetchTrips = async () => {
     const enrichedTrips = await Promise.all(
       trip.map(async (tripPlan) => {
         const tagRes = await api.get(`/api/v1/tag/plan/${tripPlan.id}`)
+
+        const authorRes = await api.get(`/api/v1/plan/user-info/${tripPlan.userId}`)
         return {
           ...tripPlan,
           tags: tagRes.data,
           createdAt: tripPlan.createdAt || new Date().toISOString(),
+          authorName: authorRes.data?.name || 'Unknown',
+          authorUserId: authorRes.data?.userId || 'unknown',
         }
       }),
     )

@@ -351,8 +351,6 @@ const filteredCompanions = computed(() => {
     return []
   }
 
-  console.log('Filtering companions for user:', currUser.value)
-
   let filtered = userStore.userList
     .filter((user) => user.id !== currUser.value.id)
     .map((user) => {
@@ -362,8 +360,6 @@ const filteredCompanions = computed(() => {
         match: matchScore,
       }
     })
-
-  console.log('Filtered companions with scores:', filtered)
 
   // 성별 필터
   if (genderFilter.value !== 'all') {
@@ -532,9 +528,6 @@ onMounted(async () => {
   await userStore.getUserList()
   currUser.value = userStore.userList.find((user) => user.id === userStore.loginUser.id)
 
-  console.log('Current User:', currUser.value)
-  console.log('All Users:', userStore.userList)
-
   window.addEventListener('scroll', handleScroll)
 })
 
@@ -558,16 +551,11 @@ const getCommonCount = (arr1, arr2) => {
 }
 
 const calculateSimilarity = (user, target, type) => {
-  console.log('Calculating similarity between:', user, target)
-
   // 사용자 태그 데이터 안전하게 가져오기
   const userPersonality = user.personality || []
   const userPreference = user.preference || []
   const targetPersonality = target.personality || []
   const targetPreference = target.preference || []
-
-  console.log('User tags:', { personality: userPersonality, preference: userPreference })
-  console.log('Target tags:', { personality: targetPersonality, preference: targetPreference })
 
   // 공통 태그 개수 계산
   const commonPersonality = getCommonCount(userPersonality, targetPersonality)
@@ -603,7 +591,6 @@ const calculateSimilarity = (user, target, type) => {
     (personalityScore * weightPersonality + preferenceScore * weightPreference) * 100
   const result = Math.round(Math.max(0, Math.min(100, finalScore)))
 
-  console.log('Similarity result:', result)
   return result
 }
 </script>

@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- 여행 계획 선택 섹션 -->
-    <div class="bg-white rounded-lg border shadow-sm overflow-hidden mb-6">
+    <div v-if="!showForm" class="bg-white rounded-lg border shadow-sm overflow-hidden mb-6">
       <div class="p-4 border-b flex justify-between items-center">
         <h3 class="text-lg font-medium">내 여행 계획 목록</h3>
         <button
@@ -352,7 +352,7 @@ const fetchTravelPlans = async () => {
 // 여행 계획 선택 함수
 const selectPlan = (plan) => {
   selectedPlan.value = plan
-
+  showForm.value = true
   // 선택한 계획에서 여행지를 가져옴 (성격 태그는 초기화)
   recruitForm.value = {
     title: '',

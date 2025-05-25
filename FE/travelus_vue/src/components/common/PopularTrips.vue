@@ -81,7 +81,7 @@
 
                 <div class="flex items-center gap-3 text-xs text-gray-500">
                   <span class="flex items-center gap-1">
-                    <heart-icon class="h-3 w-3" />
+                    🧡
                     {{ trip.likes }}
                   </span>
                   <span class="flex items-center gap-1">

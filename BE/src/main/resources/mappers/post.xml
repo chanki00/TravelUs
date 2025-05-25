@@ -43,4 +43,8 @@
     FROM Posts
     ORDER BY created_at DESC
   </select>
+    <delete id="deleteRecruitPost" parameterType="int">
+        DELETE FROM posts
+        WHERE id = #{postId}
+    </delete>
 </mapper>

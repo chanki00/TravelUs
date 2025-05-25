@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.DeleteMapping;
 
 import com.DB_PASSWORD_REDACTED.trip.dto.BasicPlanDTO;
 import com.DB_PASSWORD_REDACTED.trip.dto.Itinerary;
@@ -109,6 +110,20 @@ public class RestPlanController {
 	        return ResponseEntity.ok(user);
 	    } catch (Exception e) {
 	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("User fetch failed: " + e.getMessage());
+	    }
+	}
+	
+	@DeleteMapping("/{planId}/user/{userId}")
+	public ResponseEntity<?> deleteTripplan(@PathVariable int planId, @PathVariable int userId) {
+	    try {
+	        boolean success = service.deleteTripplan(planId, userId);
+	        if (success) {
+	            return ResponseEntity.ok().body("여행계획이 성공적으로 삭제되었습니다.");
+	        } else {
+	            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("삭제 권한이 없거나 존재하지 않는 여행계획입니다.");
+	        }
+	    } catch (Exception e) {
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("삭제 실패: " + e.getMessage());
 	    }
 	}
 	

@@ -300,7 +300,7 @@
           <p class="text-sm text-gray-500 line-clamp-2">{{ post.content }}</p>
         </div>
         <div class="p-4 border-t flex justify-between">
-          <div class="text-sm">호스트: {{ post.userId }}</div>
+          <div class="text-sm">호스트: {{ post.authorName }}</div>
           <div class="text-xs text-gray-500">{{ formatDate(post.createdAt) }}</div>
         </div>
       </div>
@@ -323,6 +323,7 @@
       :show="showTripDetails"
       :post="selectedPost"
       @close="closeTripDetails"
+      @deleted="fetchRecruitPosts"
     />
   </div>
 </template>
@@ -587,7 +588,7 @@ const fetchRecruitPosts = async () => {
               personalityTags = []
             }
           }
-
+          const authorRes = await api.get(`/api/v1/plan/user-info/${post.userId}`)
           // 여행 계획이 있는 경우에만 조회
           if (post.planId) {
             const planRes = await api.get(`/api/v1/plan/${post.planId}`)
@@ -597,12 +598,16 @@ const fetchRecruitPosts = async () => {
               plan: planRes.data,
               tags: tagRes.data,
               personalityTags: personalityTags,
+              authorName: authorRes.data?.name || 'Unknown',
+              authorUserId: authorRes.data?.userId || 'unknown',
             }
           }
 
           return {
             ...post,
             personalityTags: personalityTags,
+            authorName: 'Unknown',
+            authorUserId: 'unknown',
           }
         } catch (error) {
           console.error('모집글 추가 정보 가져오기 실패:', error)

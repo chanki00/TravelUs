@@ -57,7 +57,7 @@ public class TripPlanLikeController {
     
     // 인기 여행 계획 조회
     @GetMapping("/popular")
-    public ResponseEntity<List<Tripplan>> getPopularPlans(@RequestParam(defaultValue = "5") int limit) {
+    public ResponseEntity<List<Tripplan>> getPopularPlans(@RequestParam int limit) {
         List<Tripplan> popularPlans = likeService.getTopLikedPlans(limit);
         return ResponseEntity.ok(popularPlans);
     }

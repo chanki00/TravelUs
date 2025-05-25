@@ -42,6 +42,19 @@
 		where id = #{planId};
 	</update>
 	
+	<!-- 여행 계획 삭제 (CASCADE로 관련 데이터 자동 삭제) -->
+	<delete id="deleteTripPlan" parameterType="map">
+		DELETE FROM TripPlans
+		WHERE id = #{planId} AND user_id = #{userId}
+	</delete>
+
+	<!-- 여행 계획 존재 여부 및 소유자 확인 -->
+	<select id="checkPlanOwnership" parameterType="map" resultType="int">
+		SELECT COUNT(*)
+		FROM TripPlans
+		WHERE id = #{planId} AND user_id = #{userId}
+	</select>
+	
 	<resultMap id="TripplanResultMap" type="com.DB_PASSWORD_REDACTED.trip.dto.Tripplan">
 		<id property="id" column="id" />
 	  <result property="userId" column="user_id"/>

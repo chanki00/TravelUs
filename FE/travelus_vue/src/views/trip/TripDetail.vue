@@ -27,10 +27,14 @@
               </div>
               <span>{{ authorInfo.name || 'Unknown' }} ({{ authorInfo.userId || 'unknown' }})</span>
             </div>
-            <div class="flex items-center gap-3">
-              <span>♥ {{ tripDetails.likes }}</span>
-              <span>📤 {{ tripDetails.shares }}</span>
-            </div>
+            <span class="flex items-center gap-1">
+              🧡
+              {{ tripDetails.likes }}
+            </span>
+            <span class="flex items-center gap-1">
+              <share-icon class="h-3 w-3" />
+              {{ tripDetails.shares }}
+            </span>
           </div>
         </div>
       </div>
@@ -219,7 +223,11 @@
 <script setup>
 import { onMounted, ref, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { ArrowRight as ArrowRightIcon, Heart as HeartIcon } from 'lucide-vue-next'
+import {
+  ArrowRight as ArrowRightIcon,
+  Heart as HeartIcon,
+  Share as ShareIcon,
+} from 'lucide-vue-next'
 import { useUserStore } from '@/store/user'
 import TripPlannerMap from '@/components/trip/TripPlannerMap.vue'
 import api from '@/api'

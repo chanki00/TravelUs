@@ -14,7 +14,7 @@ import lombok.ToString;
 @ToString
 public class Post {
 	private int id;
-	private int planId;
+	private Integer planId;
 	private int userId;
 	private Date startDate;
 	private Date endDate;
