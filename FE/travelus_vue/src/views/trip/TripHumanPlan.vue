@@ -68,7 +68,7 @@
                   <option value="tour">투어버스</option>
                 </select>
               </div>
-              
+
               <!-- Changed to navigate to TripPlan with query parameters -->
               <button
                 class="w-full mt-4 py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-md flex items-center justify-center"
@@ -88,6 +88,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import api from '@/api'
+import { userAi } from '@/axios'
 
 const router = useRouter()
 const destination = ref('')
@@ -102,20 +103,23 @@ onMounted(async () => {
   try {
     const response = await api.get('/api/v1/sidos')
     sidos.value = response.data
-    console.log(sidos.value )
+    console.log(sidos.value)
   } catch (error) {
     console.error('시도 목록 조회 실패:', error)
   }
 })
 
 // New function to navigate to TripPlan with query parameters
-const navigateToTripPlan = () => {
+const navigateToTripPlan = async () => {
   // Validate inputs if needed
   if (!destination.value) {
     alert('여행지를 선택해주세요')
     return
   }
-  
+
+  const res = await userAi.post('/api/v1/chat') // 🔹 채팅방 생성
+  const chatroomId = res.data // 생성된 채팅방 ID (백엔드에서 int 또는 DTO 형태로 반환되었을 것)
+
   // Navigate to TripPlan with query parameters
   router.push({
     path: '/tripplan',
@@ -123,8 +127,9 @@ const navigateToTripPlan = () => {
       destination: destination.value,
       duration: selectedDays.value,
       members: travelers.value,
-      transport: transportation.value
-    }
+      transport: transportation.value,
+      chatroomId: chatroomId, // 🔹 함께 전달
+    },
   })
 }
 </script>

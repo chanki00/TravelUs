@@ -15,6 +15,7 @@ import com.DB_PASSWORD_REDACTED.trip.security.CustomUserDetails;
 import com.DB_PASSWORD_REDACTED.trip.security.CustomUserDetailsService;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -39,16 +40,26 @@ public class JWTVerificationFilter extends OncePerRequestFilter {
 			return;
 		}
 		
-		if (jwtUtil.isExpired(accessToken)) {
-		    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-		    return;
-		}
+		try {
+	        if (jwtUtil.isExpired(accessToken)) {
+	            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+	            return;
+	        }
 
-		Claims claims = jwtUtil.getClaims(accessToken);
-		UserDetails details = userDetailsService.loadUserByUsername(claims.get("username").toString());
-		
-		UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(details, null, details.getAuthorities());
-		SecurityContextHolder.getContext().setAuthentication(authentication);
+	        Claims claims = jwtUtil.getClaims(accessToken);
+	        UserDetails details = userDetailsService.loadUserByUsername(claims.get("username").toString());
+
+	        UsernamePasswordAuthenticationToken authentication =
+	                new UsernamePasswordAuthenticationToken(details, null, details.getAuthorities());
+
+	        SecurityContextHolder.getContext().setAuthentication(authentication);
+	    } catch (ExpiredJwtException e) {
+	        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+	        return;
+	    } catch (Exception e) {
+	        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+	        return;
+	    }
 	
 		filterChain.doFilter(request, response);
 	}
