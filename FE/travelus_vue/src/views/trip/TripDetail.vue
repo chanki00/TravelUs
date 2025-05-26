@@ -347,7 +347,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref, computed, watch } from 'vue'
+import { onMounted, ref, computed, watch, onUpdated } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import {
   ArrowRight as ArrowRightIcon,
@@ -432,7 +432,6 @@ const fetchComments = async () => {
     isCommentsLoading.value = false
   }
 }
-
 const submitComment = async () => {
   if (!user.value || !user.value.id) {
     alert('로그인이 필요합니다.')
@@ -470,6 +469,7 @@ const submitComment = async () => {
       comments.value.unshift(newCommentData)
       newComment.value = ''
     }
+    fetchComments()
   } catch (error) {
     console.error('댓글 작성 실패:', error)
     alert('댓글 작성에 실패했습니다.')
@@ -806,6 +806,7 @@ onMounted(async () => {
   await fetchSidos()
   await fetchComments() // 댓글 로드 추가
 })
+
 
 watch(
   () => route.params.id,

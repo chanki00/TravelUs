@@ -38,20 +38,22 @@
     </div>
 
     <!-- 입력창 -->
-    <div class="mt-3 flex gap-2 flex-shrink-0">
-      <input
-        v-model="newMessage"
-        @keyup.enter="sendMessage"
-        class="flex-1 px-3 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-        placeholder="메시지 보내기..."
-      />
-      <button
-        @click="sendMessage"
-        class="bg-blue-500 text-white px-4 rounded-full hover:bg-blue-600"
-      >
-        ⬆
-      </button>
-    </div>
+    <!-- 입력창 -->
+<div class="mt-3 flex gap-2 items-center">
+  <input
+    v-model="newMessage"
+    @keyup.enter="sendMessage"
+    class="flex-1 min-w-0 px-3 py-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+    placeholder="메시지 보내기..."
+  />
+  <button
+    @click="sendMessage"
+    class="bg-blue-500 text-white px-4 rounded-full hover:bg-blue-600 flex-shrink-0"
+  >
+    ⬆
+  </button>
+</div>
+
   </div>
 </template>
 

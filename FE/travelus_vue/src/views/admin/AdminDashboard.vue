@@ -15,19 +15,20 @@
         </div>
       </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
         <div v-for="(stat, index) in stats" :key="index" class="card bg-base-100 shadow-sm">
-          <div class="card-body p-6">
-            <div class="flex justify-between items-start">
-              <div>
-                <p class="text-sm text-gray-500">{{ stat.title }}</p>
-                <h3 class="text-2xl font-bold mt-2">{{ stat.value }}</h3>
-              </div>
-              <div
-                :class="`text-sm ${stat.change.startsWith('+') ? 'text-green-600' : 'text-red-600'}`"
-              >
-                {{ stat.change }}
-              </div>
+          <div class="card-body p-6 flex justify-between items-center">
+            <div>
+              <p class="text-sm text-gray-500">{{ stat.title }}</p>
+              <h3 class="text-2xl font-bold mt-2">{{ stat.value }}</h3>
+            </div>
+            <div
+              :class="[
+                'text-sm font-semibold',
+                stat.change.startsWith('+') ? 'text-green-600' : 'text-red-600'
+              ]"
+            >
+              {{ stat.change }}
             </div>
           </div>
         </div>
@@ -35,7 +36,7 @@
 
       <div class="tabs mb-8">
         <a
-          v-for="tab in ['users', 'trips', 'inquiries']"
+          v-for="tab in ['users', 'trips']"
           :key="tab"
           :class="['tab tab-bordered', activeTab === tab ? 'tab-active' : '']"
           @click="activeTab = tab"
@@ -44,6 +45,7 @@
         </a>
       </div>
 
+      <!-- 사용자 목록 -->
       <div v-if="activeTab === 'users'" class="card bg-base-100 shadow-sm">
         <div class="card-header p-6">
           <h2 class="card-title">사용자 목록</h2>
@@ -86,7 +88,7 @@
         </div>
       </div>
 
-      <!-- Trips Section -->
+      <!-- 여행 계획 목록 -->
       <div v-if="activeTab === 'trips'" class="card bg-base-100 shadow-sm">
         <div class="card-header p-6">
           <h2 class="card-title">여행 계획 목록</h2>
@@ -131,53 +133,6 @@
         </div>
       </div>
 
-      <!-- Inquiries Section -->
-      <div v-if="activeTab === 'inquiries'" class="card bg-base-100 shadow-sm">
-        <div class="card-header p-6">
-          <h2 class="card-title">문의 내역</h2>
-          <p class="text-gray-500">전체 {{ inquiries.length }}건의 문의가 등록되어 있습니다</p>
-        </div>
-        <div class="card-body p-0">
-          <div class="overflow-x-auto">
-            <table class="table w-full">
-              <thead>
-                <tr>
-                  <th>글번호</th>
-                  <th>제목</th>
-                  <th>작성자</th>
-                  <th>상태</th>
-                  <th>작성일</th>
-                  <th>관리</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="inquiry in filteredInquiries" :key="inquiry.id">
-                  <td class="font-medium">{{ inquiry.id }}</td>
-                  <td>{{ inquiry.title }}</td>
-                  <td>{{ inquiry.author }}</td>
-                  <td>
-                    <span
-                      :class="`px-2 py-1 rounded-full text-xs ${
-                        inquiry.status === '대기중'
-                          ? 'bg-yellow-100 text-yellow-800'
-                          : inquiry.status === '처리중'
-                            ? 'bg-blue-100 text-blue-800'
-                            : 'bg-green-100 text-green-800'
-                      }`"
-                    >
-                      {{ inquiry.status }}
-                    </span>
-                  </td>
-                  <td>{{ inquiry.date }}</td>
-                  <td>
-                    <button class="btn btn-outline btn-sm h-8">답변</button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 </template>
@@ -192,17 +147,16 @@ const activeTab = ref('users')
 const users = ref([])
 const sidos = ref([])
 const trips = ref([])
+
 const stats = ref([
   { title: '총 사용자', value: '0', change: '+0%' },
-  { title: '여행 계획 수', value: '3,876', change: '+23.1%' },
+  { title: '여행 계획 수', value: '0', change: '+0%' },
   { title: '동행 매칭 수', value: '572', change: '+8.3%' },
-  { title: '미답변 문의', value: '14', change: '-2' },
 ])
 
 const tabLabels = {
   users: '사용자 관리',
   trips: '여행 계획 관리',
-  inquiries: '문의 관리',
 }
 
 const fetchTrips = async () => {
@@ -210,7 +164,6 @@ const fetchTrips = async () => {
     const res = await api.get('/api/v1/plan')
     const tripList = res.data
 
-    // userId → username 매핑
     tripList.forEach((trip) => {
       const user = users.value.find((u) => u.id === trip.userId)
       trip.userId = user ? user.userId : '알 수 없음'
@@ -218,7 +171,6 @@ const fetchTrips = async () => {
 
     trips.value = tripList
 
-    // 여행 계획 수 통계 업데이트
     const tripStat = stats.value.find((stat) => stat.title === '여행 계획 수')
     if (tripStat) {
       tripStat.value = tripList.length.toString()
@@ -228,77 +180,20 @@ const fetchTrips = async () => {
   }
 }
 
-const inquiries = ref([
-  {
-    id: '1',
-    title: '여행 계획 공유 문제',
-    author: 'traveler123',
-    status: '대기중',
-    date: '2023-10-08',
-  },
-  {
-    id: '2',
-    title: '회원 정보 수정 안됨',
-    author: 'adventurer',
-    status: '처리중',
-    date: '2023-10-07',
-  },
-  { id: '3', title: '매칭 시스템 문의', author: 'explorer', status: '완료', date: '2023-10-05' },
-])
-
-// 필터 함수
-const filterData = (data, term) => {
-  if (!term) return data
-  return data.filter((item) =>
-    Object.values(item).some((value) =>
-      value.toString().toLowerCase().includes(term.toLowerCase()),
-    ),
-  )
-}
-
-const filteredUsers = computed(() => filterData(users.value, searchTerm.value))
-const filteredTrips = computed(() => filterData(trips.value, searchTerm.value))
-const filteredInquiries = computed(() => filterData(inquiries.value, searchTerm.value))
-
-// API로 사용자 목록 불러오기
 const fetchUsers = async () => {
   try {
     const res = await api.get('/api/v1/user')
     users.value = res.data
 
-    stats.value[0].value = res.data.length.toString() // 총 사용자 수 반영
+    const userStat = stats.value.find((stat) => stat.title === '총 사용자')
+    if (userStat) {
+      userStat.value = users.value.length.toString()
+    }
   } catch (error) {
     console.error('사용자 목록 불러오기 실패:', error)
   }
 }
-const deleteUser = async (id) => {
-  if (!confirm('정말 이 사용자를 삭제하시겠습니까?')) return
-  try {
-    await api.delete(`/api/v1/user/${id}`)
-    console.log(`사용자 ${id} 삭제 완료`)
-    await fetchUsers()
-  } catch (error) {
-    console.error(`사용자 ${id} 삭제 실패:`, error)
-  }
-}
-const deleteTrip = async (planId) => {
-  if (!confirm('정말 삭제하시겠습니까?')) return
 
-  try {
-    await api.delete(`/api/v1/plan/${planId}`)
-    trips.value = trips.value.filter((trip) => trip.id !== planId)
-
-    const tripStat = stats.value.find((stat) => stat.title === '여행 계획 수')
-    if (tripStat) {
-      tripStat.value = trips.value.length.toString()
-    }
-
-    alert('삭제되었습니다.')
-  } catch (error) {
-    console.error('삭제 실패:', error)
-    alert('삭제에 실패했습니다.')
-  }
-}
 const fetchSidos = async () => {
   try {
     const response = await api.get('/api/v1/sidos')
@@ -314,6 +209,46 @@ const getSidoName = (sidoCode) => {
   const sido = sidos.value.find((sido) => sido.sidoCode === sidoCode)
   return sido ? sido.sidoName : '지역 정보 없음'
 }
+
+// 필터 함수
+const filterData = (data, term) => {
+  if (!term) return data
+  return data.filter((item) =>
+    Object.values(item).some((value) =>
+      value.toString().toLowerCase().includes(term.toLowerCase()),
+    ),
+  )
+}
+
+const filteredUsers = computed(() => filterData(users.value, searchTerm.value))
+const filteredTrips = computed(() => filterData(trips.value, searchTerm.value))
+
+const deleteUser = async (id) => {
+  if (!confirm('정말 이 사용자를 삭제하시겠습니까?')) return
+  try {
+    await api.delete(`/api/v1/user/${id}`)
+    await fetchUsers()
+  } catch (error) {
+    console.error(`사용자 ${id} 삭제 실패:`, error)
+  }
+}
+
+const deleteTrip = async (planId) => {
+  if (!confirm('정말 삭제하시겠습니까?')) return
+
+  try {
+    await api.delete(`/api/v1/plan/${planId}`)
+    trips.value = trips.value.filter((trip) => trip.id !== planId)
+
+    const tripStat = stats.value.find((stat) => stat.title === '여행 계획 수')
+    if (tripStat) {
+      tripStat.value = trips.value.length.toString()
+    }
+  } catch (error) {
+    console.error('삭제 실패:', error)
+  }
+}
+
 onMounted(() => {
   fetchUsers()
   fetchTrips()
@@ -322,5 +257,5 @@ onMounted(() => {
 </script>
 
 <style scoped>
-/* 추가적인 스타일이 필요하면 여기에 작성하세요 */
+/* 필요 시 추가 스타일 작성 가능 */
 </style>

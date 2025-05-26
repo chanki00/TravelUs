@@ -69,72 +69,60 @@
 
     <!-- Main Content -->
     <main class="flex-1 overflow-hidden">
-      <div class="h-full flex">
-        <!-- 장소 검색 패널 -->
-        <div class="w-1/5 p-4 border-r h-screen overflow-hidden flex flex-col">
-          <TripSearch
-            :destination="destination"
-            :itinerary="itinerary"
-            @add-to-itinerary="addToItinerary"
-          />
+  <div class="flex flex-col md:flex-row h-full">
+    <!-- 장소 검색 패널 -->
+    <div class="md:w-1/5 w-full p-4 border-b md:border-b-0 md:border-r h-64 md:h-auto overflow-auto">
+      <TripSearch
+        :destination="destination"
+        :itinerary="itinerary"
+        @add-to-itinerary="addToItinerary"
+      />
+    </div>
+
+    <!-- 일정 목록 -->
+    <div class="md:w-1/5 w-full p-4 border-b md:border-b-0 md:border-r h-64 md:h-auto overflow-auto">
+      <TripItinerary
+        v-model="activeDay"
+        :itinerary="itinerary"
+        @remove-item="removeFromItinerary"
+        @update-memo="updateItineraryMemo"
+        @reorder-items="reorderItineraryItems"
+      />
+    </div>
+
+    <!-- 지도 -->
+    <div class="md:w-2/5 w-full p-4 border-b md:border-b-0 md:border-r h-64 md:h-auto overflow-auto">
+      <TripPlannerMap
+        :locations="[]"
+        :itinerary="itinerary"
+        :active-day="activeDay"
+        :destination="destination"
+      />
+    </div>
+
+    <!-- 채팅 영역 + AI 추천 -->
+    <div class="md:w-1/5 w-full p-4 h-64 md:h-auto overflow-auto flex flex-col gap-2">
+      <TripChat :chatroom-id="chatroomId" v-if="chatroomId" />
+      <div
+        v-if="aiPlanData && (aiPlanData.tips || aiPlanData.restaurants)"
+        class="bg-white rounded-lg shadow p-4 overflow-auto"
+      >
+        <div v-if="aiPlanData.tips?.length" class="mb-4">
+          <h3 class="font-bold text-gray-700 mb-2">여행 팁</h3>
+          <ul class="list-disc pl-5 text-sm text-gray-600">
+            <li v-for="(tip, index) in aiPlanData.tips" :key="`tip-${index}`">{{ tip }}</li>
+          </ul>
         </div>
-
-        <!-- 일정 목록 -->
-        <div class="w-1/5 p-4 border-r h-scrren overflow-hidden">
-          <TripItinerary
-            v-model="activeDay"
-            :itinerary="itinerary"
-            @remove-item="removeFromItinerary"
-            @update-memo="updateItineraryMemo"
-            @reorder-items="reorderItineraryItems"
-          />
-        </div>
-
-        <!-- 지도 -->
-        <div class="w-2/5 p-4 h-scrren overflow-hidden">
-          <TripPlannerMap
-            :locations="[]"
-            :itinerary="itinerary"
-            :active-day="activeDay"
-            :destination="destination"
-          />
-        </div>
-
-        <!-- 채팅 영역 -->
-        <!-- 채팅 영역 -->
-        <div class="w-1/5 p-4 h-full overflow-hidden flex flex-col">
-          <TripChat :chatroom-id="chatroomId" v-if="chatroomId" />
-
-          <!-- 여행 팁 및 추천 맛집 섹션 -->
-          <div
-            v-if="aiPlanData && (aiPlanData.tips || aiPlanData.restaurants)"
-            class="bg-white rounded-lg shadow p-4 overflow-y-auto max-h-[40%]"
-          >
-            <div v-if="aiPlanData.tips && aiPlanData.tips.length > 0" class="mb-4">
-              <h3 class="font-bold text-gray-700 mb-2">여행 팁</h3>
-              <ul class="list-disc pl-5 text-sm text-gray-600">
-                <li v-for="(tip, index) in aiPlanData.tips" :key="`tip-${index}`" class="mb-1">
-                  {{ tip }}
-                </li>
-              </ul>
-            </div>
-
-            <div v-if="aiPlanData.restaurants && aiPlanData.restaurants.length > 0">
-              <h3 class="font-bold text-gray-700 mb-2">추천 맛집</h3>
-              <ul class="list-disc pl-5 text-sm text-gray-600">
-                <li
-                  v-for="(restaurant, index) in aiPlanData.restaurants"
-                  :key="`restaurant-${index}`"
-                  class="mb-1"
-                >
-                  {{ restaurant }}
-                </li>
-              </ul>
-            </div>
-          </div>
+        <div v-if="aiPlanData.restaurants?.length">
+          <h3 class="font-bold text-gray-700 mb-2">추천 맛집</h3>
+          <ul class="list-disc pl-5 text-sm text-gray-600">
+            <li v-for="(restaurant, index) in aiPlanData.restaurants" :key="`restaurant-${index}`">{{ restaurant }}</li>
+          </ul>
         </div>
       </div>
-    </main>
+    </div>
+  </div>
+</main>
 
     <TripimageModal
       :is-open="isImageModalOpen"

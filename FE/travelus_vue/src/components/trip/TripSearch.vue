@@ -70,7 +70,7 @@
           class="border rounded-md p-3 flex items-center gap-3 cursor-pointer hover:border-blue-200 transition-colors"
         >
           <div class="flex-1 flex items-center gap-3" @click="showPlaceDetail(place)">
-            <img :src="place.image" :alt="place.name" class="w-16 h-16 object-cover rounded-md" />
+            <img :src="place.image || '/default_trip.svg'" :alt="place.name" class="w-16 h-16 object-cover rounded-md" />
             <div>
               <h4 class="font-medium">{{ place.title }}</h4>
               <div class="flex items-center gap-1 text-sm text-gray-500">
@@ -224,7 +224,7 @@ const addToItinerary = (place) => {
     title: place.name ?? place.title,
     type: place.contentTypeId == 12 ? '명소' : place.contentTypeId == 32 ? '숙소' : '식당',
     time: new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' }),
-    image: place.image ?? '',
+    image: place.image || '/default_trip.svg',
     placeData: {
       no: place.no, // no 필드 추가
       latitude: place.latitude,

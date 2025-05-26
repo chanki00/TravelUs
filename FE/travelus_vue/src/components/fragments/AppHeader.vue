@@ -17,6 +17,7 @@
 
       <div class="flex gap-2">
         <template v-if="userStore.isLoggedIn">
+          <RouterLink v-if="userStore.loginUser.role==='ADMIN'" to="/admin" class="btn btn-m btn-ghost">관리자</RouterLink>
           <span class="flex items-center font-medium">{{ userStore.loginUser.name }}님</span>
           <RouterLink to="/profile" class="btn btn-m btn-ghost">마이페이지</RouterLink>
           <button @click="logout" class="btn btn-m btn-ghost">로그아웃</button>
