@@ -20,10 +20,27 @@
     <result property="createdAt" column="created_at"/>
   </resultMap>
 
-  <insert id="insertUser" parameterType="UserDto" useGeneratedKeys="true" keyProperty="id">
-    INSERT INTO users (user_id, user_pw, user_email, name, age, gender, address)
-    VALUES (#{userId}, #{userPw}, #{userEmail}, #{name}, #{age}, #{gender}, #{address})
-  </insert>
+<insert id="insertUser" parameterType="UserDto" useGeneratedKeys="true" keyProperty="id">
+  INSERT INTO users (
+    user_id, user_pw, user_email, name
+    <if test="age != null">, age</if>
+    <if test="gender != null">, gender</if>
+    <if test="address != null">, address</if>
+    <if test="intro != null">, intro</if>
+    <if test="role != null">, role</if>
+    <if test="allowInvite != null">, allow_invite</if>
+  )
+  VALUES (
+    #{userId}, #{userPw}, #{userEmail}, #{name}
+    <if test="age != null">, #{age}</if>
+    <if test="gender != null">, #{gender}</if>
+    <if test="address != null">, #{address}</if>
+    <if test="intro != null">, #{intro}</if>
+    <if test="role != null">, #{role}</if>
+    <if test="allowInvite != null">, #{allowInvite}</if>
+  )
+</insert>
+
 
   <select id="selectUser" resultMap="userResultMap">
     SELECT * FROM users WHERE id = #{id}
@@ -35,7 +52,7 @@
 
   <update id="updateInfo" parameterType="UserInfoDto">
     UPDATE users 
-    SET name = #{name}, user_email = #{userEmail}, address = #{address}, age = #{age}, gender=#{gender}, intro=#{intro}
+    SET name = #{name}, user_email = #{userEmail}, address = #{address}, age = #{age}, gender=#{gender}, intro=#{intro}, allow_invite=#{allowInvite}
     WHERE id = #{id}
   </update>
 
@@ -43,7 +60,7 @@
     UPDATE users SET user_pw = #{userPw} WHERE id = #{id}
   </update>
 
-  <delete id="deleteUser" parameterType="long">
+  <delete id="deleteUser" parameterType="int">
     DELETE FROM users WHERE id = #{id}
   </delete>
 

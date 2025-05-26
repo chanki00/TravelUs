@@ -115,7 +115,7 @@
                   <option value="부산">부산</option>
                   <option value="인천">인천</option>
                   <option value="대구">대구</option>
-                  <option value="기타">기타</option>
+                  <option value="other">기타</option>
                 </select>
               </div>
 
@@ -130,7 +130,7 @@
                   <option value="30대">30대</option>
                   <option value="40대">40대</option>
                   <option value="50대 이상">50대 이상</option>
-                  <option value="기타">기타</option>
+                  <option value="other">기타</option>
                 </select>
               </div>
 
@@ -317,9 +317,10 @@
               <input
                 type="checkbox"
                 id="invite-setting"
-                v-model="allowInvites"
+                v-model="editUser.allowInvite"
                 class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
               />
+
               <label for="invite-setting" class="text-sm text-gray-700">동행 초대 받기 허용</label>
             </div>
 
@@ -536,6 +537,7 @@ const editUser = ref({})
 
 const saveProfile = async () => {
   try {
+    console.log("초대여부", editUser.value.allowInvite)
     userStore.update(editUser)
     await userAi.patch(`/api/v1/user/info/${user.value.id}`, user.value)
     alert('프로필이 저장되었습니다.')
@@ -685,7 +687,6 @@ const deleteUser = () => {
 }
 
 const trips = ref([])
-const allowInvites = ref(false)
 
 const activeTab = ref('edit')
 const tabs = [
@@ -700,15 +701,12 @@ onMounted(async () => {
   if (editUser.value.gender == null) editUser.value.gender = 'O'
   if (editUser.value.address == null) editUser.value.address = '기타'
 
-  console.log('유저', editUser)
-
   await getUserTag()
   await getTripTag()
   await fetchMyTrips() // 내 여행 계획 가져오기 추가
   await fetchSidos()
   await fetchInvites()
   await fetchRequests()
-  console.log("초대", allInvites)
 })
 
 const sidos = ref([])
