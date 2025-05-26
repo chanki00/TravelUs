@@ -2,8 +2,8 @@ import axios from 'axios'
 import { useUserStore } from '@/store/user'
 
 const userAi = axios.create({
-  // baseURL: 'http://INTERNAL_IP_REDACTED:8080',
-  baseURL: 'http://localhost:8080',
+  baseURL: 'http://INTERNAL_IP_REDACTED:8080',
+  // baseURL: 'http://localhost:8080',
 
   headers: {
     'Content-Type': 'application/json',

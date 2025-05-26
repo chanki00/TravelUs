@@ -47,7 +47,14 @@
           </div>
 
           <div class="flex gap-3 mt-4 md:mt-0">
-            <TripMembers :members="mockMembers" />
+            <TripMembers
+  v-if="chatroomId"
+  :chatroom-id="chatroomId"
+  :plan-id="parseInt(planId)"
+  :current-user-id="user.id"
+  @members-updated="handleMembersUpdated"
+  ref="tripMembers"
+/>
             <button class="px-4 py-2 border rounded-md hover:bg-gray-50">공유하기</button>
             <button
               @click="openImageModal()"
@@ -95,7 +102,7 @@
 
         <!-- 채팅 영역 -->
         <!-- 채팅 영역 -->
-        <div class="w-1/5 p-4 h-screen overflow-hidden flex flex-col">
+        <div class="w-1/5 p-4 h-full overflow-hidden flex flex-col">
           <TripChat :chatroom-id="chatroomId" v-if="chatroomId" />
 
           <!-- 여행 팁 및 추천 맛집 섹션 -->
