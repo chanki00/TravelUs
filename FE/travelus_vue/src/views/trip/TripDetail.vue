@@ -64,6 +64,7 @@
 
               <!-- 수정하기 버튼 추가 -->
               <button
+                v-if="userIds.includes(user.id)"
                 @click="goToEdit"
                 class="px-4 py-2 border border-blue-300 rounded-md transition-colors flex items-center gap-2 hover:bg-blue-50 text-blue-600"
               >
@@ -446,12 +447,14 @@ const copyToMyPlanner = async () => {
     isCopyLoading.value = false
   }
 }
-
+const chatroomId = ref(0)
+const userIds = ref([])
 // 여행 계획 데이터 로드 함수
 const loadTripData = async (tripId) => {
   try {
     // 기존 데이터 로드 코드
     const response = await api.get(`/api/v1/plan/${tripId}`)
+
     tripDetails.value.title = response.data.title
     tripDetails.value.duration = response.data.duration
     tripDetails.value.userId = response.data.userId
@@ -461,6 +464,10 @@ const loadTripData = async (tripId) => {
     tripDetails.value.location = response.data.destination
     tripDetails.value.image = response.data.image
 
+    chatroomId.value = response.data.chatroomId
+
+    const resp_userIds = await api.get(`/api/v1/chat/user/${chatroomId.value}`)
+    userIds.value = resp_userIds.data
     // 작성자 정보 가져오기
     await fetchAuthorInfo(response.data.userId)
 

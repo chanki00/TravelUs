@@ -81,10 +81,6 @@ public class ChatRestController {
     
     @PostMapping("/request")
     public ResponseEntity<Void> requestJoin(@RequestBody InviteRequest dto) {
-    	System.out.println("채팅방 ID: " + dto.getChatroomId());
-        System.out.println("inviterId: " + dto.getInviterId());
-        System.out.println("inviteeId: " + dto.getInviteeId());
-    	
         chatService.requestToJoinChatroom(dto.getChatroomId(), dto.getInviterId(), dto.getInviteeId());
         return ResponseEntity.ok().build();
     }
@@ -95,5 +91,9 @@ public class ChatRestController {
         return ResponseEntity.ok(chatService.getJoinRequests(userId));
     }
 
-
+    @GetMapping("/user/{chatroomId}")
+    public ResponseEntity<List<Integer>> getuserIdByChatroomId(@PathVariable int chatroomId){
+    	List<Integer> userIds = chatService.getuserIdByChatroomId(chatroomId);
+    	return ResponseEntity.ok(userIds);
+    }
 }

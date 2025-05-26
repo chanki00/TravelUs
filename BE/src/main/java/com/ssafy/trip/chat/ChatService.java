@@ -104,4 +104,8 @@ public class ChatService {
 	}
 
 
+
+	public List<Integer> getuserIdByChatroomId(int chatroomId) {
+		return repo.getuserIdByChatroomId(chatroomId);
+	}
 }
