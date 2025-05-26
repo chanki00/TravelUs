@@ -7,4 +7,5 @@ public class InviteRequest {
     private int chatroomId;
     private int inviterId;
     private int inviteeId;
+    private String type;  // ✅ 추가
 }

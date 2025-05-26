@@ -4,11 +4,6 @@
     <Hero />
     <PopularTrips />
 
-    <!-- ✅ 채팅창 삽입 (테스트용) -->
-    <div class="fixed bottom-4 right-4 w-[300px] bg-white border rounded shadow-lg z-50">
-      <TripChat :chatroom-id="1" />
-    </div>
-
     <!-- <Footer /> -->
     <footer class="py-12 px-6 border-t">
       <div class="max-w-7xl mx-auto text-center">
@@ -24,7 +19,6 @@
 import Hero from '@/components/common/Hero.vue'
 import PopularTrips from '@/components/common/PopularTrips.vue'
 // import Footer from '@/components/common/Footers.vue';
-// import TripChat from '@/components/trip/TripChat.vue' // ✅ 여기에 import
 </script>
 
 <style scoped>

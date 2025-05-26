@@ -20,7 +20,7 @@
         >
           <!-- 닉네임 -->
           <div v-if="msg.userId !== userId" class="text-sm font-semibold mb-1">
-            익명{{ msg.userId }}
+            {{ userMap[msg.userId] || `익명${msg.userId}` }}
           </div>
 
           <!-- 내용 -->
@@ -56,7 +56,7 @@
 </template>
 
 <script setup>
-import { ref, watch, nextTick, onUnmounted } from 'vue'
+import { ref, watch, nextTick, onMounted, onUnmounted, computed } from 'vue'
 import SockJS from 'sockjs-client'
 import Stomp from 'stompjs'
 import { useUserStore } from '@/store/user'
@@ -79,6 +79,7 @@ const fetchChatHistory = async () => {
   try {
     const res = await userAi.get(`/api/v1/chat/${props.chatroomId}`)
     messages.value = res.data
+    console.log("메시지", messages)
     scrollToBottom()
   } catch (e) {
     console.error('채팅 내역 실패', e)
@@ -87,7 +88,7 @@ const fetchChatHistory = async () => {
 
 // 2. WebSocket 연결
 const connect = () => {
-  const socket = new SockJS('http://localhost:8080/ws')
+  const socket = new SockJS('http://INTERNAL_IP_REDACTED:8080/ws')
   stompClient = Stomp.over(socket)
 
   stompClient.connect({}, () => {
@@ -148,6 +149,19 @@ const formatTime = (timestamp) => {
   const minutes = String(date.getMinutes()).padStart(2, '0')
   return `${hours}:${minutes}`
 }
+
+onMounted(async () => {
+  await userStore.getUserList()
+})
+
+const userMap = computed(() => {
+  const map = {}
+  for (const user of userStore.userList) {
+    map[user.id] = user.name
+  }
+  return map
+})
+
 </script>
 
 <style scoped>

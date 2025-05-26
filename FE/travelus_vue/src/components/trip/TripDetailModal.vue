@@ -161,12 +161,14 @@
           삭제
         </button>
         <button
-          class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-          :disabled="post.currentMembers >= post.max_members"
-          @click="joinTrip"
-        >
-          {{ post.currentMembers >= post.max_members ? '모집 완료' : '참여하기' }}
-        </button>
+  v-if="userCanRequestJoin"
+  class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+  :disabled="post.currentMembers >= post.max_members"
+  @click="requestToJoin"
+>
+  {{ post.currentMembers >= post.max_members ? '모집 완료' : '참여하기' }}
+</button>
+
       </div>
     </div>
   </div>
@@ -199,18 +201,6 @@ const activeDay = ref(0)
 // 모달 닫기
 const closeModal = () => {
   emit('close')
-}
-
-// 여행 참여하기
-const joinTrip = async () => {
-  try {
-    // 여기에 참여 API 호출 로직 구현
-    alert('참여 신청이 완료되었습니다.')
-    closeModal()
-  } catch (error) {
-    console.error('참여 신청 실패:', error)
-    alert('참여 신청에 실패했습니다. 다시 시도해주세요.')
-  }
 }
 
 // 시도 목록 가져오기
@@ -422,4 +412,30 @@ const deletePost = async () => {
     alert('게시글 삭제에 실패했습니다. 다시 시도해주세요.')
   }
 }
+
+const userCanRequestJoin = computed(() => {
+  return props.post &&
+    user.value &&
+    user.value.id !== props.post.userId &&
+    !props.post.members?.includes(user.value.id)
+})
+
+
+const requestToJoin = async () => {
+  try {
+    console.log("유저", props.post.plan.chatroomId)
+    await api.post('/api/v1/chat/request', {
+  chatroomId: props.post.plan.chatroomId,
+  inviterId: user.value.id,
+  inviteeId: props.post.userId,
+  type: 'REQUEST',
+})
+
+    alert('참여 요청을 보냈습니다.')
+  } catch (err) {
+    console.error('참여 요청 실패:', err)
+    alert('참여 요청에 실패했습니다.')
+  }
+}
+
 </script>

@@ -79,6 +79,18 @@ public class ChatRestController {
     	return ResponseEntity.ok(myChatroom);
     }
     
+    @PostMapping("/request")
+    public ResponseEntity<Void> requestJoin(@RequestBody InviteRequest dto) {
+        chatService.requestToJoinChatroom(dto.getChatroomId(), dto.getInviterId(), dto.getInviteeId());
+        return ResponseEntity.ok().build();
+    }
+    
+ // ChatRestController.java
+    @GetMapping("/request/{userId}")
+    public ResponseEntity<List<ChatInviteResponse>> getJoinRequests(@PathVariable int userId) {
+        return ResponseEntity.ok(chatService.getJoinRequests(userId));
+    }
+
     @GetMapping("/user/{chatroomId}")
     public ResponseEntity<List<Integer>> getuserIdByChatroomId(@PathVariable int chatroomId){
     	List<Integer> userIds = chatService.getuserIdByChatroomId(chatroomId);

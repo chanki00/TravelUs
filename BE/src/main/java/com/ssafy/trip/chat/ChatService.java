@@ -41,17 +41,17 @@ public class ChatService {
     
     @Transactional
     public void inviteUserToChatroom(int chatroomId, int inviterId, int inviteeId) {
-    	
-    	System.out.println("채팅번호: " + chatroomId);
-    	
         ChatInvite invite = new ChatInvite();
         invite.setChatroomId(chatroomId);
         invite.setInviterId(inviterId);
         invite.setInviteeId(inviteeId);
         invite.setStatus("PENDING");
-        invite.setCreatedAt(LocalDateTime.now());
+        invite.setType("INVITE"); // ✅ 동행 초대
+       
+
         inviteRpeo.insertInvite(invite);
     }
+
     
     public List<ChatInviteResponse> getPendingInvites(int userId) {
         return inviteRpeo.getInvitesByUserId(userId);
@@ -85,6 +85,25 @@ public class ChatService {
 	public List<Integer> getChatroomIdByuserId(int userId) {
 		return repo.getChatroomIdByuserId(userId);
 	}
+	
+	@Transactional
+	public void requestToJoinChatroom(int chatroomId, int requesterId, int inviteeId) {
+	    ChatInvite request = new ChatInvite();
+	    request.setChatroomId(chatroomId);
+	    request.setInviterId(requesterId); // 요청자 = inviter 역할
+	    request.setInviteeId(inviteeId);           // 요청 대상자가 명확히 없다면 0으로 처리
+	    request.setStatus("PENDING");
+	    request.setType("REQUEST");        // ✅ 요청 유형
+
+	    inviteRpeo.insertInvite(request);
+	}
+	
+	// ChatService.java
+	public List<ChatInviteResponse> getJoinRequests(int userId) {
+	    return inviteRpeo.getRequestsByUserId(userId); // type = 'REQUEST'
+	}
+
+
 
 	public List<Integer> getuserIdByChatroomId(int chatroomId) {
 		return repo.getuserIdByChatroomId(chatroomId);

@@ -14,6 +14,6 @@ public class ChatInvite {
     private int chatroomId;
     private int inviterId;
     private int inviteeId;
-    private String status; // PENDING, ACCEPTED, REJECTED
-    private LocalDateTime createdAt;
+    private String status;     // PENDING, ACCEPTED, REJECTED
+    private String type;       // ✅ INVITE, REQUEST
 }
