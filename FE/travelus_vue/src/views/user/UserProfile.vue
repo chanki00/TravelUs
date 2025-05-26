@@ -106,17 +106,22 @@
 
               <div class="space-y-2">
                 <label for="address" class="block text-sm font-medium text-gray-700">지역</label>
-                <select
-                  id="address"
-                  v-model="editUser.address"
-                  class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-gray-700"
-                >
-                  <option value="서울">서울</option>
-                  <option value="부산">부산</option>
-                  <option value="인천">인천</option>
-                  <option value="대구">대구</option>
-                  <option value="other">기타</option>
-                </select>
+                
+                  <select
+                    id="address"
+                    v-model="editUser.address"
+                    class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-gray-700"
+                  >
+                    <option 
+                      v-for="sido in sidos" 
+                      :key="sido.sidoName" 
+                      :value="sido.sidoName"
+                    >
+                      {{ sido.sidoName }}
+                    </option>
+                    <option value="other">기타</option>
+                  </select>
+
               </div>
 
               <div class="space-y-2">
@@ -772,5 +777,6 @@ const fetchRequests = async () => {
     console.error('참가 요청 목록 불러오기 실패', err)
   }
 }
+
 </script>
 <style scoped></style>
