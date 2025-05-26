@@ -139,6 +139,8 @@ import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { ChevronDown as ChevronDownIcon } from 'lucide-vue-next'
 import InvitePlanModel from './InvitePlanModel.vue'
 import api from '@/api'
+import SockJS from 'sockjs-client'
+import Stomp from 'stompjs'
 
 const props = defineProps({
   chatroomId: {
@@ -163,46 +165,49 @@ const allMembers = ref([])
 const pendingInvites = ref([])
 const onlineUsers = ref(new Set())
 const editingUsers = ref(new Set())
-const websocket = ref(null)
 
 // 표시할 멤버 (최대 3명)
 const displayMembers = computed(() => allMembers.value.slice(0, 3))
 const totalMembers = computed(() => allMembers.value.length)
 
-// WebSocket 연결
-const connectWebSocket = () => {
-  if (!props.chatroomId) return
+let stompClient = null
 
-  try {
-    const wsUrl = `ws://localhost:8080/ws/collaboration/${props.chatroomId}`
-    websocket.value = new WebSocket(wsUrl)
+// STOMP 연결
+const connectStomp = () => {
+  const socket = new SockJS('http://INTERNAL_IP_REDACTED:8080/ws')
+  stompClient = Stomp.over(socket)
 
-    websocket.value.onopen = () => {
-      console.log('Members WebSocket 연결됨')
-      // 접속 알림
-      sendPresenceUpdate('ONLINE')
-    }
+  stompClient.connect({}, () => {
+    console.log('STOMP 연결됨')
 
-    websocket.value.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data)
-        handleWebSocketMessage(data)
-      } catch (error) {
-        console.error('WebSocket 메시지 파싱 오류:', error)
-      }
-    }
+    stompClient.subscribe(`/topic/collaboration/${props.chatroomId}`, (message) => {
+      const data = JSON.parse(message.body)
+      handleWebSocketMessage(data)
+    })
 
-    websocket.value.onclose = () => {
-      console.log('Members WebSocket 연결 종료')
-      // 재연결 시도
-      setTimeout(connectWebSocket, 3000)
-    }
+    sendPresenceUpdate('ONLINE')
+  })
+}
 
-    websocket.value.onerror = (error) => {
-      console.error('Members WebSocket 오류:', error)
-    }
-  } catch (error) {
-    console.error('WebSocket 연결 실패:', error)
+// STOMP 메시지 전송 함수
+const sendPresenceUpdate = (status) => {
+  if (stompClient?.connected) {
+    stompClient.send('/app/presence', {}, JSON.stringify({
+      type: 'PRESENCE_UPDATE',
+      userId: props.currentUserId,
+      chatroomId: props.chatroomId,
+      status,
+    }))
+  }
+}
+
+const sendEditingStatus = (isEditing) => {
+  if (stompClient?.connected) {
+    stompClient.send('/app/editing', {}, JSON.stringify({
+      type: isEditing ? 'START_EDITING' : 'STOP_EDITING',
+      userId: props.currentUserId,
+      chatroomId: props.chatroomId,
+    }))
   }
 }
 
@@ -232,41 +237,13 @@ const handleWebSocketMessage = (data) => {
   }
 }
 
-// 접속 상태 업데이트
-const sendPresenceUpdate = (status) => {
-  if (websocket.value && websocket.value.readyState === WebSocket.OPEN) {
-    websocket.value.send(
-      JSON.stringify({
-        type: 'PRESENCE_UPDATE',
-        userId: props.currentUserId,
-        status: status,
-        chatroomId: props.chatroomId,
-      }),
-    )
-  }
-}
-
-// 편집 상태 업데이트
-const sendEditingStatus = (isEditing) => {
-  if (websocket.value && websocket.value.readyState === WebSocket.OPEN) {
-    websocket.value.send(
-      JSON.stringify({
-        type: isEditing ? 'START_EDITING' : 'STOP_EDITING',
-        userId: props.currentUserId,
-        chatroomId: props.chatroomId,
-      }),
-    )
-  }
-}
-
-// 멤버 온라인 상태 업데이트
+// 멤버 상태 업데이트
 const updateMemberOnlineStatus = () => {
   allMembers.value.forEach((member) => {
     member.isOnline = onlineUsers.value.has(member.id)
   })
 }
 
-// 멤버 편집 상태 업데이트
 const updateMemberEditingStatus = () => {
   allMembers.value.forEach((member) => {
     member.isEditing = editingUsers.value.has(member.id)
@@ -279,7 +256,6 @@ const fetchMembers = async () => {
     const response = await api.get(`/api/v1/chat/user/${props.chatroomId}`)
     const userIds = response.data
 
-    // 각 사용자 정보 가져오기
     const memberPromises = userIds.map(async (userId) => {
       try {
         const userResponse = await api.get(`/api/v1/user/${userId}`)
@@ -302,7 +278,6 @@ const fetchMembers = async () => {
 
     const members = (await Promise.all(memberPromises)).filter(Boolean)
 
-    // 호스트를 맨 앞으로
     members.sort((a, b) => {
       if (a.role === 'host') return -1
       if (b.role === 'host') return 1
@@ -316,88 +291,64 @@ const fetchMembers = async () => {
   }
 }
 
-// 대기 중인 초대 가져오기
+// 초대 대기 목록 가져오기
 const fetchPendingInvites = async () => {
   try {
-    // 구현 필요: 대기 중인 초대 목록 API
-    // const response = await api.get(`/api/v1/chat/invite/pending/${props.chatroomId}`)
-    // pendingInvites.value = response.data
+    // 구현 필요
   } catch (error) {
     console.error('대기 중인 초대 가져오기 실패:', error)
   }
 }
 
-// 시간 포맷팅
+// 시간 포맷
 const formatLastSeen = (date) => {
   if (!date) return '알 수 없음'
-
   const now = new Date()
   const diff = now - new Date(date)
   const minutes = Math.floor(diff / 60000)
   const hours = Math.floor(diff / 3600000)
   const days = Math.floor(diff / 86400000)
-
   if (minutes < 1) return '방금 전'
   if (minutes < 60) return `${minutes}분 전`
   if (hours < 24) return `${hours}시간 전`
   return `${days}일 전`
 }
 
-const toggleDropdown = () => {
-  isDropdownOpen.value = !isDropdownOpen.value
-}
+// 드롭다운 관련
+const toggleDropdown = () => { isDropdownOpen.value = !isDropdownOpen.value }
+const closeDropdown = () => { isDropdownOpen.value = false }
+const openInviteModal = () => { isInviteModalOpen.value = true; closeDropdown() }
+const closeInviteModal = () => { isInviteModalOpen.value = false }
+const handleInviteSent = () => { fetchPendingInvites(); closeInviteModal() }
 
-const closeDropdown = () => {
-  isDropdownOpen.value = false
-}
-
-const openInviteModal = () => {
-  isInviteModalOpen.value = true
-  closeDropdown()
-}
-
-const closeInviteModal = () => {
-  isInviteModalOpen.value = false
-}
-
-const handleInviteSent = () => {
-  fetchPendingInvites()
-  closeInviteModal()
-}
-
-// 컴포넌트 마운트/언마운트 시 WebSocket 관리
+// 마운트 및 언마운트
 onMounted(() => {
   fetchMembers()
   fetchPendingInvites()
-  connectWebSocket()
+  connectStomp()
 })
 
 onUnmounted(() => {
-  if (websocket.value) {
-    sendPresenceUpdate('OFFLINE')
-    websocket.value.close()
-  }
+  sendPresenceUpdate('OFFLINE')
+  stompClient?.disconnect()
 })
 
 // chatroomId 변경 시 재연결
-watch(
-  () => props.chatroomId,
-  (newId, oldId) => {
-    if (newId !== oldId) {
-      if (websocket.value) {
-        websocket.value.close()
-      }
-      if (newId) {
-        connectWebSocket()
-        fetchMembers()
-        fetchPendingInvites()
-      }
+watch(() => props.chatroomId, (newId, oldId) => {
+  if (newId !== oldId) {
+    stompClient?.disconnect()
+    if (newId) {
+      connectStomp()
+      fetchMembers()
+      fetchPendingInvites()
     }
-  },
-)
+  }
+})
 
-// 외부에서 편집 상태 제어할 수 있도록 expose
+// 외부에서 편집 상태 설정 가능
 defineExpose({
   setEditingStatus: sendEditingStatus,
 })
 </script>
+
+<style scoped></style>

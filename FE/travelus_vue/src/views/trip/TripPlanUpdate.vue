@@ -61,12 +61,14 @@
 
             <div class="flex gap-3 mt-4 md:mt-0">
               <TripMembers
-                :chatroom-id="chatroomId"
-                :plan-id="parseInt(planId)"
-                :current-user-id="user.id"
-                @members-updated="handleMembersUpdated"
-                ref="tripMembers"
-              />
+  v-if="chatroomId"
+  :chatroom-id="chatroomId"
+  :plan-id="parseInt(planId)"
+  :current-user-id="user.id"
+  @members-updated="handleMembersUpdated"
+  ref="tripMembers"
+/>
+
               <button class="px-4 py-2 border rounded-md hover:bg-gray-50">공유하기</button>
               <button
                 @click="handleSave()"
