@@ -64,7 +64,7 @@
     <main class="flex-1 overflow-hidden">
       <div class="h-full flex">
         <!-- 장소 검색 패널 -->
-        <div class="w-1/5 p-4 border-r h-full overflow-hidden flex flex-col">
+        <div class="w-1/5 p-4 border-r h-screen overflow-hidden flex flex-col">
           <TripSearch
             :destination="destination"
             :itinerary="itinerary"
@@ -73,7 +73,7 @@
         </div>
 
         <!-- 일정 목록 -->
-        <div class="w-1/5 p-4 border-r h-full overflow-hidden">
+        <div class="w-1/5 p-4 border-r h-scrren overflow-hidden">
           <TripItinerary
             v-model="activeDay"
             :itinerary="itinerary"
@@ -84,7 +84,7 @@
         </div>
 
         <!-- 지도 -->
-        <div class="w-2/5 p-4 h-full overflow-hidden">
+        <div class="w-2/5 p-4 h-scrren overflow-hidden">
           <TripPlannerMap
             :locations="[]"
             :itinerary="itinerary"
@@ -95,7 +95,7 @@
 
         <!-- 채팅 영역 -->
         <!-- 채팅 영역 -->
-        <div class="w-1/5 p-4 h-full overflow-hidden flex flex-col">
+        <div class="w-1/5 p-4 h-screen overflow-hidden flex flex-col">
           <TripChat :chatroom-id="chatroomId" v-if="chatroomId" />
 
           <!-- 여행 팁 및 추천 맛집 섹션 -->

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import com.DB_PASSWORD_REDACTED.trip.dto.BasicPlanDTO;
 import com.DB_PASSWORD_REDACTED.trip.dto.Itinerary;
@@ -46,4 +47,17 @@ public interface PlanRepository {
 	int deleteTripplanAdmin(int planId);
 
 	Tripplan getTripplanByChatroomId(Integer chatroomId);
+	
+    // 버전 관리
+    int getCurrentVersion(int planId);
+    int updatePlanWithVersion(Tripplan dto);
+
+    // 계획 잠금 관리
+    boolean checkPlanLock(@Param("planId") int planId, @Param("userId") int userId);
+    void lockPlan(@Param("planId") int planId, @Param("userId") int userId);
+    void unlockPlan(@Param("planId") int planId, @Param("userId") int userId);
 }
+
+
+
+
