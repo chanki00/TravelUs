@@ -74,7 +74,7 @@ public class UserController {
 	
 	@PatchMapping("/info/{id}")
 	@Operation(summary = "멤버 수정")
-	public ResponseEntity<Map<String, Object>> updateInfo(@PathVariable Long id, @RequestBody UserInfoDto user) throws SQLException {
+	public ResponseEntity<Map<String, Object>> updateInfo(@PathVariable int id, @RequestBody UserInfoDto user) throws SQLException {
 		user.setId(id);
 		
 		int cnt = uService.updateInfo(user);
