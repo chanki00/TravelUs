@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.DB_PASSWORD_REDACTED.trip.repository.CommentRepository">
+
+	<select id="getCommentbyPlanId" parameterType="integer" resultMap="CommentMap">
+		select * from comments
+		where plan_id = #{planId}
+	</select>
+	
+	<insert id="createComment">
+		insert into Comments(plan_id, user_id, content)
+		values (#{planId}, #{userId}, #{content})
+	</insert>
+	
+		<resultMap id="CommentMap" type="com.DB_PASSWORD_REDACTED.trip.dto.Comment">
+		<id property="id" column="id" />
+			<result property="planId" column="plan_id"/>
+			<result property="userId" column="user_id"/>
+			<result property="content" column="content"/>
+			<result property="createdAt" column="created_at"/>
+			<result property="updatedAt" column="updated_at"/>
+		
+		</resultMap>
+	
+	<update id="updateComment">
+		Update Comments
+		SET content = #{content}, updated_at = NOW()
+		where id = #{commentId}
+	</update>
+		
+	<delete id="deleteComment">
+		DELETE FROm comments
+		Where id = #{commentId}
+	</delete>
+	
+</mapper>

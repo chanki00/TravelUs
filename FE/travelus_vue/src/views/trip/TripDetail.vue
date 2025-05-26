@@ -10,9 +10,8 @@
         <div class="max-w-7xl mx-auto">
           <div class="flex items-center gap-2 mb-2">
             <span class="px-2 py-1 bg-white/20 backdrop-blur-sm rounded-full text-sm">{{
-              tripDetails.location
+              getSidoName(Number(tripDetails.location)) 
             }}</span>
-            <!-- 수정: duration + 1일로 표시 -->
             <span class="px-2 py-1 bg-white/20 backdrop-blur-sm rounded-full text-sm"
               >{{ tripDetails.duration }}박 {{ tripDetails.duration + 1 }}일</span
             >
@@ -47,7 +46,6 @@
             <h2 class="text-2xl font-bold mb-2 md:mb-0">여행 일정</h2>
 
             <div class="flex gap-3">
-              <!-- 수정: 좋아요 버튼 추가 -->
               <button
                 @click="toggleLike"
                 :class="[
@@ -62,7 +60,6 @@
                 {{ isLiked ? '좋아요 취소' : '좋아요' }} ({{ likeCount }})
               </button>
 
-              <!-- 수정하기 버튼 추가 -->
               <button
                 v-if="userIds.includes(user.id)"
                 @click="goToEdit"
@@ -133,13 +130,148 @@
           <div class="mt-8">
             <h3 class="text-xl font-medium mb-4">지도 보기</h3>
             <div class="h-[400px] border rounded-lg">
-              <!-- 높이 지정 -->
               <TripPlannerMap
                 v-if="processedItinerary.length > 0"
                 :locations="[]"
                 :itinerary="processedItinerary"
                 :active-day="activeDay"
               />
+            </div>
+          </div>
+
+          <!-- 댓글 섹션 -->
+          <div class="mt-8">
+            <h3 class="text-xl font-medium mb-4">댓글 ({{ comments.length }})</h3>
+            
+            <!-- 댓글 작성 폼 -->
+            <div class="bg-white rounded-lg border shadow-sm overflow-hidden mb-6">
+              <div class="p-6">
+                <div v-if="user && user.id">
+                  <div class="flex items-start gap-3">
+                    <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                      <span class="text-blue-600 font-medium">{{ user.name ? user.name.charAt(0) : 'U' }}</span>
+                    </div>
+                    <div class="flex-1">
+                      <textarea
+                        v-model="newComment"
+                        placeholder="이 여행 계획에 대한 의견을 남겨주세요..."
+                        class="w-full p-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        rows="3"
+                        :disabled="isCommentSubmitting"
+                      ></textarea>
+                      <div class="flex justify-between items-center mt-3">
+                        <span class="text-sm text-gray-500">{{ newComment.length }}/500</span>
+                        <button
+                          @click="submitComment"
+                          :disabled="!newComment.trim() || newComment.length > 500 || isCommentSubmitting"
+                          class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                        >
+                          {{ isCommentSubmitting ? '작성 중...' : '댓글 작성' }}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div v-else class="text-center py-4">
+                  <p class="text-gray-500 mb-3">댓글을 작성하려면 로그인이 필요합니다.</p>
+                  <button
+                    @click="$router.push('/login')"
+                    class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    로그인하기
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- 댓글 목록 -->
+            <div class="space-y-4">
+              <div v-if="isCommentsLoading" class="text-center py-8">
+                <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                <p class="mt-2 text-gray-500">댓글을 불러오는 중...</p>
+              </div>
+              
+              <div v-else-if="comments.length === 0" class="text-center py-8">
+                <p class="text-gray-500">아직 댓글이 없습니다.</p>
+                <p class="text-sm text-gray-400 mt-1">첫 번째 댓글을 작성해보세요!</p>
+              </div>
+
+              <div
+                v-else
+                v-for="comment in comments"
+                :key="comment.id"
+                class="bg-white rounded-lg border shadow-sm overflow-hidden"
+              >
+                <div class="p-4">
+                  <div class="flex items-start gap-3">
+                    <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+                      <span class="text-gray-600 font-medium">
+                        {{ comment.userId ? comment.userId : 'U' }}
+                      </span>
+                    </div>
+                    <div class="flex-1">
+                      <div class="flex items-center gap-2 mb-2">
+                        <span class="font-medium text-gray-900">{{ comment.userName || '익명' }}</span>
+                        <span class="text-sm text-gray-500">{{ formatDate(comment.createdAt) }}</span>
+                        <span v-if="comment.createdAt !== comment.updatedAt" class="text-xs text-gray-400">
+                          (수정됨)
+                        </span>
+                      </div>
+                      
+                      <!-- 댓글 내용 표시/수정 -->
+                      <div v-if="editingCommentId !== comment.id">
+                        <p class="text-gray-700 whitespace-pre-wrap">{{ comment.content }}</p>
+                        
+                        <!-- 댓글 작성자만 수정/삭제 버튼 표시 -->
+                        <div v-if="user && user.id === comment.userId" class="flex gap-2 mt-3">
+                          <button
+                            @click="startEditComment(comment)"
+                            class="text-sm text-blue-600 hover:text-blue-800 transition-colors"
+                          >
+                            수정
+                          </button>
+                          <button
+                            @click="deleteComment(comment.id)"
+                            class="text-sm text-red-600 hover:text-red-800 transition-colors"
+                            :disabled="isDeletingComment"
+                          >
+                            {{ isDeletingComment ? '삭제 중...' : '삭제' }}
+                          </button>
+                        </div>
+                      </div>
+                      
+                      <!-- 댓글 수정 폼 -->
+                      <div v-else>
+                        <textarea
+                          v-model="editCommentContent"
+                          class="w-full p-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          rows="3"
+                          :disabled="isCommentUpdating"
+                        ></textarea>
+                        <div class="flex justify-between items-center mt-3">
+                          <span class="text-sm text-gray-500">{{ editCommentContent.length }}/500</span>
+                          <div class="flex gap-2">
+                            <button
+                              @click="cancelEditComment"
+                              class="px-3 py-1 text-sm text-gray-600 hover:text-gray-800 transition-colors"
+                              :disabled="isCommentUpdating"
+                            >
+                              취소
+                            </button>
+                            <button
+                              @click="updateComment(comment.id)"
+                              :disabled="!editCommentContent.trim() || editCommentContent.length > 500 || isCommentUpdating"
+                              class="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                            >
+                              {{ isCommentUpdating ? '수정 중...' : '수정 완료' }}
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -206,21 +338,6 @@
                   </li>
                 </ul>
               </div>
-
-              <div class="pt-4 border-t">
-                <h4 class="text-sm text-gray-500 mb-2">비슷한 여행 계획</h4>
-                <ul class="space-y-3">
-                  <li>
-                    <a href="#" class="text-sm text-blue-600 hover:underline"> 미구현 상태 </a>
-                  </li>
-                  <li>
-                    <a href="#" class="text-sm text-blue-600 hover:underline"> 미구현 상태 </a>
-                  </li>
-                  <li>
-                    <a href="#" class="text-sm text-blue-600 hover:underline"> 미구현 상태 </a>
-                  </li>
-                </ul>
-              </div>
             </div>
           </div>
         </div>
@@ -247,19 +364,28 @@ const route = useRoute()
 const router = useRouter()
 const activeDay = ref(0)
 
-// 좋아요 관련 상태
+// 기존 상태들
 const isLiked = ref(false)
 const likeCount = ref(0)
 const isLikeLoading = ref(false)
 const isCopyLoading = ref(false)
 
-// 작성자 정보
 const authorInfo = ref({
   name: '',
   userId: '',
 })
 const authorPersonalityTags = ref([])
 const authorOtherTrips = ref([])
+
+// 댓글 관련 상태
+const comments = ref([])
+const newComment = ref('')
+const isCommentsLoading = ref(false)
+const isCommentSubmitting = ref(false)
+const editingCommentId = ref(null)
+const editCommentContent = ref('')
+const isCommentUpdating = ref(false)
+const isDeletingComment = ref(false)
 
 const tripDetails = ref({
   id: route.params.id || 'id',
@@ -277,16 +403,155 @@ const tripDetails = ref({
   itinerary: [],
 })
 
-// 원본 일정 데이터
 const itinerary = ref([])
-
-// 지도 컴포넌트에 전달할 처리된 일정 데이터
 const processedItinerary = ref([])
-
-// Kakao Maps API 로드 여부를 나타내는 ref
 const isKakaoMapsLoaded = ref(false)
 
-// 좋아요 토글 함수
+// 댓글 관련 함수들
+const fetchComments = async () => {
+  isCommentsLoading.value = true
+  try {
+    const response = await api.get(`/api/v1/comment/plan/${route.params.id}`)
+    comments.value = response.data || []
+    console.log('댓글 조회 성공:', comments.value)
+  } catch (error) {
+    console.error('댓글 조회 실패:', error)
+    comments.value = []
+  } finally {
+    isCommentsLoading.value = false
+  }
+}
+
+const submitComment = async () => {
+  if (!user.value || !user.value.id) {
+    alert('로그인이 필요합니다.')
+    return
+  }
+
+  if (!newComment.value.trim()) {
+    alert('댓글 내용을 입력해주세요.')
+    return
+  }
+
+  if (newComment.value.length > 500) {
+    alert('댓글은 500자 이내로 작성해주세요.')
+    return
+  }
+
+  isCommentSubmitting.value = true
+  try {
+    const response = await api.post('/api/v1/comment', {
+      planId: parseInt(route.params.id),
+      userId: user.value.id,
+      content: newComment.value.trim()
+    })
+
+    if (response.data) {
+      // 새 댓글을 목록 맨 앞에 추가
+      const newCommentData = {
+        id: response.data.id,
+        content: newComment.value.trim(),
+        userId: user.value.id,
+        userName: user.value.name,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      }
+      comments.value.unshift(newCommentData)
+      newComment.value = ''
+    }
+  } catch (error) {
+    console.error('댓글 작성 실패:', error)
+    alert('댓글 작성에 실패했습니다.')
+  } finally {
+    isCommentSubmitting.value = false
+  }
+}
+
+const startEditComment = (comment) => {
+  editingCommentId.value = comment.id
+  editCommentContent.value = comment.content
+}
+
+const cancelEditComment = () => {
+  editingCommentId.value = null
+  editCommentContent.value = ''
+}
+
+const updateComment = async (commentId) => {
+  if (!editCommentContent.value.trim()) {
+    alert('댓글 내용을 입력해주세요.')
+    return
+  }
+
+  if (editCommentContent.value.length > 500) {
+    alert('댓글은 500자 이내로 작성해주세요.')
+    return
+  }
+
+  isCommentUpdating.value = true
+  try {
+    const response = await api.put(`/api/v1/comment/${commentId}`, {
+      content: editCommentContent.value.trim()
+    })
+
+    if (response.data) {
+      // 댓글 목록에서 해당 댓글 업데이트
+      const commentIndex = comments.value.findIndex(c => c.id === commentId)
+      if (commentIndex !== -1) {
+        comments.value[commentIndex].content = editCommentContent.value.trim()
+        comments.value[commentIndex].updatedAt = new Date().toISOString()
+      }
+      cancelEditComment()
+    }
+  } catch (error) {
+    console.error('댓글 수정 실패:', error)
+    alert('댓글 수정에 실패했습니다.')
+  } finally {
+    isCommentUpdating.value = false
+  }
+}
+
+const deleteComment = async (commentId) => {
+  if (!confirm('댓글을 삭제하시겠습니까?')) {
+    return
+  }
+
+  isDeletingComment.value = true
+  try {
+    await api.delete(`/api/v1/comment/${commentId}`)
+    
+    // 댓글 목록에서 제거
+    comments.value = comments.value.filter(c => c.id !== commentId)
+  } catch (error) {
+    console.error('댓글 삭제 실패:', error)
+    alert('댓글 삭제에 실패했습니다.')
+  } finally {
+    isDeletingComment.value = false
+  }
+}
+
+const formatDate = (dateString) => {
+  const date = new Date(dateString)
+  const now = new Date()
+  const diffInMinutes = Math.floor((now - date) / (1000 * 60))
+  
+  if (diffInMinutes < 1) return '방금 전'
+  if (diffInMinutes < 60) return `${diffInMinutes}분 전`
+  
+  const diffInHours = Math.floor(diffInMinutes / 60)
+  if (diffInHours < 24) return `${diffInHours}시간 전`
+  
+  const diffInDays = Math.floor(diffInHours / 24)
+  if (diffInDays < 7) return `${diffInDays}일 전`
+  
+  return date.toLocaleDateString('ko-KR', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  })
+}
+
+// 기존 함수들 (변경 없음)
 const toggleLike = async () => {
   if (!user.value || !user.value.id) {
     alert('로그인이 필요합니다.')
@@ -312,7 +577,6 @@ const toggleLike = async () => {
   }
 }
 
-// 좋아요 상태 확인
 const checkLikeStatus = async () => {
   if (!user.value || !user.value.id) return
 
@@ -325,14 +589,12 @@ const checkLikeStatus = async () => {
   }
 }
 
-// 일정 데이터 처리 함수
 const processItineraryData = () => {
   processedItinerary.value = itinerary.value.map((day) => {
     return {
       day: day.day,
       title: `Day ${day.day + 1}`,
       items: day.items.map((item) => {
-        // items가 객체인 경우 (현재 구조)
         if (item.items && typeof item.items === 'object') {
           return {
             title: item.items.title,
@@ -342,14 +604,12 @@ const processItineraryData = () => {
             placeData: item.items.placeData,
           }
         }
-        // items가 이미 올바른 형식인 경우
         return item
       }),
     }
   })
 }
 
-// Kakao Maps API 로드 확인
 const checkKakaoMapsLoaded = () => {
   if (!window.kakao || !window.kakao.maps) {
     console.warn("Kakao Maps API is not loaded. Make sure it's included in your index.html")
@@ -360,10 +620,8 @@ const checkKakaoMapsLoaded = () => {
   return true
 }
 
-// 작성자 정보 가져오기 함수 수정:
 const fetchAuthorInfo = async (authorId) => {
   try {
-    // 작성자 기본 정보 가져오기
     const userResponse = await api.get(`/api/v1/plan/user-info/${authorId}`)
     if (userResponse.data) {
       authorInfo.value = {
@@ -372,11 +630,9 @@ const fetchAuthorInfo = async (authorId) => {
       }
     }
 
-    // 작성자 성격 태그 가져오기
     const personalityResponse = await api.get(`/api/v1/tag/user/personal/${authorId}`)
     authorPersonalityTags.value = personalityResponse.data || []
 
-    // 작성자의 다른 여행 계획 가져오기 (현재 계획 제외, 최대 3개)
     const tripsResponse = await api.get(`/api/v1/plan/user/${authorId}`)
     const allTrips = tripsResponse.data || []
     authorOtherTrips.value = allTrips
@@ -387,7 +643,6 @@ const fetchAuthorInfo = async (authorId) => {
   }
 }
 
-// 내 플래너에 가져오기 함수 수정:
 const copyToMyPlanner = async () => {
   if (!user.value || !user.value.id) {
     alert('로그인이 필요합니다.')
@@ -397,16 +652,13 @@ const copyToMyPlanner = async () => {
   isCopyLoading.value = true
 
   try {
-    // shares 수 증가
     const shareResponse = await api.patch(`/api/v1/plan/updateShare/${route.params.id}`)
     if (shareResponse.data && shareResponse.data.shares !== undefined) {
       tripDetails.value.shares = shareResponse.data.shares
     } else {
-      // 응답에 shares 정보가 없으면 로컬에서 증가
       tripDetails.value.shares += 1
     }
 
-    // 일정 데이터를 올바른 형식으로 변환
     const convertedItinerary = itinerary.value.map((day) => ({
       day: day.day,
       items: day.items.map((item) => ({
@@ -426,12 +678,11 @@ const copyToMyPlanner = async () => {
       })),
     }))
 
-    // 현재 여행 계획 데이터를 쿼리 파라미터로 전달
     const planData = {
       destination: tripDetails.value.location,
       duration: tripDetails.value.duration,
-      members: 1, // 기본값
-      transport: 'car', // 기본값
+      members: 1,
+      transport: 'car',
       title: `${tripDetails.value.title} (복사본)`,
       description: tripDetails.value.description,
       itinerary: JSON.stringify(convertedItinerary),
@@ -447,12 +698,12 @@ const copyToMyPlanner = async () => {
     isCopyLoading.value = false
   }
 }
+
 const chatroomId = ref(0)
 const userIds = ref([])
-// 여행 계획 데이터 로드 함수
+
 const loadTripData = async (tripId) => {
   try {
-    // 기존 데이터 로드 코드
     const response = await api.get(`/api/v1/plan/${tripId}`)
 
     tripDetails.value.title = response.data.title
@@ -468,13 +719,10 @@ const loadTripData = async (tripId) => {
 
     const resp_userIds = await api.get(`/api/v1/chat/user/${chatroomId.value}`)
     userIds.value = resp_userIds.data
-    // 작성자 정보 가져오기
-    await fetchAuthorInfo(response.data.userId)
 
-    // 좋아요 상태 확인
+    await fetchAuthorInfo(response.data.userId)
     await checkLikeStatus()
 
-    // 일정 초기화
     itinerary.value = []
     for (let i = 0; i < response.data.duration; i++) {
       itinerary.value.push({ day: i, items: [] })
@@ -490,7 +738,6 @@ const loadTripData = async (tripId) => {
       32: '숙박',
     }
 
-    // 날짜별로 그룹핑 (tripDetails용)
     const grouped = itineraryRes.data.reduce((acc, cur) => {
       const { dayNumber } = cur
       if (!acc[dayNumber]) acc[dayNumber] = []
@@ -505,14 +752,12 @@ const loadTripData = async (tripId) => {
       return acc
     }, {})
 
-    // tripDetails.itinerary 구성
     tripDetails.value.itinerary = Object.entries(grouped).map(([day, items]) => ({
       day: Number(day),
       title: `Day ${day}`,
       items,
     }))
 
-    // 지도용 itinerary 데이터 구성
     itineraryRes.data.forEach((res) => {
       const dayIndex = res.dayNumber - 1
       if (dayIndex >= 0 && dayIndex < itinerary.value.length) {
@@ -522,7 +767,7 @@ const loadTripData = async (tripId) => {
           description: res.memo || '',
           type: typeMap[res.contentTypeId] || '기타',
           placeData: {
-            no: res.attractionId, // no 필드 추가
+            no: res.attractionId,
             latitude: res.latitude,
             longitude: res.longitude,
             contentTypeId: res.contentTypeId,
@@ -534,32 +779,27 @@ const loadTripData = async (tripId) => {
       }
     })
 
-    // 지도용 데이터 처리
     processItineraryData()
-
-    // Kakao Maps API 로드 확인
     checkKakaoMapsLoaded()
   } catch (error) {
     console.error('Failed to fetch trip details:', error)
   }
 }
 
-// 수정하기 페이지로 이동하는 함수
 const goToEdit = () => {
   router.push(`/tripplanupdate/${route.params.id}`)
 }
 
-// onMounted에서 작성자 정보도 가져오도록 수정:
 onMounted(async () => {
   await loadTripData(route.params.id)
+  await fetchSidos()
+  await fetchComments() // 댓글 로드 추가
 })
 
-// route 파라미터 변경 감지
 watch(
   () => route.params.id,
   async (newId, oldId) => {
     if (newId && newId !== oldId) {
-      // 페이지 데이터 초기화
       tripDetails.value = {
         id: newId,
         title: '제목',
@@ -582,15 +822,15 @@ watch(
       itinerary.value = []
       processedItinerary.value = []
       activeDay.value = 0
+      comments.value = [] // 댓글 초기화 추가
 
-      // 새로운 데이터 로드
       await loadTripData(newId)
+      await fetchComments() // 새 댓글 로드 추가
     }
   },
   { immediate: false },
 )
 
-// itinerary 또는 activeDay가 변경될 때 데이터 재처리
 watch(
   [() => itinerary.value, () => activeDay.value],
   () => {
@@ -598,6 +838,23 @@ watch(
   },
   { deep: true },
 )
+
+const sidos = ref([])
+const fetchSidos = async () => {
+  try {
+    const response = await api.get('/api/v1/sidos')
+    sidos.value = response.data
+  } catch (error) {
+    console.error('시도 목록 조회 실패:', error)
+  }
+}
+
+const getSidoName = (sidoCode) => {
+  if (!sidoCode || !sidos.value.length) return '지역 정보 없음'
+
+  const sido = sidos.value.find((sido) => sido.sidoCode === sidoCode)
+  return sido ? sido.sidoName : '지역 정보 없음'
+}
 </script>
 
 <style scoped>

@@ -416,6 +416,7 @@ const reorderItineraryItems = ({ dayIndex, fromIndex, toIndex }) => {
 // 일정 생성
 const createPlan = async () => {
   try {
+
     // 이후 plan 생성 요청에 chatroomId 포함
     const planRes = await api.post('/api/v1/plan', {
       destination: tripData.value.destination,

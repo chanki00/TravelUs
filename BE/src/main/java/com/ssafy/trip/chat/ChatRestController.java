@@ -33,7 +33,6 @@ public class ChatRestController {
     	Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         long userId = userDetails.getUser().getId();
-    	
         int newRoomId = chatService.createChatRoom((int) userId);
         return ResponseEntity.ok(newRoomId);
     }

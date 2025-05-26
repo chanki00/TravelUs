@@ -36,6 +36,7 @@ public class RestPlanController {
 	public ResponseEntity<?> createPlan(@RequestBody Tripplan dto){
 		  try {
 		        int res = service.insert(dto);
+		        
 		        return ResponseEntity.ok(dto.getId());
 		    } catch (Exception e) {
 		        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Insert failed: " + e.getMessage());
