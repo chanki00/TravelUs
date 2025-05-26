@@ -43,7 +43,7 @@ public class JwtController {
         }
 
         String role = claims.get("role", String.class);
-        String newAccessToken = jwtUtil.createAccessToken(Map.of("username", username, "role", role));
+        String newAccessToken = jwtUtil.createJwt("accessToken", username, role, 600000L);
 
 
         return ResponseEntity.ok(Map.of("accessToken", newAccessToken));
@@ -55,7 +55,7 @@ public class JwtController {
     		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "RefreshToken 필요"));
     	}
     	
-    	Map<String, Object> claims = jwtUtil.getClaims(refreshToken);
+    	Claims claims = jwtUtil.getClaims(refreshToken);
     	String username = (String) claims.get("username");
     	if (username == null) {
     		throw new JwtException("username이 없습니다.");

@@ -31,6 +31,7 @@ public class ChatRestController {
     @PostMapping
     public ResponseEntity<Integer> createChatRoom() {
     	Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    	System.out.println("프린: " + authentication.getPrincipal());
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         long userId = userDetails.getUser().getId();
         int newRoomId = chatService.createChatRoom((int) userId);

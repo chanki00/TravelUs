@@ -5,6 +5,7 @@ import java.util.Arrays;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -19,13 +20,21 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import com.DB_PASSWORD_REDACTED.trip.oauth.CustomOAuth2UserService;
+import com.DB_PASSWORD_REDACTED.trip.oauth.CustomSuccessHandler;
 import com.DB_PASSWORD_REDACTED.trip.repository.RefreshRepository;
 import com.DB_PASSWORD_REDACTED.trip.security.jwt.JWTAuthenticationFilter;
 import com.DB_PASSWORD_REDACTED.trip.security.jwt.JWTUtil;
 import com.DB_PASSWORD_REDACTED.trip.security.jwt.JWTVerificationFilter;
 
+import lombok.RequiredArgsConstructor;
+
 @Configuration
+@RequiredArgsConstructor
 public class SecurityConfig {
+	
+	private final CustomOAuth2UserService oAuth2UserService;
+	private final CustomSuccessHandler customSuccessHandler;
 
 	@Bean
 	RoleHierarchy roleHierarchy() {
@@ -60,7 +69,8 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173", "http://INTERNAL_IP_REDACTED:5173")); // ★ 프론트 주소로
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
-        configuration.setAllowedHeaders(Arrays.asList("*"));
+//        configuration.setAllowedHeaders(Arrays.asList("*"));
+        configuration.setAllowedHeaders(Arrays.asList("Content-Type","Authorization","X-Requested-With", "accessToken", "refreshToken"));
         configuration.setAllowCredentials(true); // ★ 꼭 추가
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -68,7 +78,7 @@ public class SecurityConfig {
 
         return source;
     }
-
+	
 	@Bean
     SecurityFilterChain apiSecurityFilterChain(
             HttpSecurity http,
@@ -78,21 +88,35 @@ public class SecurityConfig {
             JWTVerificationFilter jwtVerifyFilter)
             throws Exception {
 		
-    	http.securityMatcher("/api/**")
-    	.cors(t -> t.configurationSource(corsConfig))
-    	.userDetailsService(userDetailsService)
+    	http.securityMatcher("/api/**", "/oauth2/**", "/login/oauth2/**")
     	.csrf(csrf -> csrf.disable())
-    	.sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+    	.sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+    	.formLogin(login -> login.disable())
+    	.httpBasic(basic -> basic.disable())
+    	.cors(t -> t.configurationSource(corsConfig))
+    	.oauth2Login(oauth -> oauth
+    			.userInfoEndpoint(info -> info.userService(oAuth2UserService))
+    			.successHandler(customSuccessHandler)
+		)
+    	.userDetailsService(userDetailsService);
 
     	http.authorizeHttpRequests(auth -> auth
-    		    .requestMatchers("/api/v1/user", "/api/v1/user/**").permitAll()  // 회원가입 등 허용
-    		    .requestMatchers("/api/auth/**").permitAll() 
-    		    .requestMatchers("/api/v1/chat").authenticated()// 로그인/재발급 허용
-//    		    .anyRequest().authenticated()                                    // 나머지는 인증 필요
+    			.requestMatchers("/api/v1/user/login","/oauth2/**", "/login/oauth2/**").permitAll()
+    			.requestMatchers(HttpMethod.POST, "/api/v1/user").permitAll()
+    			.requestMatchers("/api/v1/likes/**").permitAll()
+    			.requestMatchers("/api/v1/sidos").permitAll()
+//    		    .requestMatchers("/api/v1/user", "/api/v1/user/**").permitAll()  // 회원가입 등 허용
+//    		    .requestMatchers("/api/auth/**").permitAll() 
+//    		    .requestMatchers("/api/v1/chat").authenticated()// 로그인/재발급 허용
+////    		    .anyRequest().authenticated()                                    // 나머지는 인증 필요
     		 //  TODO : 테스트용( 제거 해야됨)
-    		    .anyRequest().permitAll() 
+    		    .anyRequest().authenticated() 
     		);
 
+    	
+//    	http.authorizeHttpRequests(auth -> auth
+//    			.requestMatchers(
+//    					"/**", "/api/v1/user/login").permitAll());
     	
     	http.addFilterBefore(jwtVerifyFilter, UsernamePasswordAuthenticationFilter.class)
     	.addFilterAt(authFilter, UsernamePasswordAuthenticationFilter.class);

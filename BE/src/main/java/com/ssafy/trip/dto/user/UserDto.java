@@ -2,6 +2,7 @@ package com.DB_PASSWORD_REDACTED.trip.dto.user;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.DB_PASSWORD_REDACTED.trip.dto.user.enums.Gender;
 import com.DB_PASSWORD_REDACTED.trip.dto.user.enums.Role;
 

@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,6 +21,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.DB_PASSWORD_REDACTED.trip.dto.user.UserDto;
 import com.DB_PASSWORD_REDACTED.trip.dto.user.UserInfoDto;
 import com.DB_PASSWORD_REDACTED.trip.dto.user.UserPwDto;
+import com.DB_PASSWORD_REDACTED.trip.dto.user.UserResponseDto;
+import com.DB_PASSWORD_REDACTED.trip.security.CustomUserDetails;
 import com.DB_PASSWORD_REDACTED.trip.service.UserService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -129,6 +132,16 @@ public class UserController {
 		
 		map.put("message", "삭제 성공");
 		return ResponseEntity.ok(map);
+	}
+	
+	@GetMapping("/me")
+	public ResponseEntity<UserResponseDto> getCurrentUser(Authentication auth) {
+	    CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
+	    UserDto userDto = userDetails.getUser();
+	    UserResponseDto user = new UserResponseDto(userDto.getId(), userDto.getUserId(), 
+				userDto.getUserEmail(), userDto.getName(), userDto.getAge(), userDto.getGender(), 
+				userDto.getAddress(), userDto.getIntro(), userDto.getRole(), userDto.getAllowInvite());
+	    return ResponseEntity.ok(user);
 	}
 	
 }
