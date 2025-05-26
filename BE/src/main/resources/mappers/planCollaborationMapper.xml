@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.DB_PASSWORD_REDACTED.trip.repository.PlanCollaborationRepository">
+
+    <!-- 편집 세션 생성 -->
+    <insert id="createEditingSession" parameterType="PlanEditingSession">
+        INSERT INTO PlanEditingSessions (plan_id, user_id, session_id, started_at, last_activity, is_active)
+        VALUES (#{planId}, #{userId}, #{sessionId}, #{startedAt}, #{lastActivity}, #{isActive})
+        ON DUPLICATE KEY UPDATE
+        session_id = #{sessionId},
+        last_activity = CURRENT_TIMESTAMP,
+        is_active = TRUE
+    </insert>
+
+    <!-- 세션 활동 업데이트 -->
+    <update id="updateSessionActivity">
+        UPDATE PlanEditingSessions 
+        SET session_id = #{sessionId}, last_activity = CURRENT_TIMESTAMP, is_active = TRUE
+        WHERE plan_id = #{planId} AND user_id = #{userId}
+    </update>
+
+    <!-- 세션 비활성화 -->
+    <update id="deactivateSession">
+        UPDATE PlanEditingSessions 
+        SET is_active = FALSE
+        WHERE plan_id = #{planId} AND user_id = #{userId} AND session_id = #{sessionId}
+    </update>
+
+    <!-- 활성 세션 조회 -->
+    <select id="findActiveSession" resultType="PlanEditingSession">
+        SELECT s.*, u.name as userName
+        FROM PlanEditingSessions s
+        JOIN users u ON s.user_id = u.id
+        WHERE s.plan_id = #{planId} AND s.user_id = #{userId} AND s.is_active = TRUE
+    </select>
+
+    <!-- 현재 편집자 목록 -->
+    <select id="findActiveEditors" resultType="PlanEditingSession">
+        SELECT s.*, u.name as userName
+        FROM PlanEditingSessions s
+        JOIN users u ON s.user_id = u.id
+        WHERE s.plan_id = #{planId} AND s.is_active = TRUE
+        ORDER BY s.started_at
+    </select>
+
+    <!-- 비활성 세션 정리 -->
+    <update id="cleanupInactiveSessions">
+        UPDATE PlanEditingSessions 
+        SET is_active = FALSE
+        WHERE plan_id = #{planId} 
+        AND last_activity &lt; DATE_SUB(NOW(), INTERVAL #{minutesThreshold} MINUTE)
+    </update>
+
+    <!-- 최신 버전 조회 -->
+    <select id="getLatestVersion" resultType="int">
+        SELECT version FROM tripplans WHERE id = #{planId}
+    </select>
+
+    <!-- 현재 데이터 조회 -->
+    <select id="getCurrentData" resultType="Object">
+        SELECT * FROM tripplans WHERE id = #{planId}
+    </select>
+
+    <!-- 마지막 편집자 조회 -->
+    <select id="getLastEditor" resultType="String">
+        SELECT u.name 
+        FROM tripplans t
+        JOIN users u ON t.last_editor_id = u.id
+        WHERE t.id = #{planId}
+    </select>
+
+    <!-- 버전 증가 -->
+    <update id="incrementVersion">
+        UPDATE tripplans 
+        SET version = version + 1, 
+            last_editor_id = #{userId},
+            updated_at = CURRENT_TIMESTAMP
+        WHERE id = #{planId}
+    </update>
+
+    <!-- 변경 이력 기록 -->
+    <insert id="insertChangeHistory">
+        INSERT INTO PlanChangeHistory (plan_id, user_id, change_type, old_value, new_value, created_at)
+        VALUES (#{planId}, #{userId}, #{changeType}, #{oldValue}, #{newValue}, CURRENT_TIMESTAMP)
+    </insert>
+
+</mapper>

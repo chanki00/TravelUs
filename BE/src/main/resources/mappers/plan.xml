@@ -142,7 +142,7 @@
   ORDER BY d.day_number, p.place_order
 </select>
 
-<update id="updatePlan" parameterType="Tripplan">
+<update id="updatePlan" parameterType="com.DB_PASSWORD_REDACTED.trip.dto.Tripplan">
 		UPDATE tripplans 
 		SET destination = #{destination},
 		    duration = #{duration},
@@ -161,4 +161,56 @@
 		INNER JOIN tripplandays tpd ON tpp.day_id = tpd.id
 		WHERE tpd.plan_id = #{planId}
 	</delete>
+	
+	<!-- 현재 버전 조회 -->
+    <select id="getCurrentVersion" parameterType="int" resultType="int">
+        SELECT version FROM tripplans WHERE id = #{planId}
+    </select>
+
+    <!-- 버전과 함께 계획 업데이트 -->
+    <update id="updatePlanWithVersion" parameterType="com.DB_PASSWORD_REDACTED.trip.dto.Tripplan">
+        UPDATE tripplans
+        SET destination = #{destination},
+            duration = #{duration},
+            members = #{members},
+            transport = #{transport},
+            title = #{title},
+            description = #{description},
+            image = #{image},
+            chatroom_id = #{chatroomId},
+            version = #{version},
+            last_editor_id = #{userId},
+            updated_at = CURRENT_TIMESTAMP
+        WHERE id = #{id} AND version = #{version} - 1
+    </update>
+
+    <!-- 계획 잠금 확인 -->
+    <select id="checkPlanLock" parameterType="map" resultType="boolean">
+        SELECT CASE
+            WHEN is_being_edited = FALSE OR last_editor_id = #{userId} OR
+                 editing_started_at &lt; DATE_SUB(NOW(), INTERVAL 5 MINUTE)
+            THEN TRUE
+            ELSE FALSE
+        END
+        FROM tripplans
+        WHERE id = #{planId}
+    </select>
+
+    <!-- 계획 잠금 -->
+    <update id="lockPlan" parameterType="map">
+        UPDATE tripplans
+        SET is_being_edited = TRUE,
+            last_editor_id = #{userId},
+            editing_started_at = CURRENT_TIMESTAMP
+        WHERE id = #{planId}
+    </update>
+
+    <!-- 계획 잠금 해제 -->
+    <update id="unlockPlan" parameterType="map">
+        UPDATE tripplans
+        SET is_being_edited = FALSE,
+            last_editor_id = NULL,
+            editing_started_at = NULL
+        WHERE id = #{planId} AND last_editor_id = #{userId}
+    </update>
 </mapper>
