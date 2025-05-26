@@ -165,7 +165,7 @@ const generateTravelPlan = async () => {
     const budget = getOptionLabel('budget')
 
     // Spring 백엔드 API 요청
-    const response = await api.post('/ai/trip-plan', {
+    const response = await api.post('/api/v1/ai/trip-plan', {
       destination,
       duration,
       style,
