@@ -312,7 +312,7 @@ const uploadSingleFile = async (file) => {
     if (response.data.status === 'SUCCESS') {
       // 업로드된 이미지 목록에 추가
       const uploadedImage = {
-        url: `http://INTERNAL_IP_REDACTED:8080${response.data.fileUrl}`, // 서버 URL 추가
+        url: import.meta.env.VITE_BACKEND_URL + `${response.data.fileUrl}`, // 서버 URL 추가
         // url: `http://localhost:8080${response.data.fileUrl}`,
         name: response.data.originalName,
         size: response.data.size,

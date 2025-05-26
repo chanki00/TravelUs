@@ -2,7 +2,7 @@ import axios from 'axios'
 import { useUserStore } from '@/store/user'
 
 const userAi = axios.create({
-  baseURL: 'http://INTERNAL_IP_REDACTED:8080',
+  baseURL: import.meta.env.VITE_BACKEND_URL,
   // baseURL: 'http://localhost:8080',
 
   headers: {
@@ -46,7 +46,7 @@ userAi.interceptors.response.use(
         //   withCredentials: true,
         // })
 
-        const refreshRes = await axios.post('http://localhost:8080/api/auth/refresh', null, {
+        const refreshRes = await axios.post(import.meta.env.VITE_BACKEND_URL + '/api/auth/refresh', null, {
           headers: {
             refreshToken: userStore.tokens.refreshToken,
           },
