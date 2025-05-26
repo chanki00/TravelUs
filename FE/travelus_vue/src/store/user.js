@@ -81,13 +81,13 @@ export const useUserStore = defineStore(
         // ✅ 나이대 변환
         const convertAgeGroup = (age) => {
           switch (age) {
-            case '50s':
+            case '50대':
               return '50대 이상'
-            case '40s':
+            case '40대':
               return '40대'
-            case '30s':
+            case '30대':
               return '30대'
-            case '20s':
+            case '20대':
               return '20대'
             default:
               return '기타'
