@@ -43,6 +43,7 @@ const props = defineProps({
 const emit = defineEmits(['select', 'close'])
 
 function select(plan) {
+  console.log("초대아이디", props.inviteeId)
   emit('select', {
     plan,
     inviteeId: props.inviteeId,

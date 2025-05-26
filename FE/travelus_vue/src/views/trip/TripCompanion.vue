@@ -251,17 +251,19 @@
               <div class="flex gap-2">
                 <button
                   class="px-4 py-2 text-sm bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
-                  @click="openInviteModal"
+                  @click="openInviteModal(companion.id)"
                 >
                   초대하기
                 </button>
-                <InvitePlanModal
-                  :show="showInviteModal"
-                  :plans="myPlans"
-                  :invitee-id="companion"
-                  @select="inviteToPlan"
-                  @close="showInviteModal = false"
-                />
+                <!-- v-for 바깥에 단 하나의 모달 -->
+<InvitePlanModal
+  :show="showInviteModal"
+  :plans="myPlans"
+  :invitee-id="selectedInviteeId"
+  @select="inviteToPlan"
+  @close="showInviteModal = false"
+/>
+
               </div>
             </div>
           </div>
@@ -610,9 +612,12 @@ const calculateSimilarity = (user, target, type) => {
 
 // ---------------
 const showInviteModal = ref(false)
+const selectedInviteeId = ref(null)
+
 const myPlans = ref([])
-const openInviteModal = async () => {
+const openInviteModal = async (inviteeId) => {
   showInviteModal.value = true
+  selectedInviteeId.value = inviteeId
   const res = await api.get(`/api/v1/plan/user/${userStore.loginUser.id}`)
   myPlans.value = res.data
 }
@@ -620,12 +625,12 @@ const inviteToPlan = async (currPlan) => {
   try {
     console.log('계획', currPlan.plan.chatroomId)
     console.log('로그인', userStore.loginUser.id)
-    console.log('상대', currPlan.inviteeId.id)
+    console.log('상대', currPlan.inviteeId)
 
     await api.post('/api/v1/chat/invite', {
       chatroomId: currPlan.plan.chatroomId, // ✅ 어떤 채팅방인지
       inviterId: userStore.loginUser.id, // ✅ 보낸 사람
-      inviteeId: currPlan.inviteeId.id, // ✅ 받는 사람
+      inviteeId: currPlan.inviteeId, // ✅ 받는 사람
       type: 'INVITE',
     })
     alert('초대를 보냈습니다!')

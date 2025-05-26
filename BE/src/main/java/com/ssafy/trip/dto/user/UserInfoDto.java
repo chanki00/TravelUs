@@ -16,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @AllArgsConstructor
 public class UserInfoDto {
-	private Long id;
+	private int id;
 	private @NonNull String name;
 	private @NonNull String userEmail;
 	private String address;

@@ -81,7 +81,11 @@ public class ChatRestController {
     
     @PostMapping("/request")
     public ResponseEntity<Void> requestJoin(@RequestBody InviteRequest dto) {
-        chatService.requestToJoinChatroom(dto.getChatroomId(), dto.getInviterId());
+    	System.out.println("채팅방 ID: " + dto.getChatroomId());
+        System.out.println("inviterId: " + dto.getInviterId());
+        System.out.println("inviteeId: " + dto.getInviteeId());
+    	
+        chatService.requestToJoinChatroom(dto.getChatroomId(), dto.getInviterId(), dto.getInviteeId());
         return ResponseEntity.ok().build();
     }
     

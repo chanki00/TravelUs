@@ -16,7 +16,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @AllArgsConstructor
 public class UserDto {
-	private Long id;
+	private int id;
 	private @NonNull String userId;
 	private @NonNull String userPw;
 	private @NonNull String userEmail;

@@ -47,7 +47,7 @@ public class ChatService {
         invite.setInviteeId(inviteeId);
         invite.setStatus("PENDING");
         invite.setType("INVITE"); // ✅ 동행 초대
-        invite.setCreatedAt(LocalDateTime.now());
+       
 
         inviteRpeo.insertInvite(invite);
     }
@@ -87,14 +87,13 @@ public class ChatService {
 	}
 	
 	@Transactional
-	public void requestToJoinChatroom(int chatroomId, int requesterId) {
+	public void requestToJoinChatroom(int chatroomId, int requesterId, int inviteeId) {
 	    ChatInvite request = new ChatInvite();
 	    request.setChatroomId(chatroomId);
 	    request.setInviterId(requesterId); // 요청자 = inviter 역할
-	    request.setInviteeId(0);           // 요청 대상자가 명확히 없다면 0으로 처리
+	    request.setInviteeId(inviteeId);           // 요청 대상자가 명확히 없다면 0으로 처리
 	    request.setStatus("PENDING");
 	    request.setType("REQUEST");        // ✅ 요청 유형
-	    request.setCreatedAt(LocalDateTime.now());
 
 	    inviteRpeo.insertInvite(request);
 	}

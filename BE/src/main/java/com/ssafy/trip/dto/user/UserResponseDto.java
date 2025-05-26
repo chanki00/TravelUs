@@ -11,14 +11,14 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class UserResponseDto {
-    private Long id;
-    private String userId;
-    private String userEmail;
-    private String name;
-    private String age;
-    private Gender gender;
-    private String address;
-    private String intro;
-    private Role role;
-    private Boolean allowInvite;
+	private int id;
+	private String userId;
+	private String userEmail;
+	private String name;
+	private String age;
+	private Gender gender;
+	private String address;
+	private String intro;
+	private Role role;
+	private Boolean allowInvite;
 }

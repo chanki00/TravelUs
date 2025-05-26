@@ -452,7 +452,7 @@
         <div v-show="activeTab === 'invites'" class="p-6">
           <h2 class="text-lg font-medium mb-6">동행 요청 목록</h2>
 
-          <div v-if="invites.length === 0" class="text-center py-12">
+          <div v-if="allInvites.length === 0" class="text-center py-12">
             <p class="text-gray-500 mb-4">아직 받은 초대가 없습니다.</p>
             <button
               class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
@@ -463,7 +463,7 @@
 
           <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div
-              v-for="invite in invites"
+              v-for="invite in allInvites"
               :key="invite.id"
               class="border rounded-lg p-4 shadow-sm flex flex-col gap-2"
             >
@@ -708,6 +708,7 @@ onMounted(async () => {
   await fetchSidos()
   await fetchInvites()
   await fetchRequests()
+  console.log("초대", allInvites)
 })
 
 const sidos = ref([])
@@ -728,6 +729,10 @@ const getSidoName = (sidoCode) => {
 }
 
 // -------------------------
+const allInvites = computed(() => {
+  return [...invites.value, ...requests.value]
+})
+
 const invites = ref([])
 
 const fetchInvites = async () => {
@@ -763,6 +768,8 @@ const fetchRequests = async () => {
   try {
     const res = await api.get(`/api/v1/chat/request/${userStore.loginUser.id}`)
     requests.value = res.data
+    console.log("유저", userStore.loginUser.id)
+    console.log("요청", requests.value)
   } catch (err) {
     console.error('참가 요청 목록 불러오기 실패', err)
   }
