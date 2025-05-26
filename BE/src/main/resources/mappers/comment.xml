@@ -23,10 +23,10 @@
 		
 		</resultMap>
 	
-	<update id="updateComment">
-		Update Comments
-		SET content = #{content}, updated_at = NOW()
-		where id = #{commentId}
+	<update id="updateComment" parameterType="map" >
+	    UPDATE Comments
+	    SET content = #{content}, updated_at = NOW()
+	    WHERE id = #{commentId}
 	</update>
 		
 	<delete id="deleteComment">

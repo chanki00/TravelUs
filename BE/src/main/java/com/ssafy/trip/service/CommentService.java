@@ -24,8 +24,8 @@ public class CommentService {
 		return repo.createComment(req);
 	}
 
-	public Comment updateComment(int commentId, UpdateCommentDTO req) {
-		return repo.updateComment(commentId, req);
+	public int updateComment(int commentId, String string) {
+		return repo.updateComment(commentId, string);
 	}
 
 	public int deleteComment(int commentId) {

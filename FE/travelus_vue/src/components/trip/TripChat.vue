@@ -88,7 +88,9 @@ const fetchChatHistory = async () => {
 
 // 2. WebSocket 연결
 const connect = () => {
-  const socket = new SockJS('http://INTERNAL_IP_REDACTED:8080/ws')
+  // const socket = new SockJS('http://INTERNAL_IP_REDACTED:8080/ws')
+  const socket = new SockJS('http://localhost:8080/ws')
+
   stompClient = Stomp.over(socket)
 
   stompClient.connect({}, () => {

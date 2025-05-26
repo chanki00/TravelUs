@@ -206,12 +206,12 @@
                   <div class="flex items-start gap-3">
                     <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
                       <span class="text-gray-600 font-medium">
-                        {{ comment.userId ? comment.userId : 'U' }}
+                        {{ comment.authorId ? comment.authorId : 'U' }}
                       </span>
                     </div>
                     <div class="flex-1">
                       <div class="flex items-center gap-2 mb-2">
-                        <span class="font-medium text-gray-900">{{ comment.userName || '익명' }}</span>
+                        <span class="font-medium text-gray-900">{{ comment.authorName || '익명' }}</span>
                         <span class="text-sm text-gray-500">{{ formatDate(comment.createdAt) }}</span>
                         <span v-if="comment.createdAt !== comment.updatedAt" class="text-xs text-gray-400">
                           (수정됨)
@@ -412,8 +412,19 @@ const fetchComments = async () => {
   isCommentsLoading.value = true
   try {
     const response = await api.get(`/api/v1/comment/plan/${route.params.id}`)
-    comments.value = response.data || []
-    console.log('댓글 조회 성공:', comments.value)
+    const comment_res = response.data || []
+    const enrichedComment = await Promise.all(
+      comment_res.map(async (comment) => {
+        const userResponse = await api.get(`/api/v1/plan/user-info/${comment.userId}`)
+        return {
+          ...comment,
+          authorName: userResponse.data?.name || 'Unknown',
+          authorId: userResponse.data?.userId || 'unknown',
+        }
+      })
+    )
+
+    comments.value = enrichedComment
   } catch (error) {
     console.error('댓글 조회 실패:', error)
     comments.value = []
