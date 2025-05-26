@@ -72,7 +72,6 @@
               <option value="all">전체</option>
               <option value="M">남성</option>
               <option value="F">여성</option>
-              <option value="O">기타</option>
             </select>
           </div>
 
@@ -195,10 +194,11 @@
           <div class="p-6">
             <div class="flex items-center gap-4 mb-4">
               <img
-                :src="companion.profile"
+                :src="companion.profile || '/default_profile.png'"
                 :alt="companion.name"
                 class="w-16 h-16 rounded-full object-cover border-2 border-white shadow"
               />
+
               <div>
                 <h3 class="font-medium text-lg">{{ companion.name }}</h3>
                 <div class="flex items-center gap-1 text-sm text-gray-500">
@@ -368,7 +368,7 @@ const filteredCompanions = computed(() => {
   }
 
   let filtered = userStore.userList
-    .filter((user) => user.id !== currUser.value.id)
+    .filter((user) => user.id !== currUser.value.id && user.allowInvite)
     .map((user) => {
       const matchScore = calculateSimilarity(currUser.value, user, activeFilter.value)
       return {
@@ -455,16 +455,16 @@ watch(
   { deep: true },
 )
 
+
+
 const convertGender = (code) => {
   switch (code) {
     case 'M':
       return '남성'
     case 'F':
       return '여성'
-    case 'O':
-      return '기타'
     default:
-      return '알 수 없음'
+      return '기타'
   }
 }
 

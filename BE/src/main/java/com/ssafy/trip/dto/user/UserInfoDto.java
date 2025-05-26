@@ -23,4 +23,5 @@ public class UserInfoDto {
 	private String age;
 	private Gender gender;
 	private String intro;
+	private Boolean allowInvite;
 }

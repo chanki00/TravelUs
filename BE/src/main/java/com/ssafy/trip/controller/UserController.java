@@ -33,7 +33,7 @@ public class UserController {
 	
 	@GetMapping("/{id}")
 	@Operation(summary = "id 검색 사용자 조회")
-	public ResponseEntity<UserDto> selectUser(@PathVariable Long id) throws SQLException {
+	public ResponseEntity<UserDto> selectUser(@PathVariable int id) throws SQLException {
 		UserDto user = uService.selectUser(id);
 		
 //		Map<String, Object> map = new HashMap<>();
@@ -116,7 +116,7 @@ public class UserController {
 	
 	@DeleteMapping("/{id}")
 	@Operation(summary = "멤버 삭제")
-	public ResponseEntity<Map<String, Object>> deleteUser(@PathVariable Long id) throws SQLException {
+	public ResponseEntity<Map<String, Object>> deleteUser(@PathVariable int id) throws SQLException {
 		
 		int cnt = uService.deleteUser(id);
 		

@@ -30,7 +30,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public UserDto selectUser(Long id) throws SQLException {		
+	public UserDto selectUser(int id) throws SQLException {		
 		return repo.selectUser(id);
 	}
 
@@ -58,7 +58,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public int deleteUser(Long id) throws SQLException {
+	public int deleteUser(int id) throws SQLException {
 		
 		int cnt = repo.deleteUser(id);
 		
