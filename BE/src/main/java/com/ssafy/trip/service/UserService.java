@@ -9,10 +9,10 @@ import com.DB_PASSWORD_REDACTED.trip.dto.user.UserPwDto;
 
 public interface UserService {
 	public int insertUser(UserDto user) throws SQLException;
-	public UserDto selectUser(Long id) throws SQLException;
+	public UserDto selectUser(int id) throws SQLException;
 	public List<UserDto> selectAllUser() throws SQLException;
 	public int updateInfo(UserInfoDto dto) throws SQLException;
 	public int updatePw(UserPwDto dto) throws SQLException;
-	public int deleteUser(Long id) throws SQLException;
+	public int deleteUser(int id) throws SQLException;
 	public UserDto getUserById(int userId);
 }

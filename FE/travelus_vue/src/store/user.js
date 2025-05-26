@@ -57,29 +57,75 @@ export const useUserStore = defineStore(
     }
 
     const getUserList = async () => {
-      try {
-        const list = await userAi.get('/api/v1/user')
+  try {
+    const list = await userAi.get('/api/v1/user')
+    const users = list.data
 
-        const users = list.data
+    const updatedUsers = await Promise.all(
+      users.map(async (user) => {
+        const personality = await getUserTags(user.id, 'personal')
+        const preference = await getUserTags(user.id, 'trip')
 
-        const updatedUsers = await Promise.all(
-          users.map(async (user) => {
-            const personality = await getUserTags(user.id, 'personal')
-            const preference = await getUserTags(user.id, 'trip')
+        // ✅ 성별 변환
+        const convertGender = (code) => {
+          switch (code) {
+            case 'M':
+              return '남성'
+            case 'F':
+              return '여성'
+            default:
+              return '기타'
+          }
+        }
 
-            return {
-              ...user,
-              personality,
-              preference,
-            }
-          }),
-        )
+        // ✅ 나이대 변환
+        const convertAgeGroup = (age) => {
+          switch (age) {
+            case '50대':
+              return '50대 이상'
+            case '40대':
+              return '40대'
+            case '30대':
+              return '30대'
+            case '20대':
+              return '20대'
+            default:
+              return '기타'
+          }
+        }
 
-        _userList.value = updatedUsers
-      } catch (e) {
-        console.log('사용자 조회 실패')
-      }
-    }
+
+        // ✅ 주소 변환
+        const convertAddress = (addr) => {
+          switch (addr) {
+            case '서울':
+            case '부산':
+            case '인천':
+            case '대구':
+              return addr
+            default:
+              return '기타'
+          }
+        }
+
+
+        return {
+          ...user,
+          personality,
+          preference,
+          gender: convertGender(user.gender),
+          age: convertAgeGroup(user.age),
+          address: convertAddress(user.address),
+        }
+      }),
+    )
+
+    _userList.value = updatedUsers
+  } catch (e) {
+    console.log('사용자 조회 실패')
+  }
+}
+
 
     const getUserTags = async (userId, type) => {
       try {
