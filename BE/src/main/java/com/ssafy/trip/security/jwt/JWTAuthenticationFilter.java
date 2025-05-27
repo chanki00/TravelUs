@@ -75,6 +75,12 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 				24 * 60 * 60 * 1000L);
 
 		repo.saveToken(new RefreshToken(user.getUserId(), refreshToken));
+		
+		Cookie accessCookie = new Cookie("Authorization", accessToken);
+	    accessCookie.setHttpOnly(true);
+	    accessCookie.setPath("/");
+	    accessCookie.setMaxAge(60 * 60);
+	    response.addCookie(accessCookie);
 
 		Map<String, Object> tokenMap = Map.of("accessToken", accessToken, "refreshToken", refreshToken, "user", user);
 		String json = new ObjectMapper().writeValueAsString(tokenMap);

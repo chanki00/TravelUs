@@ -59,7 +59,6 @@ export const useUserStore = defineStore(
     const logout = async () => {
       try {
         const refreshToken = _tokens.value.refreshToken;
-        console.log(_tokens.value)
         await userAi.post('/api/auth/logout', {}, {
           headers: {
             'refreshtoken': refreshToken
