@@ -2,6 +2,7 @@ import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 import { userAi } from '@/axios'
 import { jwtDecode } from 'jwt-decode'
+import Cookies from 'js-cookie'
 
 export const useUserStore = defineStore(
   'user',
@@ -55,10 +56,29 @@ export const useUserStore = defineStore(
     };
 
 
-    const logout = () => {
-      _isLoggedIn.value = false
-      _loginUser.value = {}
-      _tokens.value = {}
+    const logout = async () => {
+      try {
+        const refreshToken = _tokens.value.refreshToken;
+        console.log(_tokens.value)
+        await userAi.post('/api/auth/logout', {}, {
+          headers: {
+            'refreshtoken': refreshToken
+          },
+          withCredentials: true
+        });
+
+        // 프론트 상태 정리
+        _isLoggedIn.value = false;
+        _loginUser.value = {};
+        _tokens.value = {};
+
+        // (HttpOnly가 아니라면) accessToken 수동 삭제
+        Cookies.remove('Authorization', { path: '/' });
+
+        console.log('로그아웃 완료');
+      } catch (e) {
+        console.error('로그아웃 실패:', e);
+      }
     }
 
     const update = (editUser) => {

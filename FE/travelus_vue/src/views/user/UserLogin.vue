@@ -128,8 +128,9 @@ const login = async () => {
 }
 
 const loginWithNaver = () => {
-  window.location.href = 'http://localhost:8080/oauth2/authorization/naver'
-  
+  // window.location.href = 'http://localhost:8080/oauth2/authorization/naver'
+  window.location.href = import.meta.env.VITE_BACKEND_URL + '/oauth2/authorization/naver'
+
 }
 </script>
 

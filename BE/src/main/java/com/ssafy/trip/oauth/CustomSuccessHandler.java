@@ -2,6 +2,7 @@ package com.DB_PASSWORD_REDACTED.trip.oauth;
 
 import java.io.IOException;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -21,6 +22,9 @@ import lombok.RequiredArgsConstructor;
 public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 	
 	private final JWTUtil jwtUtil;
+	
+    @Value("${app.oauth2.front-uri}")
+    private String frontUri;
 
 	@Override
 	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -36,7 +40,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 		cookie.setMaxAge(60*60);
 		
 		response.addCookie(cookie);
-		response.sendRedirect("http://localhost:5173/");
+		response.sendRedirect(frontUri);
 	}
 	
 	
