@@ -41,7 +41,8 @@
       current_members AS currentMembers,
       personalityTags AS personalityTags,
       created_at AS createdAt,
-      updated_at AS updatedAt
+      updated_at AS updatedAt,
+      chatroom_id AS chatroomId
     FROM Posts
     ORDER BY created_at DESC
   </select>

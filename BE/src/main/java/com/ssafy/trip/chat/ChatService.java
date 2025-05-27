@@ -108,4 +108,8 @@ public class ChatService {
 	public List<Integer> getuserIdByChatroomId(int chatroomId) {
 		return repo.getuserIdByChatroomId(chatroomId);
 	}
+
+	public int getCountByChatroomId(int chatroomId) {
+		return repo.getCountByChatroomId(chatroomId);
+	}
 }

@@ -90,7 +90,7 @@
               </div>
 
               <div class="flex items-center justify-between text-xs text-gray-500">
-                <span>{{ plan.created ? formatDate(plan.created) : '날짜 정보 없음' }}</span>
+                <span>{{ plan.createdAt ? formatDate(plan.createdAt) : '날짜 정보 없음' }}</span>
                 <span>{{ plan.duration }}일 일정</span>
               </div>
             </div>
@@ -284,18 +284,27 @@ const recruitForm = ref({
 
 // 성격 태그 목록
 const personalityTags = [
-  '활발한',
-  '조용한',
-  '계획적인',
-  '즉흥적인',
-  '사교적인',
-  '내향적인',
-  '모험적인',
-  '안전한',
-  '유머러스한',
-  '진지한',
-  '친화적인',
-  '독립적인',
+ '외향적',
+'내향적',
+'계획적인',
+'즉흥적인',
+'느긋한',
+'활동적인',
+'꼼꼼한',
+'유쾌한',
+'조용한',
+'적응력 좋은',
+'사진 좋아함',
+'리더형',
+'서포터형',
+'아침형 인간',
+'저녁형 인간',
+'감성적인',
+'실용적인',
+'호기심 많은',
+'대화 좋아함',
+'긍정적인',
+'차분한',
 ]
 
 // 시도 목록 가져오기
@@ -360,7 +369,7 @@ const selectPlan = (plan) => {
     location: plan.destination,
     startDate: '',
     endDate: '',
-    maxMembers: 4,
+    maxMembers: plan.members,
     personalityTags: [], // 성격 태그는 초기화
     content: '',
   }

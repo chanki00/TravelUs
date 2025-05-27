@@ -33,4 +33,6 @@ public interface ChatRepository {
 	List<Integer> getChatroomIdByuserId(int userId);
 
 	List<Integer> getuserIdByChatroomId(int chatroomId);
+
+	int getCountByChatroomId(int chatroomId);
 }

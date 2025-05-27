@@ -294,7 +294,7 @@
             <div class="text-gray-500">{{ formatDateRange(post.startDate, post.endDate) }}</div>
             <div class="flex items-center">
               <users-icon class="h-3 w-3 mr-1" />
-              <span> {{ post.currentMembers }}/{{ post.max_members }}명 </span>
+              <span> {{ post.chatroon_user }}/{{ post.currentMembers }}명 </span>
             </div>
           </div>
           <p class="text-sm text-gray-500 line-clamp-2">{{ post.content }}</p>
@@ -577,6 +577,7 @@ const fetchRecruitPosts = async () => {
 
     posts = await Promise.all(
       posts.map(async (post) => {
+        if (!post) return null
         try {
           // 성격 태그 파싱
           let personalityTags = []
@@ -589,6 +590,8 @@ const fetchRecruitPosts = async () => {
             }
           }
           const authorRes = await api.get(`/api/v1/plan/user-info/${post.userId}`)
+
+          const chatroonUserRes = await api.get(`/api/v1/chat/usercount/${post.chatroomId}`)
           // 여행 계획이 있는 경우에만 조회
           if (post.planId) {
             const planRes = await api.get(`/api/v1/plan/${post.planId}`)
@@ -600,6 +603,7 @@ const fetchRecruitPosts = async () => {
               personalityTags: personalityTags,
               authorName: authorRes.data?.name || 'Unknown',
               authorUserId: authorRes.data?.userId || 'unknown',
+              chatroon_user : chatroonUserRes.data || 0,
             }
           }
 

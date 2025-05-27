@@ -114,10 +114,10 @@
           <div class="flex items-center gap-1">
             <users-icon class="h-4 w-4" />
             <span>
-              {{ post.currentMembers }}/{{ post.max_members }}명
+              {{ post.chatroon_user }}/{{ post.currentMembers }}명
               {{
-                post.currentMembers < post.max_members
-                  ? ` (${post.max_members - post.currentMembers}명 더 모집 중)`
+                post.chatroon_user < post.currentMembers
+                  ? ` (${post.currentMembers - post.chatroon_user}명 더 모집 중)`
                   : ' (모집 완료)'
               }}
             </span>
