@@ -63,6 +63,13 @@ public class ChatRestController {
         return ResponseEntity.ok().build();
     }
     
+    @PatchMapping("/join/{inviteId}")
+    public ResponseEntity<Void> respondToJoin(@PathVariable int inviteId, @RequestParam String response) {
+    	chatService.respondToJoin(inviteId, response);
+        return ResponseEntity.ok().build();
+    }
+    
+    
  // ChatRestController.java
     @GetMapping("/rooms/{userId}")
     public ResponseEntity<List<Integer>> getChatroomIds(@PathVariable int userId) {

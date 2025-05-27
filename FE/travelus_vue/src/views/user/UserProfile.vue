@@ -500,7 +500,7 @@
                   수락됨
                 </span>
                 <span
-                  v-else-if="invite.status === 'DECLINED'"
+                  v-else-if="invite.status === 'REJECTED'"
                   class="text-red-500 text-sm font-semibold"
                 >
                   거절됨
@@ -510,17 +510,18 @@
               <div v-if="invite.status === 'PENDING'" class="flex gap-2 mt-2">
                 <button
                   class="flex-1 bg-blue-600 text-white text-sm py-1 rounded hover:bg-blue-700"
-                  @click="respondToInvite(invite.id, 'ACCEPTED')"
+                  @click="invite.type === 'INVITE' ? respondToInvite(invite.id, 'ACCEPTED') : respondToJoin(invite.id, 'ACCEPTED')"
                 >
                   수락
                 </button>
                 <button
                   class="flex-1 bg-gray-200 text-gray-800 text-sm py-1 rounded hover:bg-gray-300"
-                  @click="respondToInvite(invite.id, 'DECLINED')"
+                  @click="invite.type === 'INVITE' ? respondToInvite(invite.id, 'DECLINED') : respondToJoin(invite.id, 'DECLINED')"
                 >
                   거절
                 </button>
               </div>
+
             </div>
           </div>
         </div>
@@ -764,6 +765,25 @@ const respondToInvite = async (inviteId, response) => {
     alert('초대 응답에 실패했습니다.')
   }
 }
+
+const respondToJoin = async (inviteId, response) => {
+  try {
+    console.log('참여임', inviteId)
+    await api.patch(`/api/v1/chat/join/${inviteId}`, null, {
+      params: { response }, // ✅ GET param으로 response 전송
+    })
+
+    // 프론트 상태 업데이트
+    invites.value = invites.value.map((inv) =>
+      inv.id === inviteId ? { ...inv, status: response } : inv,
+    )
+  } catch (err) {
+    console.error('초대 응답 실패', err)
+    alert('초대 응답에 실패했습니다.')
+  }
+}
+
+
 
 const requests = ref([])
 

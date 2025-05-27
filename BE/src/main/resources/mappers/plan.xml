@@ -47,7 +47,7 @@
 	
 	<update id="updateShare" parameterType="int">
 		UPDATE TripPlans
-		SET shares = shares+1
+		SET shares = shares+1, is_shared = 1
 		where id = #{planId};
 	</update>
 	

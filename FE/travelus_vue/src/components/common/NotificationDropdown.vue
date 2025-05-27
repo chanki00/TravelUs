@@ -53,7 +53,7 @@
             </div>
             <div class="flex gap-2 mt-2">
               <button
-                @click="respondToInvite(invite.id, 'ACCEPTED')"
+                @click="respondToInvite(invite.id, 'ACCEPTED') "
                 class="px-3 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600"
               >
                 수락
@@ -89,13 +89,13 @@
             </div>
             <div class="flex gap-2 mt-2">
               <button
-                @click="respondToInvite(request.id, 'ACCEPTED')"
+                @click="respondToJoin(request.id, 'ACCEPTED')"
                 class="px-3 py-1 bg-green-500 text-white text-xs rounded hover:bg-green-600"
               >
                 수락
               </button>
               <button
-                @click="respondToInvite(request.id, 'REJECTED')"
+                @click="respondToJoin(request.id, 'REJECTED')"
                 class="px-3 py-1 bg-gray-300 text-gray-700 text-xs rounded hover:bg-gray-400"
               >
                 거절
@@ -189,6 +189,24 @@ const respondToInvite = async (inviteId, response) => {
     alert('처리 중 오류가 발생했습니다.')
   }
 }
+
+
+const respondToJoin = async (inviteId, response) => {
+  try {
+    await userAi.patch(`/api/v1/chat/join/${inviteId}?response=${response}`)
+    await fetchNotifications() // 알림 새로고침
+
+    if (response === 'ACCEPTED') {
+      alert('수락했습니다!')
+    } else {
+      alert('거절했습니다.')
+    }
+  } catch (error) {
+    console.error('응답 처리 실패:', error)
+    alert('처리 중 오류가 발생했습니다.')
+  }
+}
+
 
 const formatDate = (dateString) => {
   const date = new Date(dateString)
