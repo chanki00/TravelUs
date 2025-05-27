@@ -2,15 +2,11 @@
   <header class="bg-base-100 shadow-sm">
     <div class="flex items-center justify-between h-16 px-10">
       <RouterLink to="/" class="flex items-center gap-2">
-        <div
-          class="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center"
-        > 
-        <div
-          class="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center"
-        >
-          <span class="text-white font-bold text-sm">T</span>
-        </div>
-        </div>
+        <div class="w-8 h-8 flex items-center justify-center">
+  <img src="/Travelus.png" class="w-full h-full object-contain" />
+</div>
+
+
         <span class="font-bold text-xl text-blue-600">Travelus</span>
        
       </RouterLink>
