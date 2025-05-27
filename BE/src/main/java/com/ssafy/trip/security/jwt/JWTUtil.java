@@ -33,63 +33,43 @@ public class JWTUtil {
 
     @Value("${DB_PASSWORD_REDACTED.jwt.refresh-expmin}")
     private long refreshExpMin;
-
-    public String createAccessToken(Map<String, Object> claims) {
-        return createToken("accessToken", accessExpMin, claims);
+    
+    public String createJwt(String category, String username, String role, Long expiredMs) {
+    	return Jwts.builder()
+    			.claim("category", category)
+    			.claim("username", username)
+    			.claim("role", role)
+    			.issuedAt(new Date())
+    			.expiration(new Date(System.currentTimeMillis() + expiredMs))
+    			.signWith(secretKey)
+    			.compact();
     }
-
-    public String createRefreshToken(Map<String, Object> claims) {
-        return createToken("refreshToken", refreshExpMin, claims);
-    }
-
-    private String createToken(String subject, long expireMinutes, Map<String, Object> claims) {
-        long nowMillis = System.currentTimeMillis();
-        long expMillis = nowMillis + expireMinutes * 60 * 1000;
-
-        return Jwts.builder()
-                .subject(subject)
-                .issuedAt(new Date(nowMillis))
-                .expiration(new Date(expMillis))
-                .claims(claims)
-                .signWith(secretKey, SignatureAlgorithm.HS256)
-                .compact();
-    }
-
-    public Claims getClaims(String token) {
-        try {
-            return Jwts.parser()
-                    .verifyWith(secretKey)
-                    .build()
-                    .parseSignedClaims(token)
-                    .getPayload();
-        } catch (ExpiredJwtException e) {
-            log.warn("만료된 토큰. claims 추출만 진행합니다.");
-            return e.getClaims(); // payload는 추출 가능
-        } catch (JwtException e) {
-            log.error("JWT 파싱 오류", e);
-            throw e; // 다른 오류는 그대로 던짐
-        }
-    }
-
+    
+    
     public boolean isExpired(String token) {
         try {
-            Date exp = getClaims(token).getExpiration();
-            return exp.before(new Date());
+            Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token);
+            return false;
         } catch (ExpiredJwtException e) {
+            return true;
+        } catch (JwtException e) {
             return true;
         }
     }
 
-    public String getTokenSubject(String token) {
-        try {
-            return Jwts.parser()
-                    .verifyWith(secretKey)
-                    .build()
-                    .parseSignedClaims(token)
-                    .getPayload()
-                    .getSubject();
-        } catch (ExpiredJwtException e) {
-            return e.getClaims().getSubject(); // 만료된 경우에도 subject는 추출 가능
-        }
+    public String getUsername(String token) {
+        return getClaims(token).get("username", String.class);
+    }
+
+    public String getRole(String token) {
+        return getClaims(token).get("role", String.class);
+    }
+
+    public String getCategory(String token) {
+        return getClaims(token).get("category", String.class);
+    }
+
+    public Claims getClaims(String token) {
+        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload();
     }
 }

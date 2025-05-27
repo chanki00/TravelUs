@@ -15,7 +15,6 @@ const userAi = axios.create({
 userAi.interceptors.request.use(async (config) => {
   const userStore = useUserStore()
   console.log('요청 발신: ', config.method, config.url, config.data)
-  console.log('토큰있니', userStore.tokens.accessToken)
 
   if (userStore.tokens?.accessToken) {
     config.headers['accessToken'] = `Bearer ${userStore.tokens.accessToken}`
@@ -39,19 +38,16 @@ userAi.interceptors.response.use(
       originalRequest._retry = true
 
       try {
-        // const refreshRes = await axios.post('http://INTERNAL_IP_REDACTED:8080/api/auth/refresh', null, {
-        //   headers: {
-        //     refreshToken: userStore.tokens.refreshToken,
-        //   },
-        //   withCredentials: true,
-        // })
-
-        const refreshRes = await axios.post(import.meta.env.VITE_BACKEND_URL + '/api/auth/refresh', null, {
-          headers: {
-            refreshToken: userStore.tokens.refreshToken,
+        const refreshRes = await axios.post(
+          import.meta.env.VITE_BACKEND_URL + '/api/auth/refresh',
+          null,
+          {
+            headers: {
+              refreshToken: userStore.tokens.refreshToken,
+            },
+            withCredentials: true,
           },
-          withCredentials: true,
-        })
+        )
 
         const newAccessToken = refreshRes.data.accessToken
         console.log('재발급된 accessToken:', newAccessToken)
