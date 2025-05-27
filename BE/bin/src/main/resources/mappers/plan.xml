@@ -5,8 +5,8 @@
 
 <mapper namespace="com.DB_PASSWORD_REDACTED.trip.repository.PlanRepository">
 	<insert id="insert" parameterType="Tripplan" useGeneratedKeys="true" keyProperty="id">
-		INSERT INTO tripplans (destination, duration, members, transport, user_id, title, description, image )
-		VALUES (#{destination}, #{duration}, #{members}, #{transport}, #{userId}, #{title}, #{description}, #{image})
+		INSERT INTO tripplans (destination, duration, members, transport, user_id, title, description, image, chatroom_id )
+		VALUES (#{destination}, #{duration}, #{members}, #{transport}, #{userId}, #{title}, #{description}, #{image}, #{chatroomId})
 	</insert>
 	
 	<insert id="insertDay">
@@ -24,7 +24,16 @@
 	</select>
 	
 	<select id="getTripplanByUserId" parameterType="int" resultMap="TripplanResultMap">
-	  SELECT * FROM TripPlans WHERE user_id = #{userId} and is_shared = false
+	  SELECT * FROM TripPlans WHERE user_id = #{userId}
+	</select>
+	
+	
+	<select id="getTripplanByChatroomId" parameterType="int" resultMap="TripplanResultMap">
+		SELECT * FROM TripPlans WHERE chatroom_id = #{chatroomId}
+	</select>
+	
+	<select id="getAllTripplan" resultMap="TripplanResultMap">
+	  SELECT * FROM TripPlans
 	</select>
 	
 	<select id="getPlanDaysId" parameterType="int">
@@ -38,9 +47,27 @@
 	
 	<update id="updateShare" parameterType="int">
 		UPDATE TripPlans
-		SET is_shared = TRUE
+		SET shares = shares+1
 		where id = #{planId};
 	</update>
+	
+	<!-- 여행 계획 삭제 (CASCADE로 관련 데이터 자동 삭제) -->
+	<delete id="deleteTripPlan" parameterType="map">
+		DELETE FROM TripPlans
+		WHERE id = #{planId} AND user_id = #{userId}
+	</delete>
+
+	<delete id="deleteTripplanAdmin" parameterType="int">
+		DELETE FROM TripPlans
+		WHERE id = #{planId}
+	</delete>
+	
+	<!-- 여행 계획 존재 여부 및 소유자 확인 -->
+	<select id="checkPlanOwnership" parameterType="map" resultType="int">
+		SELECT COUNT(*)
+		FROM TripPlans
+		WHERE id = #{planId} AND user_id = #{userId}
+	</select>
 	
 	<resultMap id="TripplanResultMap" type="com.DB_PASSWORD_REDACTED.trip.dto.Tripplan">
 		<id property="id" column="id" />
@@ -57,6 +84,7 @@
 	    <result property="duration" column="duration"/>
 	    <result property="members" column="members"/>
 	    <result property="transport" column="transport"/>
+	    <result property="chatroomId" column="chatroom_id"/>
 	  </resultMap>
 
 
@@ -114,5 +142,75 @@
   ORDER BY d.day_number, p.place_order
 </select>
 
+<update id="updatePlan" parameterType="com.DB_PASSWORD_REDACTED.trip.dto.Tripplan">
+		UPDATE tripplans 
+		SET destination = #{destination},
+		    duration = #{duration},
+		    members = #{members},
+		    transport = #{transport},
+		    title = #{title},
+		    description = #{description},
+		    image = #{image},
+		    chatroom_id = #{chatroomId},
+		    updated_at = CURRENT_TIMESTAMP
+		WHERE id = #{id}
+	</update>
+	<!-- 특정 계획의 모든 일정 삭제 쿼리 추가 -->
+	<delete id="deleteAllItinerary" parameterType="int">
+		DELETE tpp FROM tripplanplaces tpp
+		INNER JOIN tripplandays tpd ON tpp.day_id = tpd.id
+		WHERE tpd.plan_id = #{planId}
+	</delete>
+	
+	<!-- 현재 버전 조회 -->
+    <select id="getCurrentVersion" parameterType="int" resultType="int">
+        SELECT version FROM tripplans WHERE id = #{planId}
+    </select>
 
+    <!-- 버전과 함께 계획 업데이트 -->
+    <update id="updatePlanWithVersion" parameterType="com.DB_PASSWORD_REDACTED.trip.dto.Tripplan">
+        UPDATE tripplans
+        SET destination = #{destination},
+            duration = #{duration},
+            members = #{members},
+            transport = #{transport},
+            title = #{title},
+            description = #{description},
+            image = #{image},
+            chatroom_id = #{chatroomId},
+            version = #{version},
+            last_editor_id = #{userId},
+            updated_at = CURRENT_TIMESTAMP
+        WHERE id = #{id} AND version = #{version} - 1
+    </update>
+
+    <!-- 계획 잠금 확인 -->
+    <select id="checkPlanLock" parameterType="map" resultType="boolean">
+        SELECT CASE
+            WHEN is_being_edited = FALSE OR last_editor_id = #{userId} OR
+                 editing_started_at &lt; DATE_SUB(NOW(), INTERVAL 5 MINUTE)
+            THEN TRUE
+            ELSE FALSE
+        END
+        FROM tripplans
+        WHERE id = #{planId}
+    </select>
+
+    <!-- 계획 잠금 -->
+    <update id="lockPlan" parameterType="map">
+        UPDATE tripplans
+        SET is_being_edited = TRUE,
+            last_editor_id = #{userId},
+            editing_started_at = CURRENT_TIMESTAMP
+        WHERE id = #{planId}
+    </update>
+
+    <!-- 계획 잠금 해제 -->
+    <update id="unlockPlan" parameterType="map">
+        UPDATE tripplans
+        SET is_being_edited = FALSE,
+            last_editor_id = NULL,
+            editing_started_at = NULL
+        WHERE id = #{planId} AND last_editor_id = #{userId}
+    </update>
 </mapper>

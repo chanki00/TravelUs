@@ -85,6 +85,23 @@
     AND ci.type = 'REQUEST'
 </select>
 
-
+<select id="getSentRequestsByUserId" parameterType="int" resultType="com.DB_PASSWORD_REDACTED.trip.chat.ChatNotificationResponse">
+        SELECT 
+    ci.id,
+    ci.chatroom_id as chatroomId,
+    ci.inviter_id as inviterId,
+    u.name,
+    ci.invitee_id as inviteeId,
+    ci.status,
+    ci.type,
+    ci.created_at as createdAt,
+    tp.title as tripPlanTitle
+FROM chat_invite ci
+JOIN tripplans tp ON ci.chatroom_id = tp.chatroom_id
+JOIN users u ON tp.user_id = u.id
+WHERE ci.inviter_id = #{userId}
+AND ci.type = 'REQUEST'
+ORDER BY ci.created_at DESC;
+    </select>
 
 </mapper>

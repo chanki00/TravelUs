@@ -2,7 +2,10 @@
 package com.DB_PASSWORD_REDACTED.trip.chat;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -100,5 +103,26 @@ public class ChatRestController {
     public ResponseEntity<?> getCountByChatroomId(@PathVariable int chatroomId){
     	int count = chatService.getCountByChatroomId(chatroomId);
     	return ResponseEntity.ok(count);
+    }
+    
+    @GetMapping("/notifications/{userId}")
+    public ResponseEntity<Map<String, Object>> getAllNotifications(@PathVariable int userId) {
+        Map<String, Object> notifications = new HashMap<>();
+
+        // 받은 초대 (내가 초대받은 것)
+        List<ChatInviteResponse> receivedInvites = chatService.getPendingInvites(userId);
+
+        // 받은 참여 요청 (내 여행계획에 참여하고 싶다는 요청)
+        List<ChatInviteResponse> receivedRequests = chatService.getJoinRequests(userId);
+
+        // 내가 보낸 요청들의 상태
+        List<ChatNotificationResponse> sentRequests = chatService.getSentRequests(userId);
+
+        notifications.put("receivedInvites", receivedInvites);
+        notifications.put("receivedRequests", receivedRequests);
+        notifications.put("sentRequests", sentRequests);
+        notifications.put("totalCount", receivedInvites.size() + receivedRequests.size());
+
+        return ResponseEntity.ok(notifications);
     }
 }

@@ -12,4 +12,5 @@ public interface ChatInviteRepository {
     void updateInviteStatus(@Param("id") int id, @Param("status") String status);
     ChatInvite findById(int id);
     List<ChatInviteResponse> getRequestsByUserId(int userId);
+	List<ChatNotificationResponse> getSentRequestsByUserId(int userId);
 }

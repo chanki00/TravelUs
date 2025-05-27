@@ -112,4 +112,8 @@ public class ChatService {
 	public int getCountByChatroomId(int chatroomId) {
 		return repo.getCountByChatroomId(chatroomId);
 	}
+
+	public List<ChatNotificationResponse> getSentRequests(int userId) {
+        return inviteRpeo.getSentRequestsByUserId(userId);
+    }
 }
