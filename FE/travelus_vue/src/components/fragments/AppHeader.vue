@@ -4,13 +4,15 @@
       <RouterLink to="/" class="flex items-center gap-2">
         <div
           class="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center"
-        >
+        > 
         <div
           class="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center"
         >
           <span class="text-white font-bold text-sm">T</span>
         </div>
+        </div>
         <span class="font-bold text-xl text-blue-600">Travelus</span>
+       
       </RouterLink>
 
       <nav class="hidden md:flex gap-4">
@@ -48,7 +50,7 @@ import { RouterLink } from 'vue-router'
 import { useUserStore } from '@/store/user'
 import { useRouter } from 'vue-router'
 import NotificationDropdown from '@/components/common/NotificationDropdown.vue'
-
+import {onMounted} from 'vue'
 const userStore = useUserStore()
 const router = useRouter()
 
