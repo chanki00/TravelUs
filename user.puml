@@ -1,0 +1,113 @@
+@startuml
+
+skinparam classAttributeIconSize 0
+
+class UserController {
+  + selectUser(id) : ResponseEntity<UserDto>
+  + selectAllUser() : ResponseEntity<List<UserDto>>
+  + insertUser(user) : ResponseEntity<Map<String, Object>>
+  + updateInfo(id, user) : ResponseEntity<Map<String, Object>>
+  + updatePw(id, user) : ResponseEntity<Map<String, Object>>
+  + deleteUser(id) : ResponseEntity<Map<String, Object>>
+  + getCurrentUser(userDetails) : ResponseEntity<UserResponseDto>
+}
+
+interface UserService {
+  + insertUser(user) : int
+  + selectUser(id) : UserDto
+  + selectAllUser() : List<UserDto>
+  + updateInfo(dto) : int
+  + updatePw(dto) : int
+  + deleteUser(id) : int
+  + getUserById(userId) : UserDto
+}
+
+class LoginDto {
+  - userId : String
+  - userPw : String
+}
+
+class UserDto {
+  - id : int
+  - intro : String
+  - role : Role
+  - allowInvite : Boolean
+  - createdAt : LocalDateTime
+}
+
+class UserInfoDto {
+  - id : int
+  - address : String
+  - age : String
+  - gender : Gender
+  - intro : String
+  - allowInvite : Boolean
+}
+
+class UserServiceImpl {
+  + insertUser(user) : int
+  + selectUser(id) : UserDto
+  + selectAllUser() : List<UserDto>
+  + updateInfo(dto) : int
+  + updatePw(dto) : int
+  + deleteUser(id) : int
+  + getUserById(userId) : UserDto
+}
+
+interface UserRepository {
+  + insertUser(user) : int
+  + selectUser(id) : UserDto
+  + selectUserByUserid(userId) : UserDto
+  + selectAllUser() : List<UserDto>
+  + updateInfo(dto) : int
+  + updatePw(dto) : int
+  + deleteUser(id) : int
+  + getUserById(userId) : UserDto
+}
+
+class CustomUserDetailsService {
+  + loadUserByUsername(username) : UserDetails
+}
+
+class CustomOAuth2UserService {
+  + loadUser(userRequest) : OAuth2User
+}
+
+class UserResponseDto {
+  - id : int
+  - userId : String
+  - userEmail : String
+  - name : String
+  - age : String
+  - gender : Gender
+  - address : String
+  - intro : String
+  - role : Role
+  - allowInvite : Boolean
+}
+
+class UserPwDto {
+  - id : Long
+}
+
+CustomOAuth2UserService --> UserDto : uses
+CustomOAuth2UserService --> UserRepository : uses
+CustomUserDetailsService --> UserDto : uses
+CustomUserDetailsService --> UserRepository : uses
+UserController --> UserDto : uses
+UserController --> UserInfoDto : uses
+UserController --> UserPwDto : uses
+UserController --> UserResponseDto : uses
+UserController --> UserService : uses
+UserRepository --> UserDto : uses
+UserRepository --> UserInfoDto : uses
+UserRepository --> UserPwDto : uses
+UserService --> UserDto : uses
+UserService --> UserInfoDto : uses
+UserService --> UserPwDto : uses
+UserServiceImpl --> UserDto : uses
+UserServiceImpl --> UserInfoDto : uses
+UserServiceImpl --> UserPwDto : uses
+UserServiceImpl --> UserRepository : uses
+UserServiceImpl --> UserService : uses
+@enduml

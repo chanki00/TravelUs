@@ -1,0 +1,140 @@
+@startuml
+
+skinparam classAttributeIconSize 0
+
+class ItineraryPlaceResponseDto {
+  - dayId : int
+  - dayNumber : int
+  - attractionId : int
+  - placeOrder : int
+  - memo : String
+  - no : int
+  - contentId : int
+  - title : String
+  - contentTypeId : int
+  - areaCode : int
+  - sigunguCode : int
+  - image : String
+  - mapLevel : int
+  - latitude : double
+  - longitude : double
+  - tel : String
+  - addr : String
+  - homepage : String
+  - overview : String
+}
+
+class TripServiceImpl {
+  + getSidoList() : List<Sido>
+  + getAttractionBysidoCode(sidoCode) : List<Attraction>
+}
+
+interface TripRepository {
+}
+
+class RestTripController {
+  + getSidos() : ResponseEntity<List<Sido>>
+  + getAttractionBysidoCode(sidoCode) : ResponseEntity<List<Attraction>>
+}
+
+class RestPlanController {
+  + createPlan(dto) : ResponseEntity<?>
+  + updatePlan(planId, dto) : ResponseEntity<?>
+  + deleteAllItinerary(planId) : ResponseEntity<?>
+  + getTripplan(planId) : ResponseEntity<Tripplan>
+  + getAllTripplan() : ResponseEntity<List<Tripplan>>
+  + getItineraryByplanId(planId) : ResponseEntity<List<ItineraryPlaceResponseDto>>
+  + getTripplanByUserId(userId) : ResponseEntity<List<Tripplan>>
+  + getPlanDaysID(planId, dayNumber) : ResponseEntity<?>
+  + createItinerary(req) : ResponseEntity<?>
+  + getAllSharePlan() : ResponseEntity<?>
+  + updateShare(planId) : ResponseEntity<?>
+  + getUserById(userId) : ResponseEntity<?>
+  + deleteTripplan(planId, userId) : ResponseEntity<?>
+  + deleteTripplanAdmin(planId) : ResponseEntity<?>
+}
+
+class TripPlanLikeController {
+  + toggleLike(planId, userId) : ResponseEntity<?>
+  + checkUserLike(planId, userId) : ResponseEntity<?>
+  + getPopularPlans(limit) : ResponseEntity<List<Tripplan>>
+}
+
+interface PlanCollaborationRepository {
+}
+
+class PlanCollaborationController {
+  + joinPlanEditing(planId, Map<String, payload) : void
+  + leavePlanEditing(planId, Map<String, payload) : void
+  + broadcastChange(planId, event) : void
+  + getCurrentEditors(planId) : List<PlanEditingSession>
+}
+
+class PlanCollaborationService {
+  + startEditingSession(planId, userId, sessionId) : PlanEditingSession
+  + endEditingSession(planId, userId, sessionId) : void
+  + getCurrentEditors(planId) : List<PlanEditingSession>
+  + detectConflict(planId, currentVersion, newData) : ConflictResolution
+  + recordChange(planId, userId, changeType, oldValue, newValue) : void
+}
+
+interface TripService {
+}
+
+interface PlanRepository {
+}
+
+class PlanService {
+  + insert(dto) : int
+  + updatePlan(dto) : int
+  + deleteAllItinerary(planId) : int
+  + makeDaysPlan(dto) : void
+  + getTripplanById(planId) : Tripplan
+  + getPlanDaysId(planId, dayNumber) : int
+  + insertItinerary(req) : int
+  + getTripplanByUserId(userId) : List<Tripplan>
+  + updateShare(planId) : int
+  + getAllSharePlan() : List<Tripplan>
+  + getItineraryByPlanId(planId) : List<ItineraryPlaceResponseDto>
+  + copyTripPlan(req, originalPlanId, newUserId, chatroomid) : int
+  - copyItineraryFromOriginal(originalPlanId, newPlanId) : void
+  + deleteTripplan(planId, userId) : boolean
+  + getAllTripplan() : List<Tripplan>
+  + deleteTripplanAdmin(planId) : boolean
+  + getTripplanByChatroomId(chatroomId) : Tripplan
+}
+
+class TripPlanLikeService {
+  + toggleLike(planId, userId) : boolean
+  + isUserLiked(planId, userId) : boolean
+  + getLikeCount(planId) : int
+  + getTopLikedPlans(limit) : List<Tripplan>
+}
+
+interface TripPlanLikeRepository {
+}
+
+class BasicPlanDTO {
+  - id : int
+  - destination : String
+  - duration : int
+  - members : int
+  - transport : String
+}
+
+PlanCollaborationController --> PlanCollaborationService : uses
+PlanCollaborationService --> PlanCollaborationRepository : uses
+PlanRepository --> BasicPlanDTO : uses
+PlanRepository --> ItineraryPlaceResponseDto : uses
+PlanService --> BasicPlanDTO : uses
+PlanService --> ItineraryPlaceResponseDto : uses
+PlanService --> PlanRepository : uses
+RestPlanController --> BasicPlanDTO : uses
+RestPlanController --> ItineraryPlaceResponseDto : uses
+RestPlanController --> PlanService : uses
+RestTripController --> TripServiceImpl : uses
+TripPlanLikeController --> TripPlanLikeService : uses
+TripPlanLikeService --> TripPlanLikeRepository : uses
+TripServiceImpl --> TripRepository : uses
+TripServiceImpl --> TripService : uses
+@enduml

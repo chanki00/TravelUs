@@ -1,0 +1,52 @@
+@startuml
+left to right direction
+
+actor Guest
+actor User
+actor Admin
+
+rectangle "Travelus 서비스" {
+  (회원가입) as Register
+  (로그인) as Login
+  (로그아웃) as Logout
+  (마이페이지 조회/수정) as Profile
+  (여행계획 생성) as CreatePlan
+  (여행계획 수정) as UpdatePlan
+  (여행계획 삭제) as DeletePlan
+  (여행계획 공유) as SharePlan
+  (여행계획 상세보기) as ViewPlan
+  (여행계획 좋아요) as LikePlan
+  (여행계획 댓글) as CommentPlan
+  (여행계획 협업 편집) as CollaborativeEdit
+  (여행 인원 모집) as Recruit
+  (동행자 찾기) as FindCompanion
+  (알림 확인) as Notification
+  (관리자 페이지) as AdminPage
+  (회원 관리) as ManageUsers
+  (여행계획 관리) as ManagePlans
+}
+
+Guest --> Register
+Guest --> Login
+Guest --> ViewPlan
+Guest --> SharePlan
+
+User --> Logout
+User --> Profile
+User --> CreatePlan
+User --> UpdatePlan
+User --> DeletePlan
+User --> SharePlan
+User --> ViewPlan
+User --> LikePlan
+User --> CommentPlan
+User --> CollaborativeEdit
+User --> Recruit
+User --> FindCompanion
+User --> Notification
+
+Admin --> AdminPage
+AdminPage --> ManageUsers
+AdminPage --> ManagePlans
+
+@enduml

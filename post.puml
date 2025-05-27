@@ -1,0 +1,61 @@
+@startuml
+
+skinparam classAttributeIconSize 0
+
+class RestPostController {
+  + createRecruitPost(req) : ResponseEntity<?>
+  + getALlRecruitPost() : ResponseEntity<List<Post>>
+  + deleteRecruitPost(postId) : ResponseEntity<?>
+}
+
+interface CommentRepository {
+}
+
+interface PostRepository {
+}
+
+class InsertCommentDTO {
+  - planId : int
+  - userId : int
+  - content : String
+}
+
+class PostServiceImpl {
+  + createRecruitPost(req) : int
+  + getALlRecruitPost() : List<Post>
+  + deleteRecruitPost(postId) : int
+}
+
+interface PostService {
+}
+
+class CommentController {
+  + getCommentbyPlanId(planId) : ResponseEntity<?>
+  + createComment(req) : ResponseEntity<?>
+  + updateComment(commentId, req) : ResponseEntity<?>
+  + deleteComment(commentId) : ResponseEntity<Void>
+}
+
+class CommentService {
+  + getCommentbyPlanId(planId) : List<Comment>
+  + createComment(req) : int
+  + updateComment(commentId, string) : int
+  + deleteComment(commentId) : int
+}
+
+class UpdateCommentDTO {
+  - content : String
+}
+
+CommentController --> CommentService : uses
+CommentController --> InsertCommentDTO : uses
+CommentController --> UpdateCommentDTO : uses
+CommentRepository --> InsertCommentDTO : uses
+CommentRepository --> UpdateCommentDTO : uses
+CommentService --> CommentRepository : uses
+CommentService --> InsertCommentDTO : uses
+CommentService --> UpdateCommentDTO : uses
+PostServiceImpl --> PostRepository : uses
+PostServiceImpl --> PostService : uses
+RestPostController --> PostServiceImpl : uses
+@enduml

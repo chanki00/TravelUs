@@ -1,0 +1,281 @@
+@startuml
+!define Table(name,desc) class name as "desc" << (T,#FFAAAA) >>
+hide methods
+hide stereotypes
+
+' 주요 테이블 정의
+Table(sidos, "sidos") {
+  +no : int <<PK>>
+  sido_code : int <<UQ>>
+  sido_name : varchar(20)
+}
+
+Table(guguns, "guguns") {
+  +no : int <<PK>>
+  sido_code : int
+  gugun_code : int
+  gugun_name : varchar(20)
+}
+
+Table(contenttypes, "contenttypes") {
+  +content_type_id : int <<PK>>
+  content_type_name : varchar(45)
+}
+
+Table(attractions, "attractions") {
+  +no : int <<PK>>
+  content_id : int
+  title : varchar(500)
+  content_type_id : int
+  area_code : int
+  si_gun_gu_code : int
+  first_image1 : varchar(100)
+  first_image2 : varchar(100)
+  map_level : int
+  latitude : decimal(20,17)
+  longitude : decimal(20,17)
+  tel : varchar(20)
+  addr1 : varchar(100)
+  addr2 : varchar(100)
+  homepage : varchar(1000)
+  overview : varchar(10000)
+}
+
+Table(users, "users") {
+  +id : int <<PK>>
+  user_id : varchar(50) <<UQ>>
+  user_pw : varchar(255)
+  user_email : varchar(100) <<UQ>>
+  name : varchar(50)
+  age : varchar(10)
+  gender : enum
+  address : varchar(100)
+  intro : text
+  role : enum
+  allow_invite : boolean
+  created_at : datetime
+}
+
+Table(refresh_token, "refresh_token") {
+  +username : varchar(255) <<PK>>
+  token : text
+  created_at : timestamp
+}
+
+Table(chatroom, "chatroom") {
+  +room_id : int <<PK>>
+  is_temporary : boolean
+  created_at : datetime
+}
+
+Table(chatroom_users, "chatroom_users") {
+  +chatroom_id : int <<PK>>
+  +user_id : int <<PK>>
+}
+
+Table(chat, "chat") {
+  +chatroom_id : int <<PK>>
+  +chat_id : int <<PK>>
+  user_id : int
+  content : varchar(255)
+  created_at : timestamp
+}
+
+Table(tags, "tags") {
+  +id : int <<PK>>
+  name : varchar(50)
+  type : enum
+}
+
+Table(usertags, "usertags") {
+  +user_id : int <<PK>>
+  +tag_id : int <<PK>>
+}
+
+Table(tripplans, "tripplans") {
+  +id : int <<PK>>
+  user_id : int
+  chatroom_id : int <<UQ>>
+  title : varchar(100)
+  description : text
+  destination : varchar(100)
+  duration : int
+  members : int
+  transport : varchar(50)
+  likes : int
+  shares : int
+  created_at : datetime
+  updated_at : datetime
+  is_shared : boolean
+  image : varchar(100)
+  version : int
+  last_editor_id : int
+  editing_started_at : datetime
+  is_being_edited : boolean
+}
+
+Table(triplantags, "tripplantags") {
+  +plan_id : int <<PK>>
+  +tag_id : int <<PK>>
+}
+
+Table(tripplanday, "tripplanday") {
+  +id : int <<PK>>
+  plan_id : int
+  day_number : int
+  date : date
+  version : int
+  last_modified_by : int
+  last_modified_at : datetime
+}
+
+Table(tripplanplaces, "tripplanplaces") {
+  +id : int <<PK>>
+  day_id : int
+  attraction_id : int
+  place_order : int
+  memo : text
+  version : int
+  last_modified_by : int
+  last_modified_at : datetime
+}
+
+Table(posts, "posts") {
+  +id : int <<PK>>
+  plan_id : int
+  chatroom_id : int
+  user_id : int
+  start_date : date
+  end_date : date
+  title : varchar(100)
+  content : text
+  current_members : int
+  created_at : datetime
+  updated_at : datetime
+  personalityTags : text
+}
+
+Table(comments, "comments") {
+  +id : int <<PK>>
+  post_id : int
+  user_id : int
+  content : text
+  created_at : datetime
+  updated_at : datetime
+}
+
+Table(tripcompanions, "tripcompanions") {
+  +plan_id : int <<PK>>
+  +user_id : int <<PK>>
+  status : enum
+}
+
+Table(notices, "notices") {
+  +id : int <<PK>>
+  title : varchar(100)
+  content : text
+  created_at : datetime
+}
+
+Table(inquiries, "inquiries") {
+  +id : int <<PK>>
+  user_id : int
+  title : varchar(100)
+  content : text
+  reply : text
+  created_at : datetime
+}
+
+Table(tripplanlikes, "tripplanlikes") {
+  +id : int <<PK>>
+  plan_id : int
+  user_id : int
+  created_at : datetime
+}
+
+Table(chat_invite, "chat_invite") {
+  +id : int <<PK>>
+  chatroom_id : int
+  inviter_id : int
+  invitee_id : int
+  status : varchar(10)
+  type : enum
+  created_at : timestamp
+}
+
+Table(planchangehistory, "planchangehistory") {
+  +id : int <<PK>>
+  plan_id : int
+  user_id : int
+  change_type : enum
+  old_value : text
+  new_value : text
+  day_number : int
+  item_index : int
+  created_at : datetime
+}
+
+Table(planeditingsessions, "planeditingsessions") {
+  +id : int <<PK>>
+  plan_id : int
+  user_id : int
+  session_id : varchar(255)
+  started_at : datetime
+  last_activity : datetime
+  is_active : boolean
+}
+
+' 관계 정의
+guguns::sido_code --> sidos::sido_code
+attractions::area_code --> sidos::sido_code
+attractions::si_gun_gu_code --> guguns::gugun_code
+attractions::content_type_id --> contenttypes::content_type_id
+
+chatroom_users::chatroom_id --> chatroom::room_id
+chatroom_users::user_id --> users::id
+chat::chatroom_id --> chatroom::room_id
+chat::user_id --> users::id
+
+usertags::user_id --> users::id
+usertags::tag_id --> tags::id
+
+tripplans::user_id --> users::id
+tripplans::chatroom_id --> chatroom::room_id
+tripplans::last_editor_id --> users::id
+
+triplantags::plan_id --> tripplans::id
+triplantags::tag_id --> tags::id
+
+tripplanday::plan_id --> tripplans::id
+tripplanday::last_modified_by --> users::id
+
+tripplanplaces::day_id --> tripplanday::id
+tripplanplaces::attraction_id --> attractions::no
+tripplanplaces::last_modified_by --> users::id
+
+posts::plan_id --> tripplans::id
+posts::chatroom_id --> chatroom::room_id
+posts::user_id --> users::id
+
+comments::post_id --> posts::id
+comments::user_id --> users::id
+
+tripcompanions::plan_id --> tripplans::id
+tripcompanions::user_id --> users::id
+
+inquiries::user_id --> users::id
+
+tripplanlikes::plan_id --> tripplans::id
+tripplanlikes::user_id --> users::id
+
+chat_invite::chatroom_id --> chatroom::room_id
+chat_invite::inviter_id --> users::id
+chat_invite::invitee_id --> users::id
+
+planchangehistory::plan_id --> tripplans::id
+planchangehistory::user_id --> users::id
+
+planeditingsessions::plan_id --> tripplans::id
+planeditingsessions::user_id --> users::id
+
+@enduml
