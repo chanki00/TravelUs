@@ -6,6 +6,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
+import com.DB_PASSWORD_REDACTED.trip.dto.user.UserDto;
+import com.DB_PASSWORD_REDACTED.trip.dto.user.UserResponseDto;
 import com.DB_PASSWORD_REDACTED.trip.security.jwt.JWTUtil;
 
 import jakarta.servlet.ServletException;

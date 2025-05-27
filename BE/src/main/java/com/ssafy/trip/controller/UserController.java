@@ -8,6 +8,7 @@ import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -135,12 +136,16 @@ public class UserController {
 	}
 	
 	@GetMapping("/me")
-	public ResponseEntity<UserResponseDto> getCurrentUser(Authentication auth) {
-	    CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
+	public ResponseEntity<UserResponseDto> getCurrentUser(@AuthenticationPrincipal CustomUserDetails userDetails) {
 	    UserDto userDto = userDetails.getUser();
-	    UserResponseDto user = new UserResponseDto(userDto.getId(), userDto.getUserId(), 
-				userDto.getUserEmail(), userDto.getName(), userDto.getAge(), userDto.getGender(), 
-				userDto.getAddress(), userDto.getIntro(), userDto.getRole(), userDto.getAllowInvite());
+
+	    UserResponseDto user = new UserResponseDto(
+	        userDto.getId(), userDto.getUserId(), userDto.getUserEmail(),
+	        userDto.getName(), userDto.getAge(), userDto.getGender(),
+	        userDto.getAddress(), userDto.getIntro(),
+	        userDto.getRole(), userDto.getAllowInvite()
+	    );
+
 	    return ResponseEntity.ok(user);
 	}
 	

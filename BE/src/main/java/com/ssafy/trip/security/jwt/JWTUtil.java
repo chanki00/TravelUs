@@ -44,7 +44,8 @@ public class JWTUtil {
     			.signWith(secretKey)
     			.compact();
     }
-
+    
+    
     public boolean isExpired(String token) {
         try {
             Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token);

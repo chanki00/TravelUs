@@ -129,6 +129,7 @@ const login = async () => {
 
 const loginWithNaver = () => {
   window.location.href = 'http://localhost:8080/oauth2/authorization/naver'
+  
 }
 </script>
 

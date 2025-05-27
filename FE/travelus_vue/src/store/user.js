@@ -33,6 +33,28 @@ export const useUserStore = defineStore(
       console.log(loginUser.value.name)
     }
 
+    const fetchUser = async () => {
+      try {
+        const res = await userAi.get('/api/v1/user/me', {
+          withCredentials: true, // ← 쿠키 전송 허용
+        });
+
+        const user = res.data;
+
+        _loginUser.value = user;
+        _isLoggedIn.value = true;
+
+        console.log('유저 정보:', user);
+        console.log('로그인 여부:', _isLoggedIn.value);
+        console.log('유저 이름:', _loginUser.value.name);
+      } catch (e) {
+        console.warn('유저 정보를 가져오지 못했습니다:', e);
+        _loginUser.value = {};
+        _isLoggedIn.value = false;
+      }
+    };
+
+
     const logout = () => {
       _isLoggedIn.value = false
       _loginUser.value = {}
@@ -148,6 +170,7 @@ export const useUserStore = defineStore(
       getUserList,
       userList,
       setAccessToken,
+      fetchUser,
     }
   },
   { persist: { storage: sessionStorage } },

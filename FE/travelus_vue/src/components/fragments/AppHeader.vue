@@ -42,6 +42,7 @@
 import { RouterLink } from 'vue-router'
 import { useUserStore } from '@/store/user'
 import { useRouter } from 'vue-router'
+import { onMounted } from 'vue'
 
 const userStore = useUserStore()
 const router = useRouter()
@@ -51,6 +52,10 @@ const logout = () => {
   userStore.logout()
   router.push('/login')
 }
+
+onMounted(() => {
+  userStore.fetchUser()
+})
 </script>
 
 <style scoped></style>

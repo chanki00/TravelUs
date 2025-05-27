@@ -12,6 +12,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
 import com.DB_PASSWORD_REDACTED.trip.dto.user.UserDto;
+import com.DB_PASSWORD_REDACTED.trip.dto.user.enums.Role;
 import com.DB_PASSWORD_REDACTED.trip.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -49,7 +50,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 		try {
 			user = repo.selectUserByUserid(username);
 
-			System.out.println("유저아이디: " + user.getUserId());
+//			System.out.println("유저아이디: " + user.getUserId());
 
 			if (user == null) {
 				// 신규 회원 등록
@@ -61,7 +62,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 //            user.setAge("0");
 //            user.setGender(Gender.);
 //            user.setAddress("소셜 가입자");
-//            user.setRole(Role.ROLE_USER);
+				user.setRole(Role.USER);
 				user.setAllowInvite(true);
 //				user.setCreatedAt(LocalDateTime.now());
 				repo.insertUser(user);
