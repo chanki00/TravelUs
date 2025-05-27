@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.DB_PASSWORD_REDACTED.trip.dto.BasicPlanDTO;
 import com.DB_PASSWORD_REDACTED.trip.dto.Itinerary;
 import com.DB_PASSWORD_REDACTED.trip.dto.ItineraryPlaceResponseDto;
+import com.DB_PASSWORD_REDACTED.trip.dto.Post;
 import com.DB_PASSWORD_REDACTED.trip.dto.Tripplan;
 import com.DB_PASSWORD_REDACTED.trip.repository.PlanRepository;
 
@@ -80,7 +81,7 @@ public class PlanService {
 		return repo.getItineraryByPlanId(planId);
 	}
 
-	public int copyTripPlan(int originalPlanId, int newUserId, int chatroomid) {
+	public int copyTripPlan(Post req, int originalPlanId, int newUserId, int chatroomid) {
     try {
         // 1. 원본 여행계획 조회
         Tripplan originalPlan = repo.selectTripplanById(originalPlanId);
@@ -97,7 +98,7 @@ public class PlanService {
             originalPlan.getTransport(),
             chatroomid,
             newUserId, // 새로운 사용자 ID
-            originalPlan.getTitle() + " (모집용)",
+            req.getTitle(),
             originalPlan.getDescription(),
             0, // likes 초기화
             0, // shares 초기화

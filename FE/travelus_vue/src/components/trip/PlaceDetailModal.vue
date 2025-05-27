@@ -25,10 +25,10 @@
                   place.contentTypeId == 12 ? '명소' : place.contentTypeId == 32 ? '숙소' : '식당'
                 }}
               </span>
-              <div class="flex items-center text-yellow-500">
+              <!-- <div class="flex items-center text-yellow-500">
                 <star-icon class="h-4 w-4 fill-current" />
                 <span class="ml-1 text-sm">{{ place.rating }}</span>
-              </div>
+              </div> -->
             </div>
 
             <p class="text-gray-700 mb-4">{{ place.overview }}</p>

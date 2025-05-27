@@ -114,10 +114,10 @@
           <div class="flex items-center gap-1">
             <users-icon class="h-4 w-4" />
             <span>
-              {{ post.currentMembers }}/{{ post.max_members }}명
+              {{ post.chatroon_user }}/{{ post.currentMembers }}명
               {{
-                post.currentMembers < post.max_members
-                  ? ` (${post.max_members - post.currentMembers}명 더 모집 중)`
+                post.chatroon_user < post.currentMembers
+                  ? ` (${post.currentMembers - post.chatroon_user}명 더 모집 중)`
                   : ' (모집 완료)'
               }}
             </span>
@@ -160,14 +160,24 @@
         >
           삭제
         </button>
-        <button
-  v-if="userCanRequestJoin"
-  class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-  :disabled="post.currentMembers >= post.max_members"
-  @click="requestToJoin"
->
-  {{ post.currentMembers >= post.max_members ? '모집 완료' : '참여하기' }}
-</button>
+        <!-- 모집 완료 상태: 클릭 불가 -->
+          <button
+            v-if="userCanRequestJoin && post.chatroon_user >= post.currentMembers"
+            class="px-4 py-2 bg-gray-400 text-white rounded-md cursor-not-allowed"
+            disabled
+          >
+            모집 완료
+          </button>
+
+          <!-- 참여 가능 상태: 클릭 가능 -->
+          <button
+            v-else-if="userCanRequestJoin"
+            class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            :disabled="post.currentMembers >= post.max_members"
+            @click="requestToJoin"
+          >
+            참여하기
+          </button>
 
       </div>
     </div>

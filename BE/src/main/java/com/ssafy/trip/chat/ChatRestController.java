@@ -96,4 +96,10 @@ public class ChatRestController {
     	List<Integer> userIds = chatService.getuserIdByChatroomId(chatroomId);
     	return ResponseEntity.ok(userIds);
     }
+    
+    @GetMapping("/usercount/{chatroomId}")
+    public ResponseEntity<?> getCountByChatroomId(@PathVariable int chatroomId){
+    	int count = chatService.getCountByChatroomId(chatroomId);
+    	return ResponseEntity.ok(count);
+    }
 }

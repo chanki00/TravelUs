@@ -68,7 +68,7 @@ public class ChatService {
             // 1. 채팅방 참여
             System.out.println("초대채팅방: " + invite.getChatroomId());
             System.out.println("초대받은유저: " + invite.getInviteeId());
-            repo.insertChatroomUser(invite.getChatroomId(), invite.getInviteeId());
+            repo.insertChatroomUser(invite.getChatroomId(), invite.getInviterId());
 
             // 🔹 여기까지 하면 해당 유저는 자동으로 여행 계획에도 참여한 것으로 간주됨
             // (chatroom_id를 통해 tripplans와 연결 가능하므로)
@@ -107,5 +107,9 @@ public class ChatService {
 
 	public List<Integer> getuserIdByChatroomId(int chatroomId) {
 		return repo.getuserIdByChatroomId(chatroomId);
+	}
+
+	public int getCountByChatroomId(int chatroomId) {
+		return repo.getCountByChatroomId(chatroomId);
 	}
 }

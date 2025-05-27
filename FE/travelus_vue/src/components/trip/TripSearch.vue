@@ -77,8 +77,7 @@
                 <span>{{
                   place.contentTypeId == 12 ? '명소' : place.contentTypeId == 32 ? '숙소' : '식당'
                 }}</span>
-                <span>•</span>
-                <span>★ {{ place.rating }}</span>
+               
               </div>
             </div>
           </div>
