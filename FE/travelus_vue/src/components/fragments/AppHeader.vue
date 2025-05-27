@@ -5,6 +5,9 @@
         <div
           class="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center"
         >
+        <div
+          class="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center"
+        >
           <span class="text-white font-bold text-sm">T</span>
         </div>
         <span class="font-bold text-xl text-blue-600">Travelus</span>
@@ -54,6 +57,10 @@ const logout = () => {
   userStore.logout()
   router.push('/login')
 }
+
+onMounted(() => {
+  userStore.fetchUser()
+})
 </script>
 
 <style scoped></style>

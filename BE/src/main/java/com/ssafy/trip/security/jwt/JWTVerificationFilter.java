@@ -1,9 +1,8 @@
 package com.DB_PASSWORD_REDACTED.trip.security.jwt;
 
-import java.io.IOException;
-
-import org.springframework.security.authentication.AuthenticationManager;
+import java.io.IOException;import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -18,6 +17,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -33,46 +33,44 @@ public class JWTVerificationFilter extends OncePerRequestFilter {
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
 		
-		String accessToken = extractToken(request);
+		String token = resolveToken(request);
 		
-		if (accessToken == null) {
+		if (token == null || jwtUtil.isExpired(token)) {
 			filterChain.doFilter(request, response);
 			return;
 		}
 		
-		try {
-	        if (jwtUtil.isExpired(accessToken)) {
-	            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-	            return;
-	        }
-
-	        Claims claims = jwtUtil.getClaims(accessToken);
-	        UserDetails details = userDetailsService.loadUserByUsername(claims.get("username").toString());
-
-	        UsernamePasswordAuthenticationToken authentication =
-	                new UsernamePasswordAuthenticationToken(details, null, details.getAuthorities());
-
-	        SecurityContextHolder.getContext().setAuthentication(authentication);
-	    } catch (ExpiredJwtException e) {
-	        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-	        return;
-	    } catch (Exception e) {
-	        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-	        return;
-	    }
-	
+		String username = jwtUtil.getUsername(token);
+		String role = jwtUtil.getRole(token);
+		
+		UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+		
+		Authentication auth = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+		
+		SecurityContextHolder.getContext().setAuthentication(auth);
+		
 		filterChain.doFilter(request, response);
 	}
 	
-	private String extractToken(HttpServletRequest request) {
-		String header = request.getHeader("accessToken");
-		if (header != null && header.startsWith("Bearer ")) {
-			return header.substring(7);
-		}
-		
-		return null;
-	}
+	private String resolveToken(HttpServletRequest request) {
+        String token = request.getHeader("accessToken");
+        
+        if (token != null && token.startsWith("Bearer ")) {
+        	return token.substring(7);
+        }
+
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if ("Authorization".equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
+        }
+
+        return null;
+    }
 	
+
 	
 	
 }

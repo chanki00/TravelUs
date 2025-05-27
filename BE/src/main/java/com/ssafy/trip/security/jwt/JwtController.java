@@ -14,6 +14,8 @@ import com.DB_PASSWORD_REDACTED.trip.repository.RefreshRepository;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -43,25 +45,35 @@ public class JwtController {
         }
 
         String role = claims.get("role", String.class);
-        String newAccessToken = jwtUtil.createAccessToken(Map.of("username", username, "role", role));
+        String newAccessToken = jwtUtil.createJwt("accessToken", username, role, 600000L);
 
 
         return ResponseEntity.ok(Map.of("accessToken", newAccessToken));
     }
     
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(@RequestHeader("Refresh-Token") String refreshToken) {
-    	if (refreshToken == null || refreshToken.isEmpty()) {
-    		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "RefreshToken 필요"));
+    public ResponseEntity<?> logout(HttpServletResponse response, @RequestHeader(value="refreshtoken", required = false) String refreshToken) {
+    	if (!(refreshToken == null || refreshToken.isEmpty())) {
+    		Claims claims = jwtUtil.getClaims(refreshToken);
+    		String username = (String) claims.get("username");
+    		if (username == null) {
+    			throw new JwtException("username이 없습니다.");
+    		}
+    		
+    		repo.deleteToken(username);
     	}
     	
-    	Map<String, Object> claims = jwtUtil.getClaims(refreshToken);
-    	String username = (String) claims.get("username");
-    	if (username == null) {
-    		throw new JwtException("username이 없습니다.");
-    	}
     	
-    	repo.deleteToken(username);
+        // ✅ accessToken 쿠키 제거
+        Cookie cookie = new Cookie("Authorization", null);
+        cookie.setHttpOnly(true); // 기존과 동일하게 설정
+        cookie.setPath("/");
+        cookie.setMaxAge(0); // 쿠키 만료
+        cookie.setSecure(false);
+        
+        System.out.println("쿠키 제거됨");
+        
+        response.addCookie(cookie);
     	
     	return ResponseEntity.ok("로그아웃 완료");
     }

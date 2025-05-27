@@ -1,6 +1,7 @@
 package com.DB_PASSWORD_REDACTED.trip.security.jwt;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.Map;
 
@@ -33,6 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
+
 	private final AuthenticationManager authenticationManager;
 	private final JWTUtil jwtUtil;
 	private final RefreshRepository repo;
@@ -41,8 +43,8 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) {
 
 		UsernamePasswordAuthenticationToken authToken = null;
-
 		ObjectMapper mapper = new ObjectMapper();
+
 		try {
 			LoginDto login = mapper.readValue(request.getInputStream(), LoginDto.class);
 
@@ -60,60 +62,48 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 	protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
 			Authentication authentication) throws IOException, ServletException {
 
-		System.out.println("로그인 성공");
+		CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
 
-		CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
-		String username = customUserDetails.getUsername();
-		Collection<? extends GrantedAuthority> authorities = customUserDetails.getAuthorities();
+		UserDto userDto = userDetails.getUser();
+		UserResponseDto user = new UserResponseDto(userDto.getId(), userDto.getUserId(), 
+				userDto.getUserEmail(), userDto.getName(), userDto.getAge(), userDto.getGender(), 
+				userDto.getAddress(), userDto.getIntro(), userDto.getRole(), userDto.getAllowInvite());
+				
+				
+		String accessToken = jwtUtil.createJwt("accessToken", user.getUserId(), user.getRole().name(), 60 * 60 * 1000L);
+		String refreshToken = jwtUtil.createJwt("refreshToken", user.getUserId(), user.getRole().name(),
+				24 * 60 * 60 * 1000L);
 
-		String role = new String();
-		for (GrantedAuthority grantedAuthority : authorities) {
-			role = grantedAuthority.getAuthority();
-		}
+		repo.saveToken(new RefreshToken(user.getUserId(), refreshToken));
+		
+		Cookie accessCookie = new Cookie("Authorization", accessToken);
+	    accessCookie.setHttpOnly(true);
+	    accessCookie.setPath("/");
+	    accessCookie.setMaxAge(60 * 60);
+	    response.addCookie(accessCookie);
 
-		// AccessToken, RefreshToken
-		String accessToken = jwtUtil.createAccessToken(Map.of("username", username, "role", role));
-		String refreshToken = jwtUtil.createRefreshToken(Map.of("username", username));
-
-		repo.saveToken(new RefreshToken(username, refreshToken));
-
-		// ------------------------------
-		UserDto user = customUserDetails.getUser();
-		UserResponseDto userResponse = new UserResponseDto(user.getId(), user.getUserId(), user.getUserEmail(),
-				user.getName(), user.getAge(), user.getGender(), user.getAddress(), user.getIntro(), user.getRole(),
-				user.getAllowInvite());
-
-		// 응답 헤더 설정 (선택 사항)
-		response.setHeader("accessToken", accessToken);
-		response.setHeader("refreshToken", refreshToken);
-		response.addCookie(createCookie("refreshToken", refreshToken));
-
-		// 응답 본문에 JSON으로 토큰 전달
+		Map<String, Object> tokenMap = Map.of("accessToken", accessToken, "refreshToken", refreshToken, "user", user);
+		String json = new ObjectMapper().writeValueAsString(tokenMap);
 		response.setContentType("application/json");
-		response.setCharacterEncoding("UTF-8");
+		response.getWriter().write(json);
 
-		Map<String, Object> responseBody = Map.of("accessToken", accessToken, "refreshToken", refreshToken, "user",
-				userResponse);
-
-		ObjectMapper objectMapper = new ObjectMapper();
-		response.getWriter().write(objectMapper.writeValueAsString(responseBody));
-
-	}
-
-	private Cookie createCookie(String key, String refreshToken) {
-		Cookie cookie = new Cookie(key, refreshToken);
-		cookie.setMaxAge(24 * 60 * 60);
-		// cookie.setSecure(true);
-		// cookie.setPath("/");
-		cookie.setHttpOnly(true);
-		return cookie;
 	}
 
 	@Override
 	protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
 			AuthenticationException failed) throws IOException, ServletException {
-		System.out.println("login 실패");
-		response.setStatus(401);
+
+		log.warn("로그인 실패: {}", failed.getMessage());
+
+		response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+		response.setContentType("application/json");
+
+		Map<String, String> error = Map.of("message", "아이디 또는 비밀번호가 올바르지 않습니다.");
+		String json = new ObjectMapper().writeValueAsString(error);
+
+		PrintWriter out = response.getWriter();
+		out.print(json);
+		out.flush();
 	}
 
 }
