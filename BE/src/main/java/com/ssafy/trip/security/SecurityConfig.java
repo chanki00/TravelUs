@@ -88,11 +88,13 @@ public class SecurityConfig {
             JWTVerificationFilter jwtVerifyFilter)
             throws Exception {
 		
-    	http.securityMatcher("/api/**", "/oauth2/**", "/login/oauth2/**")
+//    	http.securityMatcher("/api/**", "/oauth2/**", "/login/oauth2/**")
+		http
     	.csrf(csrf -> csrf.disable())
     	.sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
     	.formLogin(login -> login.disable())
     	.httpBasic(basic -> basic.disable())
+    	
     	.cors(t -> t.configurationSource(corsConfig))
     	.oauth2Login(oauth -> oauth
     			.userInfoEndpoint(info -> info.userService(oAuth2UserService))
