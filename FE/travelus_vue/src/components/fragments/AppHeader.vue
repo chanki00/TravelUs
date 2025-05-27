@@ -2,7 +2,7 @@
   <header class="bg-base-100 shadow-sm">
     <div class="flex items-center justify-between h-16 px-10">
       <RouterLink to="/" class="flex items-center gap-2">
-        <div class="w-8 h-8 flex items-center justify-center">
+        <div class="w-12 h-12 flex items-center justify-center">
   <img src="/Travelus.png" class="w-full h-full object-contain" />
 </div>
 
