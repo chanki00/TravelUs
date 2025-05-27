@@ -8,9 +8,9 @@ import org.springframework.data.repository.query.Param;
 @Mapper
 public interface ChatInviteRepository {
     void insertInvite(ChatInvite invite);
-    List<ChatInviteResponse> getInvitesByUserId(int userId);
+    List<ChatInviteResponse> getInvitesByUserId(int userId, String type);
     void updateInviteStatus(@Param("id") int id, @Param("status") String status);
     ChatInvite findById(int id);
-    List<ChatInviteResponse> getRequestsByUserId(int userId);
+    List<ChatInviteResponse> getRequestsByUserId(int userId, String type);
 	List<ChatNotificationResponse> getSentRequestsByUserId(int userId);
 }

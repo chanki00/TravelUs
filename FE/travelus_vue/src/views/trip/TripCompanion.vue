@@ -80,10 +80,10 @@
             <label class="block text-sm font-medium text-gray-700 mb-2">나이</label>
             <select v-model="ageFilter" class="w-full px-3 py-2 border border-gray-300 rounded-md">
               <option value="all">전체</option>
-              <option value="20s">20대</option>
-              <option value="30s">30대</option>
-              <option value="40s">40대</option>
-              <option value="50s">50대 이상</option>
+              <option value="20대">20대</option>
+              <option value="30대">30대</option>
+              <option value="40대">40대</option>
+              <option value="50대">50대 이상</option>
             </select>
           </div>
 
@@ -204,7 +204,7 @@
                 <div class="flex items-center gap-1 text-sm text-gray-500">
                   <span>{{ companion.age }}</span>
                   <span>•</span>
-                  <span>{{ convertGender(companion.gender) }}</span>
+                  <span>{{ companion.gender }}</span>
                   <span>•</span>
                   <span>{{ companion.address }}</span>
                 </div>
@@ -256,14 +256,13 @@
                   초대하기
                 </button>
                 <!-- v-for 바깥에 단 하나의 모달 -->
-<InvitePlanModal
-  :show="showInviteModal"
-  :plans="myPlans"
-  :invitee-id="selectedInviteeId"
-  @select="inviteToPlan"
-  @close="showInviteModal = false"
-/>
-
+                <InvitePlanModal
+                  :show="showInviteModal"
+                  :plans="myPlans"
+                  :invitee-id="selectedInviteeId"
+                  @select="inviteToPlan"
+                  @close="showInviteModal = false"
+                />
               </div>
             </div>
           </div>
@@ -328,51 +327,50 @@ const currUser = ref(null)
 // 태그 목록
 const personalityTags = [
   '외향적',
-'내향적',
-'계획적인',
-'즉흥적인',
-'느긋한',
-'활동적인',
-'꼼꼼한',
-'유쾌한',
-'조용한',
-'적응력 좋은',
-'사진 좋아함',
-'리더형',
-'서포터형',
-'아침형 인간',
-'저녁형 인간',
-'감성적인',
-'실용적인',
-'호기심 많은',
-'대화 좋아함',
-'긍정적인',
-'차분한',
+  '내향적',
+  '계획적인',
+  '즉흥적인',
+  '느긋한',
+  '활동적인',
+  '꼼꼼한',
+  '유쾌한',
+  '조용한',
+  '적응력 좋은',
+  '사진 좋아함',
+  '리더형',
+  '서포터형',
+  '아침형 인간',
+  '저녁형 인간',
+  '감성적인',
+  '실용적인',
+  '호기심 많은',
+  '대화 좋아함',
+  '긍정적인',
+  '차분한',
 ]
 
 const preferenceTags = [
   '휴양',
-'모험',
-'문화체험',
-'맛집투어',
-'쇼핑',
-'힐링',
-'럭셔리',
-'알뜰여행',
-'자연',
-'도시',
-'해변',
-'산',
-'역사',
-'예술',
-'축제',
-'스포츠',
-'봄',
-'여름',
-'가을',
-'겨울',
-'사계절',
-
+  '모험',
+  '문화체험',
+  '맛집투어',
+  '쇼핑',
+  '힐링',
+  '럭셔리',
+  '알뜰여행',
+  '자연',
+  '도시',
+  '해변',
+  '산',
+  '역사',
+  '예술',
+  '축제',
+  '스포츠',
+  '봄',
+  '여름',
+  '가을',
+  '겨울',
+  '사계절',
 ]
 
 // 필터링된 동행자 목록
@@ -469,19 +467,6 @@ watch(
   },
   { deep: true },
 )
-
-
-
-const convertGender = (code) => {
-  switch (code) {
-    case 'M':
-      return '남성'
-    case 'F':
-      return '여성'
-    default:
-      return '기타'
-  }
-}
 
 const getMatchScoreColor = (score) => {
   if (score >= 80) return 'text-green-600'

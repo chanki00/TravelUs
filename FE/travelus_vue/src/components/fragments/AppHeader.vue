@@ -3,12 +3,10 @@
     <div class="flex items-center justify-between h-16 px-10">
       <RouterLink to="/" class="flex items-center gap-2">
         <div class="w-12 h-12 flex items-center justify-center">
-  <img src="/Travelus.png" class="w-full h-full object-contain" />
-</div>
-
+          <img src="/Travelus.png" class="w-full h-full object-contain" />
+        </div>
 
         <span class="font-bold text-xl text-blue-600">Travelus</span>
-       
       </RouterLink>
 
       <nav class="hidden md:flex gap-4">
@@ -20,7 +18,7 @@
 
       <div class="flex gap-2">
         <template v-if="userStore.isLoggedIn">
-          <NotificationDropdown v-if="userStore.isLoggedIn" />
+          <!-- <NotificationDropdown v-if="userStore.isLoggedIn" /> -->
 
           <RouterLink
             v-if="userStore.loginUser.role === 'ADMIN'"
@@ -46,7 +44,7 @@ import { RouterLink } from 'vue-router'
 import { useUserStore } from '@/store/user'
 import { useRouter } from 'vue-router'
 import NotificationDropdown from '@/components/common/NotificationDropdown.vue'
-import {onMounted} from 'vue'
+import { onMounted } from 'vue'
 const userStore = useUserStore()
 const router = useRouter()
 

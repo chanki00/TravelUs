@@ -52,7 +52,7 @@ public class ChatRestController {
     @GetMapping("/invite/{userId}")
     public ResponseEntity<List<ChatInviteResponse>> getPending(@PathVariable int userId) {
     	System.out.println("유저아이디: " + userId);
-        ResponseEntity<List<ChatInviteResponse>> ok = ResponseEntity.ok(chatService.getPendingInvites(userId));
+        ResponseEntity<List<ChatInviteResponse>> ok = ResponseEntity.ok(chatService.getPendingInvites(userId, "INVITE"));
         System.out.println(ok);
         return ok;
     }
@@ -98,7 +98,7 @@ public class ChatRestController {
  // ChatRestController.java
     @GetMapping("/request/{userId}")
     public ResponseEntity<List<ChatInviteResponse>> getJoinRequests(@PathVariable int userId) {
-        return ResponseEntity.ok(chatService.getJoinRequests(userId));
+        return ResponseEntity.ok(chatService.getJoinRequests(userId, "REQUEST"));
     }
 
     @GetMapping("/user/{chatroomId}")
@@ -113,24 +113,24 @@ public class ChatRestController {
     	return ResponseEntity.ok(count);
     }
     
-    @GetMapping("/notifications/{userId}")
-    public ResponseEntity<Map<String, Object>> getAllNotifications(@PathVariable int userId) {
-        Map<String, Object> notifications = new HashMap<>();
-
-        // 받은 초대 (내가 초대받은 것)
-        List<ChatInviteResponse> receivedInvites = chatService.getPendingInvites(userId);
-
-        // 받은 참여 요청 (내 여행계획에 참여하고 싶다는 요청)
-        List<ChatInviteResponse> receivedRequests = chatService.getJoinRequests(userId);
-
-        // 내가 보낸 요청들의 상태
-        List<ChatNotificationResponse> sentRequests = chatService.getSentRequests(userId);
-
-        notifications.put("receivedInvites", receivedInvites);
-        notifications.put("receivedRequests", receivedRequests);
-        notifications.put("sentRequests", sentRequests);
-        notifications.put("totalCount", receivedInvites.size() + receivedRequests.size());
-
-        return ResponseEntity.ok(notifications);
-    }
+//    @GetMapping("/notifications/{userId}")
+//    public ResponseEntity<Map<String, Object>> getAllNotifications(@PathVariable int userId) {
+//        Map<String, Object> notifications = new HashMap<>();
+//
+//        // 받은 초대 (내가 초대받은 것)
+//        List<ChatInviteResponse> receivedInvites = chatService.getPendingInvites(userId);
+//
+//        // 받은 참여 요청 (내 여행계획에 참여하고 싶다는 요청)
+//        List<ChatInviteResponse> receivedRequests = chatService.getJoinRequests(userId);
+//
+//        // 내가 보낸 요청들의 상태
+////        List<ChatNotificationResponse> sentRequests = chatService.getSentRequests(userId);
+//
+//        notifications.put("receivedInvites", receivedInvites);
+//        notifications.put("receivedRequests", receivedRequests);
+////        notifications.put("sentRequests", sentRequests);
+//        notifications.put("totalCount", receivedInvites.size() + receivedRequests.size());
+//
+//        return ResponseEntity.ok(notifications);
+//    }
 }

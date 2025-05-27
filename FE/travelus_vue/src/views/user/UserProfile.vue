@@ -106,22 +106,17 @@
 
               <div class="space-y-2">
                 <label for="address" class="block text-sm font-medium text-gray-700">지역</label>
-                
-                  <select
-                    id="address"
-                    v-model="editUser.address"
-                    class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-gray-700"
-                  >
-                    <option 
-                      v-for="sido in sidos" 
-                      :key="sido.sidoName" 
-                      :value="sido.sidoName"
-                    >
-                      {{ sido.sidoName }}
-                    </option>
-                    <option value="other">기타</option>
-                  </select>
 
+                <select
+                  id="address"
+                  v-model="editUser.address"
+                  class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-gray-700"
+                >
+                  <option v-for="sido in sidos" :key="sido.sidoName" :value="sido.sidoName">
+                    {{ sido.sidoName }}
+                  </option>
+                  <option value="other">기타</option>
+                </select>
               </div>
 
               <div class="space-y-2">
@@ -510,18 +505,25 @@
               <div v-if="invite.status === 'PENDING'" class="flex gap-2 mt-2">
                 <button
                   class="flex-1 bg-blue-600 text-white text-sm py-1 rounded hover:bg-blue-700"
-                  @click="invite.type === 'INVITE' ? respondToInvite(invite.id, 'ACCEPTED') : respondToJoin(invite.id, 'ACCEPTED')"
+                  @click="
+                    invite.type === 'INVITE'
+                      ? respondToInvite(invite.id, 'ACCEPTED')
+                      : respondToJoin(invite.id, 'ACCEPTED')
+                  "
                 >
                   수락
                 </button>
                 <button
                   class="flex-1 bg-gray-200 text-gray-800 text-sm py-1 rounded hover:bg-gray-300"
-                  @click="invite.type === 'INVITE' ? respondToInvite(invite.id, 'DECLINED') : respondToJoin(invite.id, 'DECLINED')"
+                  @click="
+                    invite.type === 'INVITE'
+                      ? respondToInvite(invite.id, 'DECLINED')
+                      : respondToJoin(invite.id, 'DECLINED')
+                  "
                 >
                   거절
                 </button>
               </div>
-
             </div>
           </div>
         </div>
@@ -543,7 +545,7 @@ const editUser = ref({})
 
 const saveProfile = async () => {
   try {
-    console.log("초대여부", editUser.value.allowInvite)
+    console.log('초대여부', editUser.value.allowInvite)
     userStore.update(editUser)
     await userAi.patch(`/api/v1/user/info/${user.value.id}`, user.value)
     alert('프로필이 저장되었습니다.')
@@ -783,20 +785,18 @@ const respondToJoin = async (inviteId, response) => {
   }
 }
 
-
-
 const requests = ref([])
 
 const fetchRequests = async () => {
   try {
     const res = await api.get(`/api/v1/chat/request/${userStore.loginUser.id}`)
     requests.value = res.data
-    console.log("유저", userStore.loginUser.id)
-    console.log("요청", requests.value)
+    console.log('유저', userStore.loginUser.id)
+    console.log('요청', requests.value)
+    console.log('all', allInvites.value)
   } catch (err) {
     console.error('참가 요청 목록 불러오기 실패', err)
   }
 }
-
 </script>
 <style scoped></style>

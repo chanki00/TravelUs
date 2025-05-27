@@ -53,8 +53,8 @@ public class ChatService {
     }
 
     
-    public List<ChatInviteResponse> getPendingInvites(int userId) {
-        return inviteRpeo.getInvitesByUserId(userId);
+    public List<ChatInviteResponse> getPendingInvites(int userId, String type) {
+        return inviteRpeo.getInvitesByUserId(userId, type);
     }
 
 
@@ -99,8 +99,8 @@ public class ChatService {
 	}
 	
 	// ChatService.java
-	public List<ChatInviteResponse> getJoinRequests(int userId) {
-	    return inviteRpeo.getRequestsByUserId(userId); // type = 'REQUEST'
+	public List<ChatInviteResponse> getJoinRequests(int userId, String type) {
+	    return inviteRpeo.getRequestsByUserId(userId, type); // type = 'REQUEST'
 	}
 
 

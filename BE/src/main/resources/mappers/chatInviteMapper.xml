@@ -67,6 +67,7 @@
   FROM chat_invite ci
   JOIN users u ON ci.inviter_id = u.id
   WHERE ci.invitee_id = #{userId}
+ 	AND ci.type = #{type}
 </select>
 
 <select id="getRequestsByUserId" resultMap="ChatInviteResponseMap">
@@ -82,7 +83,7 @@
   FROM chat_invite ci
   JOIN users u ON ci.inviter_id = u.id
   WHERE ci.invitee_id = #{userId}
-    AND ci.type = 'REQUEST'
+    AND ci.type = #{type}
 </select>
 
 <select id="getSentRequestsByUserId" parameterType="int" resultType="com.DB_PASSWORD_REDACTED.trip.chat.ChatNotificationResponse">

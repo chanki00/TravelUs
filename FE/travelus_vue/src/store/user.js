@@ -38,45 +38,48 @@ export const useUserStore = defineStore(
       try {
         const res = await userAi.get('/api/v1/user/me', {
           withCredentials: true, // ← 쿠키 전송 허용
-        });
+        })
 
-        const user = res.data;
+        const user = res.data
 
-        _loginUser.value = user;
-        _isLoggedIn.value = true;
+        _loginUser.value = user
+        _isLoggedIn.value = true
 
-        console.log('유저 정보:', user);
-        console.log('로그인 여부:', _isLoggedIn.value);
-        console.log('유저 이름:', _loginUser.value.name);
+        console.log('유저 정보:', user)
+        console.log('로그인 여부:', _isLoggedIn.value)
+        console.log('유저 이름:', _loginUser.value.name)
       } catch (e) {
-        console.warn('유저 정보를 가져오지 못했습니다:', e);
-        _loginUser.value = {};
-        _isLoggedIn.value = false;
+        console.warn('유저 정보를 가져오지 못했습니다:', e)
+        _loginUser.value = {}
+        _isLoggedIn.value = false
       }
-    };
-
+    }
 
     const logout = async () => {
       try {
-        const refreshToken = _tokens.value.refreshToken;
-        await userAi.post('/api/auth/logout', {}, {
-          headers: {
-            'refreshtoken': refreshToken
+        const refreshToken = _tokens.value.refreshToken
+        await userAi.post(
+          '/api/auth/logout',
+          {},
+          {
+            headers: {
+              refreshtoken: refreshToken,
+            },
+            withCredentials: true,
           },
-          withCredentials: true
-        });
+        )
 
         // 프론트 상태 정리
-        _isLoggedIn.value = false;
-        _loginUser.value = {};
-        _tokens.value = {};
+        _isLoggedIn.value = false
+        _loginUser.value = {}
+        _tokens.value = {}
 
         // (HttpOnly가 아니라면) accessToken 수동 삭제
-        Cookies.remove('Authorization', { path: '/' });
+        Cookies.remove('Authorization', { path: '/' })
 
-        console.log('로그아웃 완료');
+        console.log('로그아웃 완료')
       } catch (e) {
-        console.error('로그아웃 실패:', e);
+        console.error('로그아웃 실패:', e)
       }
     }
 
@@ -106,6 +109,7 @@ export const useUserStore = defineStore(
 
             // ✅ 성별 변환
             const convertGender = (code) => {
+              console.log('성별', code)
               switch (code) {
                 case 'M':
                   return '남성'
@@ -134,15 +138,10 @@ export const useUserStore = defineStore(
 
             // ✅ 주소 변환
             const convertAddress = (addr) => {
-              switch (addr) {
-                case '서울':
-                case '부산':
-                case '인천':
-                case '대구':
-                  return addr
-                default:
-                  return '기타'
+              if (addr === 'other') {
+                return '기타'
               }
+              return addr
             }
 
             return {

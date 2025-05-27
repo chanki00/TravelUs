@@ -10,7 +10,7 @@
         <div class="max-w-7xl mx-auto">
           <div class="flex items-center gap-2 mb-2">
             <span class="px-2 py-1 bg-white/20 backdrop-blur-sm rounded-full text-sm">{{
-              getSidoName(Number(tripDetails.location)) 
+              getSidoName(Number(tripDetails.location))
             }}</span>
             <span class="px-2 py-1 bg-white/20 backdrop-blur-sm rounded-full text-sm"
               >{{ tripDetails.duration }}박 {{ tripDetails.duration + 1 }}일</span
@@ -142,14 +142,18 @@
           <!-- 댓글 섹션 -->
           <div class="mt-8">
             <h3 class="text-xl font-medium mb-4">댓글 ({{ comments.length }})</h3>
-            
+
             <!-- 댓글 작성 폼 -->
             <div class="bg-white rounded-lg border shadow-sm overflow-hidden mb-6">
               <div class="p-6">
                 <div v-if="user && user.id">
                   <div class="flex items-start gap-3">
-                    <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                      <span class="text-blue-600 font-medium">{{ user.name ? user.name.charAt(0) : 'U' }}</span>
+                    <div
+                      class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0"
+                    >
+                      <span class="text-blue-600 font-medium">{{
+                        user.name ? user.name.charAt(0) : 'U'
+                      }}</span>
                     </div>
                     <div class="flex-1">
                       <textarea
@@ -163,7 +167,9 @@
                         <span class="text-sm text-gray-500">{{ newComment.length }}/500</span>
                         <button
                           @click="submitComment"
-                          :disabled="!newComment.trim() || newComment.length > 500 || isCommentSubmitting"
+                          :disabled="
+                            !newComment.trim() || newComment.length > 500 || isCommentSubmitting
+                          "
                           class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
                         >
                           {{ isCommentSubmitting ? '작성 중...' : '댓글 작성' }}
@@ -187,10 +193,12 @@
             <!-- 댓글 목록 -->
             <div class="space-y-4">
               <div v-if="isCommentsLoading" class="text-center py-8">
-                <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                <div
+                  class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"
+                ></div>
                 <p class="mt-2 text-gray-500">댓글을 불러오는 중...</p>
               </div>
-              
+
               <div v-else-if="comments.length === 0" class="text-center py-8">
                 <p class="text-gray-500">아직 댓글이 없습니다.</p>
                 <p class="text-sm text-gray-400 mt-1">첫 번째 댓글을 작성해보세요!</p>
@@ -204,24 +212,33 @@
               >
                 <div class="p-4">
                   <div class="flex items-start gap-3">
-                    <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+                    <div
+                      class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0"
+                    >
                       <span class="text-gray-600 font-medium">
                         {{ comment.authorId ? comment.authorId : 'U' }}
                       </span>
                     </div>
                     <div class="flex-1">
                       <div class="flex items-center gap-2 mb-2">
-                        <span class="font-medium text-gray-900">{{ comment.authorName || '익명' }}</span>
-                        <span class="text-sm text-gray-500">{{ formatDate(comment.createdAt) }}</span>
-                        <span v-if="comment.createdAt !== comment.updatedAt" class="text-xs text-gray-400">
+                        <span class="font-medium text-gray-900">{{
+                          comment.authorName || '익명'
+                        }}</span>
+                        <span class="text-sm text-gray-500">{{
+                          formatDate(comment.createdAt)
+                        }}</span>
+                        <span
+                          v-if="comment.createdAt !== comment.updatedAt"
+                          class="text-xs text-gray-400"
+                        >
                           (수정됨)
                         </span>
                       </div>
-                      
+
                       <!-- 댓글 내용 표시/수정 -->
                       <div v-if="editingCommentId !== comment.id">
                         <p class="text-gray-700 whitespace-pre-wrap">{{ comment.content }}</p>
-                        
+
                         <!-- 댓글 작성자만 수정/삭제 버튼 표시 -->
                         <div v-if="user && user.id === comment.userId" class="flex gap-2 mt-3">
                           <button
@@ -239,7 +256,7 @@
                           </button>
                         </div>
                       </div>
-                      
+
                       <!-- 댓글 수정 폼 -->
                       <div v-else>
                         <textarea
@@ -249,7 +266,9 @@
                           :disabled="isCommentUpdating"
                         ></textarea>
                         <div class="flex justify-between items-center mt-3">
-                          <span class="text-sm text-gray-500">{{ editCommentContent.length }}/500</span>
+                          <span class="text-sm text-gray-500"
+                            >{{ editCommentContent.length }}/500</span
+                          >
                           <div class="flex gap-2">
                             <button
                               @click="cancelEditComment"
@@ -260,7 +279,11 @@
                             </button>
                             <button
                               @click="updateComment(comment.id)"
-                              :disabled="!editCommentContent.trim() || editCommentContent.length > 500 || isCommentUpdating"
+                              :disabled="
+                                !editCommentContent.trim() ||
+                                editCommentContent.length > 500 ||
+                                isCommentUpdating
+                              "
                               class="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
                             >
                               {{ isCommentUpdating ? '수정 중...' : '수정 완료' }}
@@ -357,6 +380,7 @@ import {
 import { useUserStore } from '@/store/user'
 import TripPlannerMap from '@/components/trip/TripPlannerMap.vue'
 import api from '@/api'
+import { userAi } from '@/axios'
 
 const userStore = useUserStore()
 const user = computed(() => userStore.loginUser)
@@ -421,7 +445,7 @@ const fetchComments = async () => {
           authorName: userResponse.data?.name || 'Unknown',
           authorId: userResponse.data?.userId || 'unknown',
         }
-      })
+      }),
     )
 
     comments.value = enrichedComment
@@ -453,7 +477,7 @@ const submitComment = async () => {
     const response = await api.post('/api/v1/comment', {
       planId: parseInt(route.params.id),
       userId: user.value.id,
-      content: newComment.value.trim()
+      content: newComment.value.trim(),
     })
 
     if (response.data) {
@@ -464,7 +488,7 @@ const submitComment = async () => {
         userId: user.value.id,
         userName: user.value.name,
         createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        updatedAt: new Date().toISOString(),
       }
       comments.value.unshift(newCommentData)
       newComment.value = ''
@@ -502,12 +526,12 @@ const updateComment = async (commentId) => {
   isCommentUpdating.value = true
   try {
     const response = await api.put(`/api/v1/comment/${commentId}`, {
-      content: editCommentContent.value.trim()
+      content: editCommentContent.value.trim(),
     })
 
     if (response.data) {
       // 댓글 목록에서 해당 댓글 업데이트
-      const commentIndex = comments.value.findIndex(c => c.id === commentId)
+      const commentIndex = comments.value.findIndex((c) => c.id === commentId)
       if (commentIndex !== -1) {
         comments.value[commentIndex].content = editCommentContent.value.trim()
         comments.value[commentIndex].updatedAt = new Date().toISOString()
@@ -530,9 +554,9 @@ const deleteComment = async (commentId) => {
   isDeletingComment.value = true
   try {
     await api.delete(`/api/v1/comment/${commentId}`)
-    
+
     // 댓글 목록에서 제거
-    comments.value = comments.value.filter(c => c.id !== commentId)
+    comments.value = comments.value.filter((c) => c.id !== commentId)
   } catch (error) {
     console.error('댓글 삭제 실패:', error)
     alert('댓글 삭제에 실패했습니다.')
@@ -545,20 +569,20 @@ const formatDate = (dateString) => {
   const date = new Date(dateString)
   const now = new Date()
   const diffInMinutes = Math.floor((now - date) / (1000 * 60))
-  
+
   if (diffInMinutes < 1) return '방금 전'
   if (diffInMinutes < 60) return `${diffInMinutes}분 전`
-  
+
   const diffInHours = Math.floor(diffInMinutes / 60)
   if (diffInHours < 24) return `${diffInHours}시간 전`
-  
+
   const diffInDays = Math.floor(diffInHours / 24)
   if (diffInDays < 7) return `${diffInDays}일 전`
-  
+
   return date.toLocaleDateString('ko-KR', {
     year: 'numeric',
     month: 'long',
-    day: 'numeric'
+    day: 'numeric',
   })
 }
 
@@ -688,7 +712,8 @@ const copyToMyPlanner = async () => {
         },
       })),
     }))
-
+    const res = await userAi.post('/api/v1/chat') // 🔹 채팅방 생성
+    const chatroomId_res = res.data
     const planData = {
       destination: tripDetails.value.location,
       duration: tripDetails.value.duration,
@@ -698,6 +723,7 @@ const copyToMyPlanner = async () => {
       description: tripDetails.value.description,
       itinerary: JSON.stringify(convertedItinerary),
       tags: JSON.stringify(tripDetails.value.travelTags),
+      chatroomId: chatroomId_res,
     }
 
     const queryString = new URLSearchParams(planData).toString()
@@ -806,7 +832,6 @@ onMounted(async () => {
   await fetchSidos()
   await fetchComments() // 댓글 로드 추가
 })
-
 
 watch(
   () => route.params.id,

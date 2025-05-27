@@ -1,5 +1,4 @@
 <template>
-
   <div class="font-bmjua">
     <AppHeader />
     <!-- <UserLogin /> -->
@@ -13,7 +12,7 @@
 </template>
 
 <script setup>
-import {RouterView} from "vue-router"
+import { RouterView } from 'vue-router'
 import AppHeader from './components/fragments/AppHeader.vue'
 // import TripAiPlan from './views/trip/TripAiPlan.vue'
 // import UserLogin from './components/user/UserLogin.vue'
@@ -25,3 +24,5 @@ import AppHeader from './components/fragments/AppHeader.vue'
 <style scoped>
 @import './assets/main.css';
 </style>
+
+<!-- body { font-family: 'BMJUA', 'Noto Sans KR', 'Malgun Gothic', sans-serif; } -->
